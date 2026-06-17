@@ -1,0 +1,153 @@
+HP / Agilent 3458A REV9 firmware osszeallitasi es feltarasi terv
+
+Kiindulasi adatok
+- CPU: MC68HC000PB / Motorola 68000 csalad, big-endian vegrehajtasi modell.
+- Feltoltott REV9 fajlok: U110...U115, mindegyik 65536 byte.
+- Feltoltott REV7 referencia: 6 darabos U110...U115 es egy darabos 512 KiB image.
+- A REV7 referencia alapjan a 6 darabos image helyes osszefuzese ellenorizheto volt.
+
+Osszeillesztesi eredmeny
+- U110 + U111 -> ROM bank 0, byte-interleave.
+- U112 + U113 -> ROM bank 1, byte-interleave.
+- U114 + U115 -> ROM bank 2, byte-interleave.
+- Bankok sorrendje: bank0, bank1, bank2.
+- Aktiv tartalom merete: 3 x 128 KiB = 384 KiB.
+- 512 KiB egyfajlos formatumhoz a fennmarado 128 KiB 0xFF padding.
+- REV7 ellenorzes: 6 darabbol osszerakott 384 KiB == egyfajlos REV7 elso 384 KiB: True.
+- REV7 egyfajlos maradek 128 KiB csak 0xFF: True.
+
+Melyik fajl mire valo?
+- HP3458A_REV9_interleaved_raw_384K_from_U110-U115.bin: a hat REV9 EPROM aktiv 384 KiB-os, paronkent osszefuzott tartalma. Ez felel meg leginkabb az adott 6 EPROM-os hardver aktiv ROM-teruletenek.
+- HP3458A_REV9_interleaved_raw_512K_padded_FF.bin: ugyanaz, de 512 KiB-ra 0xFF-fel kitoltve. Ez a REV7 egyfajlos referenciahoz hasonlo formatum.
+- HP3458A_REV9_cpu_order_384K_for_Ghidra.bin: 16 bites byte-swappelt, 68000 disassemblyhez ajanlott aktiv image.
+- HP3458A_REV9_cpu_order_512K_for_Ghidra_padded_FF.bin: disassemblyhez swappelt, 512 KiB-ra padolt valtozat.
+- Bank fajlok: bankonkenti 128 KiB raw es CPU-order valtozatok, ha kulon ROM bankokat akarsz vizsgalni.
+
+Fontos byte-sorrend
+- A fizikai/programozo szerinti interleave image onmagaban meg nem a legjobb disassemblyhez.
+- MC68HC000/68000 big-endian CPU elemzeshez 16 bites byte-swap kell az interleavelt image-en.
+- Ghidra/IDA elemzeshez ezt hasznald: HP3458A_REV9_cpu_order_384K_for_Ghidra.bin
+- 512 KiB padded valtozatot akkor hasznald, ha egy M27C4002-szeru egyfajlos/programozo-formatum kell.
+
+Reset vector a REV9 CPU-order image elejen
+- Initial SP: 0x0001897E
+- Reset PC:  0x00000808
+- Javasolt Ghidra import: Motorola 68000, big-endian, base address 0x000000, entry/reset PC 0x00000808.
+
+Letrehozott fajlok es SHA256
+- HP3458A_REV9_interleaved_raw_384K_from_U110-U115.bin
+  Meret: 393216 byte
+  SHA256: be10b76df151fa6f4fea7682e7a1d6a33adf68123da018d89f675dbf134652d1
+- HP3458A_REV9_interleaved_raw_512K_padded_FF.bin
+  Meret: 524288 byte
+  SHA256: 05ba9e96d8a06dd977b59c5cb3dd7d3abf438732e2021f5dc1e7d7169bc24eea
+- HP3458A_REV9_cpu_order_384K_for_Ghidra.bin
+  Meret: 393216 byte
+  SHA256: 98ae54efe22a0a4eb9c581956bbc2d839481a480600f7d58a39fdb78d73876d7
+- HP3458A_REV9_cpu_order_512K_for_Ghidra_padded_FF.bin
+  Meret: 524288 byte
+  SHA256: 7a9cfc6a280734ff3e09f56bf7786efb62b010f7bd12a39f7dc7d22de55a5634
+- HP3458A_REV9_bank0_U110-U111_raw_128K.bin
+  Meret: 131072 byte
+  SHA256: 87fb147975268293ec513d80cf047ebf3bb815ce85728907d8c66add9b3334d9
+- HP3458A_REV9_bank0_U110-U111_cpu_order_128K.bin
+  Meret: 131072 byte
+  SHA256: cd60e4ddd251b92429fd3dec7cd5e8c3e8566d364f203de214682f71515e4e5c
+- HP3458A_REV9_bank1_U112-U113_raw_128K.bin
+  Meret: 131072 byte
+  SHA256: eaff4f57c2aafca5119d60dfaa87179a518336df323370025e3f233a485230cf
+- HP3458A_REV9_bank1_U112-U113_cpu_order_128K.bin
+  Meret: 131072 byte
+  SHA256: 784a9d52f2f7120738aae84dc6dfc9b385c5204aa511c0c485582336e7ac774e
+- HP3458A_REV9_bank2_U114-U115_raw_128K.bin
+  Meret: 131072 byte
+  SHA256: 5ef14025ce4b4dff7ef9b48981bd4af769be7be6ed75a08083c34718b8431790
+- HP3458A_REV9_bank2_U114-U115_cpu_order_128K.bin
+  Meret: 131072 byte
+  SHA256: fc2e7888ca07bc5c7333487248106f6806263b3c1dbbb15e2a1e044ebceac0ae
+
+Fontos talalatok a REV9 CPU-order image-ben
+- HP3458A: 0x000554
+- MREAD: 0x00A42A
+- MWRITE: 0x00A442
+- MADDR: 0x00A45A
+- CALLARRAY: 0x00A48A
+- CAL?: 0x008C5A
+- CALNUM?: 0x008C8A
+- CALSTR: 0x008CA2, 0x009572, 0x04B57A
+- REV?: 0x0091E2
+- NONVOLATILE RAM: 0x002886, 0x002CC0, 0x002CD6, 0x002CF2
+- CAL RAM WRITE: 0x002D88, 0x002DA8
+- CAL RAM WRITE OR PROTECT: 0x002D88
+- ROM 0 HI CHK: 0x000C60
+- ROM 0 LO CHK: 0x000C6F
+- OPTIONAL RAM: 0x002D0C, 0x002D20, 0x002D3A, 0x002D54, 0x002D6E
+- ERROR: 0x001DFB, 0x00224F, 0x002539, 0x00258A, 0x002638, 0x00275B, 0x002ECA, 0x003CAF
+- SECURE: 0x00928A, 0x05ADD2, 0x05D464
+- PROTECT: 0x002D99
+
+String-kornyezeti hex mintak
+- MREAD @ 0x00A42A: 4d 52 45 41 44 00 00 00 00 00 01 85 00 00 89 ea 00 01 7b ba 00 00 00 06 4d 57 52 49 54 45 00 00 00 00 01 86 00 00 89 ea 00 01 7b f6 00 01 00 05 4d 41 44 44 52 00 00 00 00 00 01 87 00 00 89 ea
+- MWRITE @ 0x00A442: 4d 57 52 49 54 45 00 00 00 00 01 86 00 00 89 ea 00 01 7b f6 00 01 00 05 4d 41 44 44 52 00 00 00 00 00 01 87 00 00 89 ea 00 01 7c 8c 00 00 00 03 4a 53 52 00 00 00 00 00 00 00 01 89 00 00 89 ea
+- MADDR @ 0x00A45A: 4d 41 44 44 52 00 00 00 00 00 01 87 00 00 89 ea 00 01 7c 8c 00 00 00 03 4a 53 52 00 00 00 00 00 00 00 01 89 00 00 89 ea 00 01 7c 28 00 01 00 09 43 41 4c 4c 41 52 52 41 59 00 01 8a 00 00 89 ea
+- CALLARRAY @ 0x00A48A: 43 41 4c 4c 41 52 52 41 59 00 01 8a 00 00 89 ea 00 01 7c 58 00 01 00 04 45 43 48 4f 00 00 00 00 00 00 01 8c 00 00 89 ea 00 01 db 86 00 00 00 05 45 43 48 4f 32 00 00 00 00 00 01 8e 00 00 89 ea
+
+Parancs / szerviz iranyu kovetkeztetes
+- A firmware-ben megtalalhatoak a memoria-hozzaferesi parancsokra utalo stringek: MREAD, MWRITE, MADDR.
+- Ez megerositi, hogy a WinGPIB-s CAL/NVRAM dump valoszinuleg a muszer sajat firmware parancsparseren keresztul hivott memoriaolvasasara epul.
+- Kovetkezo reverse engineering cel: MREAD es MWRITE handler rutinok teljes visszafejtese, kulonosen a cimkonverzio, jogosultsag/protect ellenorzes es valaszformatum miatt.
+
+Feladatterv
+1. Archivum es integritas
+   - Minden eredeti U110...U115 fajlt valtozatlanul tarts meg.
+   - Minden uj image-rol SHA256 hash keszuljon.
+   - A muszerben levo chipek helyet fotozd, hogy az U110...U115 pozicio kesobb ne keveredjen.
+
+2. Firmware image eloallitasa
+   - U110/U111, U112/U113, U114/U115 parok byte-interleave.
+   - A 3 bank egymas utan.
+   - Disassemblyhez 16 bites byte-swap.
+   - Programozo/egyfajlos formatumhoz 512 KiB-ra 0xFF padding.
+
+3. Ghidra projekt
+   - Import: HP3458A_REV9_cpu_order_384K_for_Ghidra.bin.
+   - Processor: Motorola 68000 big-endian.
+   - Base: 0x000000.
+   - Reset vector: PC=0x00000808.
+   - Indulj a reset vektortol, majd nevezd el a megtalalt stringeket es parancstablat.
+
+4. Command table feltaras
+   - Keresd: MREAD, MWRITE, MADDR, CALLARRAY, CAL?, CALNUM?, REV?.
+   - A stringek kornyezeteben azonositsd a rekordformatumot: string pointer / handler pointer / flag / parameter informacio.
+   - A gyanus handler cimeket nevezd el: cmd_MREAD, cmd_MWRITE, cmd_MADDR.
+
+5. MREAD/MWRITE funkcionalis visszafejtes
+   - Deritsd ki, hogy a parameter decimalis vagy hex cimet var-e.
+   - Deritsd ki, hogy byte, word vagy long read tortenik-e.
+   - Deritsd ki, hogyan formatumozza a valaszt GPIB-re.
+   - MWRITE esetben eloszor csak statikus elemzes: protect flag, CAL kapcsolo, unlock szekvencia, write-enable vonal. Vak probalgatas tilos.
+
+6. CAL/NVRAM terulet azonositas
+   - MREAD-del csak olvasasi teszt: ismert CAL RAM cimtartomanyok dumpja.
+   - Hasonlitsd ossze a GPIB dumpot a fizikai DS1220/FRAM dumpal.
+   - Endian, szavas/byte-os sorrend, offset es padding validalas.
+   - Minimum 3 egyezo dump kell, mielott barmilyen irasi muveleten gondolkodsz.
+
+7. Differencialis elemzes
+   - Dump alapallapotban.
+   - Egy nem kritikus front-panel setting valtoztatasa, majd uj dump.
+   - Kulonbsegekbol meghatarozhato settings/NVRAM terulet, checksum es counter.
+   - CAL konstansokhoz csak akkor nyulj, ha van teljes fizikai mentes es visszaallithato FRAM/chip.
+
+8. Biztonsagi szabalyok
+   - MREAD biztonsagosabb, MWRITE destruktiv lehet.
+   - Kerulendo ismeretlenul: MWRITE, CAL, STORE, SAVE, INIT, ERASE, FORMAT.
+   - Barmilyen iras elott: fizikai NVRAM backup, GPIB backup, hash, verify, es eredeti chip felreteve.
+
+Mit tudunk most biztosan vagy nagy valoszinuseggel
+- A REV9 hat EPROM-ja a REV7 referencia alapjan osszeallithato.
+- Az aktiv firmware tartalom 384 KiB.
+- Az egyfajlos 512 KiB formatum utolso 128 KiB-ja padding lehet.
+- A CPU-order image reset vektora ertelmes 68000 vektorokat ad.
+- A firmware tartalmaz MREAD/MWRITE/MADDR stringeket, tehat a memoriaolvaso/iro parancsok firmware-szinten jelen vannak.
+- A pontos MWRITE biztonsagi feltetelek es a CAL RAM checksum/logika meg visszafejtesre var.

@@ -1,0 +1,1068 @@
+==============================================================================
+HP3458A REV9 FIRMWARE — ANNOTÁLT 68000 DISASSEMBLY
+Generálva: 2026-06-04  |  Capstone M68K engine
+
+KULCS-MEGÁLLAPÍTÁSOK:
+  1. Handler-cím ek 24-bitesek: 0x00017xxx (flag2 mező = magas 2 byte)
+  2. BEEP 0/1/2: A5+0x13A6 flag -> MREAD engedélyezés/tiltás/bypass
+  3. BEEP 2 = MREAD bypass (security check kihagyva!)
+  4. Minden érték IEEE 754 double deszkriptorban tárolva
+  5. MREAD/MWRITE mindig WORD (2 bájt) hozzáférés
+  6. JSR GPIB-parancs = tetszőleges 68000 kód futtatása GPIB-ből
+  7. pSOS RTOS: TRAP #0 / D7=#24 = I/O csatorna rendszerhívás
+  8. XYZZY -> "I see " (Adventure idézet, 6 karakter GPIB-re)
+  9. Build dátum: Fri Jan 19 1990 @ 0x053E
+==============================================================================
+
+ISMERT CIMEK (LABELS):
+  0x02F96  sprintf_like
+  0x049DE  gpib_output_dispatch
+  0x0761E  mread_output_cleanup
+  0x0763A  mread_main_logic
+  0x07BBA  mread_entry_lowaddr
+  0x07BCC  beep_handler
+  0x07BD6  beep_setflag_path
+  0x07C04  beep2_mread_bypass
+  0x07C1E  beep_mode_dispatch
+  0x07C38  common_unlk_rts
+  0x07C3C  mwrite_exec_lowaddr
+  0x084D4  str_expected_0_2
+  0x084F4  str_OFF
+  0x084FC  str_BEEP_fmt
+  0x08908  timer_delay
+  0x08B20  cmd_table_start
+  0x0A42A  cmd_MREAD_name
+  0x0A442  cmd_MWRITE_name
+  0x17BA0  XYZZY_handler
+  0x17BBA  MREAD_handler
+  0x17BF6  MWRITE_handler
+  0x17C28  JSR_GPIB_handler
+  0x17C58  CALLARRAY_handler
+  0x17C8C  MADDR_handler
+  0x17C9A  maddr_type1
+  0x17CC0  maddr_type2
+  0x17CE6  maddr_type3
+  0x17CF2  maddr_type4
+  0x17D04  maddr_type_dispatch
+  0x17D1E  maddr_encode_and_output
+  0x185C0  xyzzy_string
+  0x188C8  psos_channel_read_type0
+  0x18918  psos_channel_read_type5
+  0x1D8B8  gpib_send_string
+  0x1D8DC  gpib_send_word
+  0x1D900  gpib_send_descriptor
+  0x1DC20  mwrite_write_core
+  0x1F530  gpib_flush
+  0x50958  int_to_decimal_ascii
+  0x52FC4  gpib_send_descriptor2
+  0x58340  ieee754_double_to_int
+  0x583BA  int_to_ieee754_double
+  0x5845A  fp_convert_sub1
+  0x584BE  fp_compare_sub
+  0x585A0  descriptor_to_addr
+  0x585B4  store_descriptor
+  0x5DA0C  beep_hw_driver
+
+RAM OFFSZETEK (A5 bázistól):
+  A5+0x0A48  gpib_output_pending
+  A5+0x0BAE  timer_cal_constant
+  A5+0x0F00  gpib_channel_descriptor
+  A5+0x13A6  beep_mread_enable_flag
+  A5+0x144A  mwrite_protect_flag
+  A5+0x1B02  beep_hw_state
+  A5+0x1DB5  beep_mode_copy
+
+
+==============================================================================
+; MREAD entry (low-addr wrapper) - BEEP/MREAD flag check
+; Address: 0x07BBA  Length: 24 bytes
+==============================================================================
+mread_entry_lowaddr:
+  07BBA  4e560000        link.w     a6, #$0                               
+  07BBE  4a2d13a6        tst.b      $13a6(a5)                               ; [beep_mread_enable_flag]
+  07BC2  6704            beq.b      $7bc8                                   ; => 0x07BC8
+  07BC4  4ebafa74        jsr        $763a(pc)                               ; => mread_main_logic
+  07BC8  4e5e            unlk       a6                                    
+  07BCA  4e75            rts                                              
+  07BCC  4e560000        link.w     a6, #$0                               
+  07BD0  3e2e            move.w     -$5556(a6), d7                        
+
+
+==============================================================================
+; BEEP handler + dispatch (sets A5+0x13A6 = MREAD enable flag)
+; Address: 0x07BCC  Length: 80 bytes
+==============================================================================
+beep_handler:
+  07BCC  4e560000        link.w     a6, #$0                               
+  07BD0  3e2e0008        move.w     $8(a6), d7                            
+  07BD4  6048            bra.b      $7c1e                                   ; => beep_mode_dispatch
+  07BD6  42a7            clr.l      -(a7)                                 
+  07BD8  3f3c0005        move.w     #$5, -(a7)                            
+  07BDC  4eb9000188c8    jsr        $188c8.l                              
+  07BE2  5c8f            addq.l     #$6, a7                               
+  07BE4  302e0008        move.w     $8(a6), d0                            
+  07BE8  1b401db5        move.b     d0, $1db5(a5)                           ; [beep_mode_copy]
+  07BEC  1b4013a6        move.b     d0, $13a6(a5)                           ; [beep_mread_enable_flag]
+  07BF0  4eb90005da0c    jsr        $5da0c.l                              
+  07BF6  3f3c0005        move.w     #$5, -(a7)                            
+  07BFA  4eb900018918    jsr        $18918.l                              
+  07C00  548f            addq.l     #$2, a7                               
+  07C02  6034            bra.b      $7c38                                   ; => common_unlk_rts
+  07C04  4ebafa34        jsr        $763a(pc)                               ; => mread_main_logic
+  07C08  602e            bra.b      $7c38                                   ; => common_unlk_rts
+  07C0A  2f3823f0        move.l     $23f0.w, -(a7)                        
+  07C0E  41fa08c4        lea.l      $84d4(pc), a0                         
+  07C12  2f08            move.l     a0, -(a7)                             
+  07C14  4eb900002f96    jsr        $2f96.l                               
+  07C1A  508f            addq.l     #$8, a7                               
+
+
+==============================================================================
+; MREAD main logic (low-addr, BEEP-related wrapper)
+; Address: 0x0763A  Length: 96 bytes
+==============================================================================
+mread_main_logic:
+  0763A  4e560000        link.w     a6, #$0                               
+  0763E  4267            clr.w      -(a7)                                 
+  07640  4eb9000188c8    jsr        $188c8.l                              
+  07646  548f            addq.l     #$2, a7                               
+  07648  3f3c0097        move.w     #$97, -(a7)                           
+  0764C  4ebad390        jsr        $49de(pc)                               ; => gpib_output_dispatch
+  07650  548f            addq.l     #$2, a7                               
+  07652  1b7c00010a48    move.b     #$1, $a48(a5)                           ; [gpib_output_pending]
+  07658  3f3c7530        move.w     #$7530, -(a7)                         
+  0765C  4eb900008908    jsr        $8908.l                               
+  07662  548f            addq.l     #$2, a7                               
+  07664  3f3c7530        move.w     #$7530, -(a7)                         
+  07668  4eb900008908    jsr        $8908.l                               
+  0766E  548f            addq.l     #$2, a7                               
+  07670  3f3c7530        move.w     #$7530, -(a7)                         
+  07674  4eb900008908    jsr        $8908.l                               
+  0767A  548f            addq.l     #$2, a7                               
+  0767C  61a0            bsr.b      $761e                                   ; => mread_output_cleanup
+  0767E  4267            clr.w      -(a7)                                 
+  07680  4eb900018918    jsr        $18918.l                              
+  07686  548f            addq.l     #$2, a7                               
+  07688  4e5e            unlk       a6                                    
+  0768A  4e75            rts                                              
+  0768C  4e56fffa        link.w     a6, #$fffa                            
+  07690  3f3c012c        move.w     #$12c, -(a7)                          
+  07694  4eb900008908    jsr        $8908.l                               
+
+
+==============================================================================
+; MREAD output cleanup sub (sends type 0x98 EOI, clears pending flag)
+; Address: 0x0761E  Length: 32 bytes
+==============================================================================
+mread_output_cleanup:
+  0761E  4e560000        link.w     a6, #$0                               
+  07622  4a2d0a48        tst.b      $a48(a5)                                ; [gpib_output_pending]
+  07626  670e            beq.b      $7636                                   ; => 0x07636
+  07628  3f3c0098        move.w     #$98, -(a7)                           
+  0762C  4ebad3b0        jsr        $49de(pc)                               ; => gpib_output_dispatch
+  07630  548f            addq.l     #$2, a7                               
+  07632  422d0a48        clr.b      $a48(a5)                                ; [gpib_output_pending]
+  07636  4e5e            unlk       a6                                    
+  07638  4e75            rts                                              
+  0763A  4e560000        link.w     a6, #$0                               
+
+
+==============================================================================
+; MWRITE execution (low-addr, calls mwrite_write_core)
+; Address: 0x07C3C  Length: 80 bytes
+==============================================================================
+mwrite_exec_lowaddr:
+  07C3C  4e56fffc        link.w     a6, #$fffc                            
+  07C40  4eb90001dc20    jsr        $1dc20.l                              
+  07C46  4a07            tst.b      d7                                    
+  07C48  673a            beq.b      $7c84                                   ; => 0x07C84
+  07C4A  4a2d13a6        tst.b      $13a6(a5)                               ; [beep_mread_enable_flag]
+  07C4E  660a            bne.b      $7c5a                                   ; => 0x07C5A
+  07C50  41fa08a2        lea.l      $84f4(pc), a0                         
+  07C54  2d48fffc        move.l     a0, -$4(a6)                           
+  07C58  6008            bra.b      $7c62                                   ; => 0x07C62
+  07C5A  43fa089c        lea.l      $84f8(pc), a1                         
+  07C5E  2d49fffc        move.l     a1, -$4(a6)                           
+  07C62  246efffc        movea.l    -$4(a6), a2                           
+  07C66  2f0a            move.l     a2, -(a7)                             
+  07C68  47fa0892        lea.l      $84fc(pc), a3                         
+  07C6C  2f0b            move.l     a3, -(a7)                             
+  07C6E  49f900120f00    lea.l      $120f00.l, a4                         
+  07C74  2f0c            move.l     a4, -(a7)                             
+  07C76  4eb9000532de    jsr        $532de.l                              
+  07C7C  dffc0000000c    adda.l     #$c, a7                               
+  07C82  6022            bra.b      $7ca6                                   ; => 0x07CA6
+  07C84  102d13a6        move.b     $13a6(a5), d0                           ; [beep_mread_enable_flag]
+  07C88  4880            ext.w      d0                                    
+  07C8A  3f00            move.w     d0, -(a7)                             
+
+
+==============================================================================
+; MREAD_handler (TRUE 24-bit handler) - reads WORD, sends via GPIB
+; Address: 0x17BBA  Length: 64 bytes
+==============================================================================
+MREAD_handler:
+  17BBA  4e56fff4        link.w     a6, #$fff4                            
+  17BBE  43eefff8        lea.l      -$8(a6), a1                           
+  17BC2  206e0008        movea.l    $8(a6), a0                            
+  17BC6  22d8            move.l     (a0)+, (a1)+                          
+  17BC8  22d8            move.l     (a0)+, (a1)+                          
+  17BCA  486efff8        pea.l      -$8(a6)                               
+  17BCE  4eb9000585a0    jsr        $585a0.l                              
+  17BD4  588f            addq.l     #$4, a7                               
+  17BD6  0287fffffffe    andi.l     #$fffffffe, d7                        
+  17BDC  2d47fff4        move.l     d7, -$c(a6)                           
+  17BE0  3f3c0006        move.w     #$6, -(a7)                            
+  17BE4  206efff4        movea.l    -$c(a6), a0                           
+  17BE8  3f10            move.w     (a0), -(a7)                           
+  17BEA  4eb90001d8dc    jsr        $1d8dc.l                              
+  17BF0  588f            addq.l     #$4, a7                               
+  17BF2  4e5e            unlk       a6                                    
+  17BF4  4e75            rts                                              
+  17BF6  4e56fff4        link.w     a6, #$fff4                            
+
+
+==============================================================================
+; MWRITE_handler (TRUE 24-bit handler) - writes WORD to address
+; Address: 0x17BF6  Length: 48 bytes
+==============================================================================
+MWRITE_handler:
+  17BF6  4e56fff4        link.w     a6, #$fff4                            
+  17BFA  43eefff8        lea.l      -$8(a6), a1                           
+  17BFE  206e000a        movea.l    $a(a6), a0                            
+  17C02  22d8            move.l     (a0)+, (a1)+                          
+  17C04  22d8            move.l     (a0)+, (a1)+                          
+  17C06  486efff8        pea.l      -$8(a6)                               
+  17C0A  4eb9000585a0    jsr        $585a0.l                              
+  17C10  588f            addq.l     #$4, a7                               
+  17C12  0287fffffffe    andi.l     #$fffffffe, d7                        
+  17C18  2d47fff4        move.l     d7, -$c(a6)                           
+  17C1C  206efff4        movea.l    -$c(a6), a0                           
+  17C20  30ae0008        move.w     $8(a6), (a0)                          
+  17C24  4e5e            unlk       a6                                    
+
+
+==============================================================================
+; JSR_GPIB_handler - resolves address and executes 68000 code!
+; Address: 0x17C28  Length: 48 bytes
+==============================================================================
+JSR_GPIB_handler:
+  17C28  4e56fff4        link.w     a6, #$fff4                            
+  17C2C  43eefff8        lea.l      -$8(a6), a1                           
+  17C30  206e0008        movea.l    $8(a6), a0                            
+  17C34  22d8            move.l     (a0)+, (a1)+                          
+  17C36  22d8            move.l     (a0)+, (a1)+                          
+  17C38  486efff8        pea.l      -$8(a6)                               
+  17C3C  4eb9000585a0    jsr        $585a0.l                              
+  17C42  588f            addq.l     #$4, a7                               
+  17C44  0287fffffffe    andi.l     #$fffffffe, d7                        
+  17C4A  2d47fff4        move.l     d7, -$c(a6)                           
+  17C4E  206efff4        movea.l    -$c(a6), a0                           
+  17C52  4e90            jsr        (a0)                                  
+  17C54  4e5e            unlk       a6                                    
+  17C56  4e75            rts                                              
+
+
+==============================================================================
+; CALLARRAY_handler - vtable method dispatch (offset 0x16)
+; Address: 0x17C58  Length: 64 bytes
+==============================================================================
+CALLARRAY_handler:
+  17C58  4e56fff8        link.w     a6, #$fff8                            
+  17C5C  302e000c        move.w     $c(a6), d0                            
+  17C60  48c0            ext.l      d0                                    
+  17C62  e380            asl.l      #$1, d0                               
+  17C64  206e0008        movea.l    $8(a6), a0                            
+  17C68  43f00800        lea.l      (a0, d0.l), a1                        
+  17C6C  2d51fffc        move.l     (a1), -$4(a6)                         
+  17C70  246efffc        movea.l    -$4(a6), a2                           
+  17C74  266a0016        movea.l    $16(a2), a3                           
+  17C78  3f2e000c        move.w     $c(a6), -(a7)                         
+  17C7C  2f2e0008        move.l     $8(a6), -(a7)                         
+  17C80  2d4bfff8        move.l     a3, -$8(a6)                           
+  17C84  4e93            jsr        (a3)                                  
+  17C86  5c8f            addq.l     #$6, a7                               
+  17C88  4e5e            unlk       a6                                    
+  17C8A  4e75            rts                                              
+  17C8C  4e56fff4        link.w     a6, #$fff4                            
+  17C90  206e0008        movea.l    $8(a6), a0                            
+  17C94  3e28000e        move.w     $e(a0), d7                            
+
+
+==============================================================================
+; XYZZY_handler - sends "I see " to GPIB (Adventure easter egg)
+; Address: 0x17BA0  Length: 32 bytes
+==============================================================================
+XYZZY_handler:
+  17BA0  4e560000        link.w     a6, #$0                               
+  17BA4  3f3c0006        move.w     #$6, -(a7)                            
+  17BA8  41fa0a16        lea.l      $185c0(pc), a0                        
+  17BAC  2f08            move.l     a0, -(a7)                             
+  17BAE  4eb90001d8b8    jsr        $1d8b8.l                              
+  17BB4  5c8f            addq.l     #$6, a7                               
+  17BB6  4e5e            unlk       a6                                    
+  17BB8  4e75            rts                                              
+  17BBA  4e56fff4        link.w     a6, #$fff4                            
+  17BBE  43ee            lea.l      -$5556(a6), a1                        
+
+
+==============================================================================
+; MADDR_handler entry
+; Address: 0x17C8C  Length: 32 bytes
+==============================================================================
+MADDR_handler:
+  17C8C  4e56fff4        link.w     a6, #$fff4                            
+  17C90  206e0008        movea.l    $8(a6), a0                            
+  17C94  3e28000e        move.w     $e(a0), d7                            
+  17C98  606a            bra.b      $17d04                                  ; => maddr_type_dispatch
+  17C9A  226e0008        movea.l    $8(a6), a1                            
+  17C9E  3029000c        move.w     $c(a1), d0                            
+  17CA2  b07900008a00    cmp.w      $8a00.l, d0                           
+  17CA8  660a            bne.b      $17cb4                                  ; => 0x17CB4
+  17CAA  45e9            lea.l      -$5556(a1), a2                        
+
+
+==============================================================================
+; MADDR type dispatch (subtypes 1-4) + encode_and_output
+; Address: 0x17C9A  Length: 160 bytes
+==============================================================================
+maddr_type1:
+  17C9A  226e0008        movea.l    $8(a6), a1                            
+  17C9E  3029000c        move.w     $c(a1), d0                            
+  17CA2  b07900008a00    cmp.w      $8a00.l, d0                           
+  17CA8  660a            bne.b      $17cb4                                  ; => 0x17CB4
+  17CAA  45e90016        lea.l      $16(a1), a2                           
+  17CAE  2d4afffc        move.l     a2, -$4(a6)                           
+  17CB2  600a            bra.b      $17cbe                                  ; => 0x17CBE
+  17CB4  266e0008        movea.l    $8(a6), a3                            
+  17CB8  2d6b0016fffc    move.l     $16(a3), -$4(a6)                      
+  17CBE  605e            bra.b      $17d1e                                  ; => maddr_encode_and_output
+  17CC0  286e0008        movea.l    $8(a6), a4                            
+  17CC4  322c000c        move.w     $c(a4), d1                            
+  17CC8  b27900008a00    cmp.w      $8a00.l, d1                           
+  17CCE  660a            bne.b      $17cda                                  ; => 0x17CDA
+  17CD0  41ec0016        lea.l      $16(a4), a0                           
+  17CD4  2d48fffc        move.l     a0, -$4(a6)                           
+  17CD8  600a            bra.b      $17ce4                                  ; => 0x17CE4
+  17CDA  226e0008        movea.l    $8(a6), a1                            
+  17CDE  2d690016fffc    move.l     $16(a1), -$4(a6)                      
+  17CE4  6038            bra.b      $17d1e                                  ; => maddr_encode_and_output
+  17CE6  246e0008        movea.l    $8(a6), a2                            
+  17CEA  2d6a0016fffc    move.l     $16(a2), -$4(a6)                      
+  17CF0  602c            bra.b      $17d1e                                  ; => maddr_encode_and_output
+  17CF2  266e0008        movea.l    $8(a6), a3                            
+  17CF6  2d6b0016fffc    move.l     $16(a3), -$4(a6)                      
+  17CFC  6020            bra.b      $17d1e                                  ; => maddr_encode_and_output
+  17CFE  42aefffc        clr.l      -$4(a6)                               
+  17D02  601a            bra.b      $17d1e                                  ; => maddr_encode_and_output
+  17D04  0c470001        cmpi.w     #$1, d7                               
+  17D08  6790            beq.b      $17c9a                                  ; => maddr_type1
+  17D0A  0c470002        cmpi.w     #$2, d7                               
+  17D0E  67b0            beq.b      $17cc0                                  ; => maddr_type2
+  17D10  0c470003        cmpi.w     #$3, d7                               
+  17D14  67d0            beq.b      $17ce6                                  ; => maddr_type3
+  17D16  0c470004        cmpi.w     #$4, d7                               
+  17D1A  67d6            beq.b      $17cf2                                  ; => maddr_type4
+  17D1C  60e0            bra.b      $17cfe                                  ; => 0x17CFE
+  17D1E  3f3c0006        move.w     #$6, -(a7)                            
+  17D22  242efffc        move.l     -$4(a6), d2                           
+  17D26  2f02            move.l     d2, -(a7)                             
+  17D28  486efff4        pea.l      -$c(a6)                               
+  17D2C  4eb9000585b4    jsr        $585b4.l                              
+  17D32  508f            addq.l     #$8, a7                               
+  17D34  486efff4        pea.l      -$c(a6)                               
+  17D38  4eb9            jsr        $aaaaaaaa.l                           
+
+
+==============================================================================
+; MADDR type_dispatch switch (D7=1..4)
+; Address: 0x17D04  Length: 64 bytes
+==============================================================================
+maddr_type_dispatch:
+  17D04  0c470001        cmpi.w     #$1, d7                               
+  17D08  6790            beq.b      $17c9a                                  ; => maddr_type1
+  17D0A  0c470002        cmpi.w     #$2, d7                               
+  17D0E  67b0            beq.b      $17cc0                                  ; => maddr_type2
+  17D10  0c470003        cmpi.w     #$3, d7                               
+  17D14  67d0            beq.b      $17ce6                                  ; => maddr_type3
+  17D16  0c470004        cmpi.w     #$4, d7                               
+  17D1A  67d6            beq.b      $17cf2                                  ; => maddr_type4
+  17D1C  60e0            bra.b      $17cfe                                  ; => 0x17CFE
+  17D1E  3f3c0006        move.w     #$6, -(a7)                            
+  17D22  242efffc        move.l     -$4(a6), d2                           
+  17D26  2f02            move.l     d2, -(a7)                             
+  17D28  486efff4        pea.l      -$c(a6)                               
+  17D2C  4eb9000585b4    jsr        $585b4.l                              
+  17D32  508f            addq.l     #$8, a7                               
+  17D34  486efff4        pea.l      -$c(a6)                               
+  17D38  4eb90001d900    jsr        $1d900.l                              
+  17D3E  5c8f            addq.l     #$6, a7                               
+  17D40  4e5e            unlk       a6                                    
+  17D42  4e75            rts                                              
+
+
+==============================================================================
+; descriptor_to_addr - IEEE754 double descriptor -> integer address
+; Address: 0x585A0  Length: 48 bytes
+==============================================================================
+descriptor_to_addr:
+  585A0  4cef01000004    movem.l    $4(a7), a0                            
+  585A6  4cd00003        movem.l    (a0), d0-d1                           
+  585AA  4eb900058340    jsr        $58340.l                              
+  585B0  2e00            move.l     d0, d7                                
+  585B2  4e75            rts                                              
+  585B4  202f0008        move.l     $8(a7), d0                            
+  585B8  4eb9000583ba    jsr        $583ba.l                              
+  585BE  206f0004        movea.l    $4(a7), a0                            
+  585C2  20c0            move.l     d0, (a0)+                             
+  585C4  2081            move.l     d1, (a0)                              
+  585C6  4e75            rts                                              
+  585C8  226f0004        movea.l    $4(a7), a1                            
+  585CC  2019            move.l     (a1)+, d0                             
+  585CE  2211            move.l     (a1), d1                              
+
+
+==============================================================================
+; ieee754_double_to_int - IEEE754 double -> integer core
+; Address: 0x58340  Length: 112 bytes
+==============================================================================
+ieee754_double_to_int:
+  58340  3200            move.w     d0, d1                                
+  58342  4841            swap       d1                                    
+  58344  4240            clr.w      d0                                    
+  58346  4840            swap       d0                                    
+  58348  3e00            move.w     d0, d7                                
+  5834A  3c00            move.w     d0, d6                                
+  5834C  02467ff0        andi.w     #$7ff0, d6                            
+  58350  e84e            lsr.w      #$4, d6                               
+  58352  044603fe        subi.w     #$3fe, d6                             
+  58356  0c460020        cmpi.w     #$20, d6                              
+  5835A  6e4e            bgt.b      $583aa                                  ; => 0x583AA
+  5835C  6734            beq.b      $58392                                  ; => 0x58392
+  5835E  4a46            tst.w      d6                                    
+  58360  6c04            bge.b      $58366                                  ; => 0x58366
+  58362  7000            moveq      #$0, d0                               
+  58364  4e75            rts                                              
+  58366  0240000f        andi.w     #$f, d0                               
+  5836A  ea89            lsr.l      #$5, d1                               
+  5836C  ea98            ror.l      #$5, d0                               
+  5836E  8280            or.l       d0, d1                                
+  58370  4446            neg.w      d6                                    
+  58372  06460020        addi.w     #$20, d6                              
+  58376  08c1001f        bset.b     #$1f, d1                              
+  5837A  eca9            lsr.l      d6, d1                                
+  5837C  640a            bcc.b      $58388                                  ; => 0x58388
+  5837E  5281            addq.l     #$1, d1                               
+  58380  6a06            bpl.b      $58388                                  ; => 0x58388
+  58382  4a47            tst.w      d7                                    
+  58384  6a000024        bpl.w      $583aa                                  ; => 0x583AA
+  58388  4a47            tst.w      d7                                    
+  5838A  6a02            bpl.b      $5838e                                  ; => 0x5838E
+  5838C  4481            neg.l      d1                                    
+  5838E  2001            move.l     d1, d0                                
+  58390  4e75            rts                                              
+  58392  4a40            tst.w      d0                                    
+  58394  6a14            bpl.b      $583aa                                  ; => 0x583AA
+  58396  0240000f        andi.w     #$f, d0                               
+  5839A  660e            bne.b      $583aa                                  ; => 0x583AA
+  5839C  ea89            lsr.l      #$5, d1                               
+  5839E  660a            bne.b      $583aa                                  ; => 0x583AA
+  583A0  6508            bcs.b      $583aa                                  ; => 0x583AA
+  583A2  203c80000000    move.l     #$80000000, d0                        
+  583A8  4e75            rts                                              
+  583AA  303cfffc        move.w     #$fffc, d0                            
+  583AE  4e4a            trap       #$a                                   
+
+
+==============================================================================
+; int_to_ieee754_double - integer -> IEEE754 double core
+; Address: 0x583BA  Length: 80 bytes
+==============================================================================
+int_to_ieee754_double:
+  583BA  7e00            moveq      #$0, d7                               
+  583BC  7200            moveq      #$0, d1                               
+  583BE  4a80            tst.l      d0                                    
+  583C0  6606            bne.b      $583c8                                  ; => 0x583C8
+  583C2  7000            moveq      #$0, d0                               
+  583C4  2200            move.l     d0, d1                                
+  583C6  4e75            rts                                              
+  583C8  6a08            bpl.b      $583d2                                  ; => 0x583D2
+  583CA  4480            neg.l      d0                                    
+  583CC  69e2            bvs.b      $583b0                                  ; => 0x583B0
+  583CE  3e3c8000        move.w     #$8000, d7                            
+  583D2  4840            swap       d0                                    
+  583D4  4a40            tst.w      d0                                    
+  583D6  674a            beq.b      $58422                                  ; => 0x58422
+  583D8  383c0413        move.w     #$413, d4                             
+  583DC  3a00            move.w     d0, d5                                
+  583DE  0245fff0        andi.w     #$fff0, d5                            
+  583E2  6612            bne.b      $583f6                                  ; => 0x583F6
+  583E4  2c3c00100000    move.l     #$100000, d6                          
+  583EA  4840            swap       d0                                    
+  583EC  d080            add.l      d0, d0                                
+  583EE  5344            subq.w     #$1, d4                               
+  583F0  b086            cmp.l      d6, d0                                
+  583F2  6df8            blt.b      $583ec                                  ; => 0x583EC
+  583F4  6058            bra.b      $5844e                                  ; => 0x5844E
+  583F6  3a00            move.w     d0, d5                                
+  583F8  02450ff0        andi.w     #$ff0, d5                             
+  583FC  660c            bne.b      $5840a                                  ; => 0x5840A
+  583FE  4840            swap       d0                                    
+  58400  5084            addq.l     #$8, d4                               
+  58402  1200            move.b     d0, d1                                
+  58404  e099            ror.l      #$8, d1                               
+  58406  e088            lsr.l      #$8, d0                               
+  58408  6002            bra.b      $5840c                                  ; => 0x5840C
+
+
+==============================================================================
+; store_descriptor - write back descriptor
+; Address: 0x585B4  Length: 32 bytes
+==============================================================================
+store_descriptor:
+  585B4  202f0008        move.l     $8(a7), d0                            
+  585B8  4eb9000583ba    jsr        $583ba.l                              
+  585BE  206f0004        movea.l    $4(a7), a0                            
+  585C2  20c0            move.l     d0, (a0)+                             
+  585C4  2081            move.l     d1, (a0)                              
+  585C6  4e75            rts                                              
+  585C8  226f0004        movea.l    $4(a7), a1                            
+  585CC  2019            move.l     (a1)+, d0                             
+  585CE  2211            move.l     (a1), d1                              
+  585D0  6100fe88        bsr.w      $5845a                                  ; => fp_convert_sub1
+
+
+==============================================================================
+; gpib_send_word - send integer word to GPIB
+; Address: 0x1D8DC  Length: 48 bytes
+==============================================================================
+gpib_send_word:
+  1D8DC  4e560000        link.w     a6, #$0                               
+  1D8E0  3f2e0008        move.w     $8(a6), -(a7)                         
+  1D8E4  41ed0f00        lea.l      $f00(a5), a0                            ; [gpib_channel_descriptor]
+  1D8E8  2f08            move.l     a0, -(a7)                             
+  1D8EA  4eb900050958    jsr        $50958.l                              
+  1D8F0  5c8f            addq.l     #$6, a7                               
+  1D8F2  4267            clr.w      -(a7)                                 
+  1D8F4  4eb90001f530    jsr        $1f530.l                              
+  1D8FA  548f            addq.l     #$2, a7                               
+  1D8FC  4e5e            unlk       a6                                    
+  1D8FE  4e75            rts                                              
+  1D900  4e56fff8        link.w     a6, #$fff8                            
+  1D904  43eefff8        lea.l      -$8(a6), a1                           
+  1D908  206e0008        movea.l    $8(a6), a0                            
+
+
+==============================================================================
+; int_to_decimal_ascii - integer -> +/-XXXXX ASCII for GPIB
+; Address: 0x50958  Length: 80 bytes
+==============================================================================
+int_to_decimal_ascii:
+  50958  4280            clr.l      d0                                    
+  5095A  302f0008        move.w     $8(a7), d0                            
+  5095E  206f0004        movea.l    $4(a7), a0                            
+  50962  43e80006        lea.l      $6(a0), a1                            
+  50966  4211            clr.b      (a1)                                  
+  50968  7204            moveq      #$4, d1                               
+  5096A  742b            moveq      #$2b, d2                              
+  5096C  4a40            tst.w      d0                                    
+  5096E  6a04            bpl.b      $50974                                  ; => 0x50974
+  50970  742d            moveq      #$2d, d2                              
+  50972  4440            neg.w      d0                                    
+  50974  80fc000a        divu.w     #$a, d0                               
+  50978  4840            swap       d0                                    
+  5097A  06000030        addi.b     #$30, d0                              
+  5097E  1300            move.b     d0, -(a1)                             
+  50980  4240            clr.w      d0                                    
+  50982  4840            swap       d0                                    
+  50984  57c9ffee        dbeq       d1, $50974                              ; => 0x50974
+  50988  0c02002b        cmpi.b     #$2b, d2                              
+  5098C  6702            beq.b      $50990                                  ; => 0x50990
+  5098E  1302            move.b     d2, -(a1)                             
+  50990  b3c8            cmpa.l     a0, a1                                
+  50992  6704            beq.b      $50998                                  ; => 0x50998
+  50994  10d9            move.b     (a1)+, (a0)+                          
+  50996  66fc            bne.b      $50994                                  ; => 0x50994
+  50998  4e75            rts                                              
+  5099A  206f0004        movea.l    $4(a7), a0                            
+  5099E  43e8000b        lea.l      $b(a0), a1                            
+  509A2  4211            clr.b      (a1)                                  
+  509A4  7209            moveq      #$9, d1                               
+  509A6  742b            moveq      #$2b, d2                              
+
+
+==============================================================================
+; timer_delay - delay(n * cal_constant) busy-wait
+; Address: 0x08908  Length: 32 bytes
+==============================================================================
+timer_delay:
+  08908  302f0004        move.w     $4(a7), d0                            
+  0890C  c0ed0bae        mulu.w     $bae(a5), d0                            ; [timer_cal_constant]
+  08910  4840            swap       d0                                    
+  08912  5d40            subq.w     #$6, d0                               
+  08914  6504            bcs.b      $891a                                   ; => 0x0891A
+  08916  5340            subq.w     #$1, d0                               
+  08918  66fc            bne.b      $8916                                   ; => 0x08916
+  0891A  4e75            rts                                              
+  0891C  3b7c928e0bae    move.w     #$928e, $bae(a5)                        ; [timer_cal_constant]
+  08922  4e75            rts                                              
+  08924  5d8f            subq.l     #$6, a7                               
+  08926  3eaf            move.w     -$5556(a7), (a7)                      
+
+
+==============================================================================
+; psos_channel_read - pSOS TRAP#0 sys call #24 (GPIB I/O channel)
+; Address: 0x188C8  Length: 80 bytes
+==============================================================================
+psos_channel_read_type0:
+  188C8  302f0004        move.w     $4(a7), d0                            
+  188CC  d040            add.w      d0, d0                                
+  188CE  4287            clr.l      d7                                    
+  188D0  41f900120c14    lea.l      $120c14.l, a0                         
+  188D6  52700000        addq.w     #$1, (a0, d0.w)                       
+  188DA  671c            beq.b      $188f8                                  ; => 0x188F8
+  188DC  41f900120c32    lea.l      $120c32.l, a0                         
+  188E2  d040            add.w      d0, d0                                
+  188E4  20700000        movea.l    (a0, d0.w), a0                        
+  188E8  43f900120c6e    lea.l      $120c6e.l, a1                         
+  188EE  4241            clr.w      d1                                    
+  188F0  202f0006        move.l     $6(a7), d0                            
+  188F4  7e18            moveq      #$18, d7                              
+  188F6  4e40            trap       #$0                                   
+  188F8  4e75            rts                                              
+  188FA  527900120c16    addq.w     #$1, $120c16.l                        
+  18900  6714            beq.b      $18916                                  ; => 0x18916
+  18902  207900120c36    movea.l    $120c36.l, a0                         
+  18908  43f900120c6e    lea.l      $120c6e.l, a1                         
+  1890E  4241            clr.w      d1                                    
+  18910  4280            clr.l      d0                                    
+  18912  7e18            moveq      #$18, d7                              
+  18914  4e40            trap       #$0                                   
+  18916  4e75            rts                                              
+
+
+==============================================================================
+; beep_hw_driver - sets beep hardware state
+; Address: 0x5DA0C  Length: 48 bytes
+==============================================================================
+beep_hw_driver:
+  5DA0C  4e560000        link.w     a6, #$0                               
+  5DA10  61d6            bsr.b      $5d9e8                                  ; => 0x5D9E8
+  5DA12  3b471b02        move.w     d7, $1b02(a5)                           ; [beep_hw_state]
+  5DA16  4e5e            unlk       a6                                    
+  5DA18  4e75            rts                                              
+  5DA1A  4e56fffa        link.w     a6, #$fffa                            
+  5DA1E  422efffc        clr.b      -$4(a6)                               
+  5DA22  302d1b00        move.w     $1b00(a5), d0                         
+  5DA26  0c40aa55        cmpi.w     #$aa55, d0                            
+  5DA2A  660c            bne.b      $5da38                                  ; => 0x5DA38
+  5DA2C  61ba            bsr.b      $5d9e8                                  ; => 0x5D9E8
+  5DA2E  322d1b02        move.w     $1b02(a5), d1                           ; [beep_hw_state]
+  5DA32  b247            cmp.w      d7, d1                                
+  5DA34  6602            bne.b      $5da38                                  ; => 0x5DA38
+  5DA36  6058            bra.b      $5da90                                  ; => 0x5DA90
+  5DA38  41ed1dbc        lea.l      $1dbc(a5), a0                         
+
+==============================================================================
+; XYZZY easter egg string @ 0x185C0
+==============================================================================
+  Hex:    4920736565206e6f2063617665206865
+  ASCII:  'I see no cave here.\x00allocate_exe'
+  Kuldo:  "I see " (6 karakter, Adventure: "I see no cave here")
+
+==============================================================================
+; PARANCS TÁBLA RÉSZLET (0x8B20 - 0xAF80) — 388 × 24 bájt
+; Rekord: [name_len:2][name:10][cmd_id:2][flags:2][0x89EA:2][flag2:2][handler_lo:2][priv:2]
+; Valódi handler = 0x0001_HHHH ahol HHHH = handler_lo mező
+==============================================================================
+;    #  Parancs       CmdID  Flag2  Handler_lo  Valódi_handler  Priv  Leírás
+; ------------------------------------------------------------------------------------------
+;    0  ACAL         0x000E  0x0003  0xF71E      0x0001F71E      0x0001  mérési parancs
+;    1  ACBAND       0x0010  0x0003  0x1094      0x00011094      0x0000  mérési parancs
+;    2  ACDCI        0x0012  0x0003  0x0A28      0x00010A28      0x0001  mérési parancs
+;    3  ACDCV        0x0014  0x0003  0x0868      0x00010868      0x0001  mérési parancs
+;    4  ACI          0x0015  0x0003  0x0A28      0x00010A28      0x0001  mérési parancs
+;    5  ACV          0x0017  0x0003  0x0868      0x00010868      0x0001  mérési parancs
+;    6  ADDRESS      0x0018  0x0005  0xB7E4      0x0001B7E4      0x0000  math/stack
+;    7  APER         0x001A  0x0003  0x258E      0x0001258E      0x0000  mérési parancs
+;    8  ARANGE       0x001C  0x0002  0xFEC6      0x0001FEC6      0x0001  query
+;    9  AUXERR?      0x001E  0x0000  0x37CC      0x000037CC      0x0001  token/keyword
+;   10  AZERO        0x001F  0x0003  0x24A0      0x000124A0      0x0001  mérési parancs
+;   11  BEEP         0x0020  0x0000  0x7BCC      0x00007BCC      0x0000  token/keyword
+;   12  CAL          0x0021  0x0004  0xA9FA      0x0001A9FA      0x0000  CAL/privilegizált
+;   13  CAL?         0x0023  0x0002  0x0DCE      0x00010DCE      0x0001  query
+;   14  CALL         0x0025  0x0001  0x00CA      0x000100CA      0x0000  egyszerű parancs
+;   15  CALNUM?      0x0027  0x0002  0x08BA      0x000108BA      0x0001  query
+;   16  CALSTR       0x0028  0x0004  0xB162      0x0001B162      0x0001  CAL/privilegizált
+;   17  CIIL         0x002A  0x0004  0xE91E      0x0001E91E      0x0002  CAL/privilegizált
+;   18  COMPRESS     0x002B  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;   19  CONT         0x002D  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;   20  CSB          0x002E  0x0000  0x4270      0x00004270      0x0001  token/keyword
+;   21  DCI          0x002F  0x0003  0x0440      0x00010440      0x0001  mérési parancs
+;   22  DCV          0x0031  0x0003  0x0762      0x00010762      0x0001  mérési parancs
+;   23  DEFEAT       0x0032  0x0002  0xFCAA      0x0001FCAA      0x0001  query
+;   24  DEFKEY       0x0034  0x0000  0x6DDC      0x00006DDC      0x0001  token/keyword
+;   25  DELAY        0x0036  0x0003  0x379C      0x0001379C      0x0000  mérési parancs
+;   26  DELSUB       0x0037  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;   27  DISP         0x0038  0x0000  0x7F72      0x00007F72      0x0000  token/keyword
+;   28  DSAC         0x003A  0x0003  0x0B22      0x00010B22      0x0001  mérési parancs
+;   29  DSDC         0x003C  0x0003  0x0B22      0x00010B22      0x0001  mérési parancs
+;   30  EMASK        0x003E  0x0000  0x33BA      0x000033BA      0x0001  token/keyword
+;   31  END          0x0040  0x0002  0x7A40      0x00017A40      0x0001  query
+;   32  ERR?         0x0042  0x0000  0x34B6      0x000034B6      0x0001  token/keyword
+;   33  ERRSTR?      0x0043  0x0000  0x354E      0x0000354E      0x0001  token/keyword
+;   34  EXTOUT       0x0044  0x0003  0x2CF8      0x00012CF8      0x0000  mérési parancs
+;   35  FIXEDZ       0x0046  0x0003  0x117E      0x0001117E      0x0000  mérési parancs
+;   36  FREQ         0x0047  0x0003  0x02CA      0x000102CA      0x0001  mérési parancs
+;   37  FSOURCE      0x0048  0x0003  0x14FA      0x000114FA      0x0000  mérési parancs
+;   38  FUNC         0x004A  0x0003  0x11EA      0x000111EA      0x0000  mérési parancs
+;   39  GAL          0x004C  0x0004  0xE9AA      0x0001E9AA      0x0002  CAL/privilegizált
+;   40  ID?          0x004D  0x0001  0x767C      0x0001767C      0x0001  egyszerű parancs
+;   41  INBUF        0x004E  0x0005  0xB6C6      0x0001B6C6      0x0001  math/stack
+;   42  ISCALE?      0x004F  0x0002  0x017C      0x0001017C      0x0001  query
+;   43  LEVEL        0x0050  0x0003  0x3C42      0x00013C42      0x0000  mérési parancs
+;   44  LFILTER      0x0052  0x0003  0x3E46      0x00013E46      0x0000  mérési parancs
+;   45  LFREQ        0x0053  0x0003  0x1932      0x00011932      0x0000  mérési parancs
+;   46  LINE?        0x0055  0x0002  0xF2C8      0x0001F2C8      0x0000  query
+;   47  LOCK         0x0056  0x0005  0xAF96      0x0001AF96      0x0001  math/stack
+;   48  MATH         0x0057  0x0005  0x3816      0x00013816      0x0000  math/stack
+;   49  MCOUNT?      0x0059  0x0001  0xDEFA      0x0001DEFA      0x0000  egyszerű parancs
+;   50  MEM          0x005A  0x0001  0xB97E      0x0001B97E      0x0000  egyszerű parancs
+;   51  MENU         0x005C  0x0000  0x53D2      0x000053D2      0x0001  token/keyword
+;   52  MFORMAT      0x005E  0x0001  0xBA98      0x0001BA98      0x0000  egyszerű parancs
+;   53  MMATH        0x0060  0x0005  0x36DA      0x000136DA      0x0000  math/stack
+;   54  MSIZE?       0x0061  0x0002  0x7AB2      0x00017AB2      0x0000  query
+;   55  NDIG         0x0062  0x0005  0x297E      0x0001297E      0x0000  math/stack
+;   56  NPLC         0x0063  0x0003  0x28CE      0x000128CE      0x0001  mérési parancs
+;   57  NRDGS        0x0064  0x0003  0x32D8      0x000132D8      0x0001  mérési parancs
+;   58  OCOMP        0x0066  0x0003  0x1494      0x00011494      0x0001  mérési parancs
+;   59  OFORMAT      0x0067  0x0005  0x2872      0x00012872      0x0001  math/stack
+;   60  OHM          0x0068  0x0003  0x0654      0x00010654      0x0001  mérési parancs
+;   61  OHMF         0x0069  0x0003  0x0546      0x00010546      0x0001  mérési parancs
+;   62  OPT?         0x006A  0x0001  0x75DA      0x000175DA      0x0002  egyszerű parancs
+;   63  PAUSE        0x006B  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;   64  PER          0x006C  0x0003  0x0154      0x00010154      0x0001  mérési parancs
+;   65  PRESET       0x006D  0x0000  0x4562      0x00004562      0x0000  token/keyword
+;   66  PURGE        0x006F  0x0000  0x47F0      0x000047F0      0x0000  token/keyword
+;   67  QFORMAT      0x0071  0x0001  0xDC62      0x0001DC62      0x0001  egyszerű parancs
+;   68  RANGE        0x0073  0x0003  0x15DE      0x000115DE      0x0001  mérési parancs
+;   69  RATIO        0x0074  0x0003  0x1C46      0x00011C46      0x0000  mérési parancs
+;   70  RES          0x0075  0x0003  0x1790      0x00011790      0x0000  mérési parancs
+;   71  RESET        0x0076  0x0000  0x1CE4      0x00001CE4      0x0001  token/keyword
+;   72  REV?         0x0077  0x0001  0x755E      0x0001755E      0x0001  egyszerű parancs
+;   73  RMATH        0x0078  0x0005  0x396E      0x0001396E      0x0000  math/stack
+;   74  RMEM         0x007A  0x0001  0xC0DE      0x0001C0DE      0x0000  egyszerű parancs
+;   75  RQS          0x007C  0x0000  0x4138      0x00004138      0x0001  token/keyword
+;   76  RSTATE       0x007D  0x0000  0x4412      0x00004412      0x0001  token/keyword
+;   77  SCAL         0x007F  0x0004  0xAE4A      0x0001AE4A      0x0001  CAL/privilegizált
+;   78  SCRATCH      0x0080  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;   79  SECURE       0x0081  0x0002  0xFCEE      0x0001FCEE      0x0000  query
+;   80  SETACV       0x0083  0x0003  0x0FF0      0x00010FF0      0x0000  mérési parancs
+;   81  SLOPE        0x0085  0x0003  0x3BEA      0x00013BEA      0x0000  mérési parancs
+;   82  SMATH        0x0087  0x0005  0x4284      0x00014284      0x0000  math/stack
+;   83  SRQ          0x0089  0x0000  0x4126      0x00004126      0x0001  token/keyword
+;   84  SSAC         0x008A  0x0003  0x0C02      0x00010C02      0x0001  mérési parancs
+;   85  SSDC         0x008B  0x0003  0x0C02      0x00010C02      0x0001  mérési parancs
+;   86  SSPARM?      0x008C  0x0001  0xE70E      0x0001E70E      0x0001  egyszerű parancs
+;   87  SSRC         0x008D  0x0003  0x0CE2      0x00010CE2      0x0001  mérési parancs
+;   88  SSTATE       0x008F  0x0000  0x433A      0x0000433A      0x0001  token/keyword
+;   89  STB?         0x0091  0x0000  0x4176      0x00004176      0x0001  token/keyword
+;   90  SUB          0x0092  0x0001  0x8818      0x00018818      0x0001  egyszerű parancs
+;   91  SUBEND       0x0094  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;   92  SWEEP        0x0095  0x0003  0x0DA8      0x00010DA8      0x0000  mérési parancs
+;   93  TARM         0x0097  0x0003  0x308C      0x0001308C      0x0000  mérési parancs
+;   94  TBUFF        0x0099  0x0003  0x3D86      0x00013D86      0x0000  mérési parancs
+;   95  TEMP?        0x009A  0x0002  0xFB8C      0x0001FB8C      0x0001  query
+;   96  TERM?        0x009B  0x0002  0x0C00      0x00010C00      0x0001  query
+;   97  TEST         0x009C  0x0001  0x780E      0x0001780E      0x0001  egyszerű parancs
+;   98  TIMER        0x009D  0x0003  0x3A3E      0x00013A3E      0x0000  mérési parancs
+;   99  TRIG         0x009E  0x0003  0x31B6      0x000131B6      0x0001  mérési parancs
+;  100  END_MENU     0x00A0  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  101  NMR          0x00A2  0x0003  0xFB78      0x0001FB78      0x0001  mérési parancs
+;  102  NMR?         0x00A4  0x0003  0xFAFE      0x0001FAFE      0x0001  mérési parancs
+;  103  HELP         0x00A5  0x0001  0x7544      0x00017544      0x0001  egyszerű parancs
+;  104  ACBAND?      0x00A7  0x0002  0x0930      0x00010930      0x0001  query
+;  105  ADDRESS?     0x00A8  0x0005  0xB89E      0x0001B89E      0x0001  math/stack
+;  106  APER?        0x00A9  0x0002  0x00DC      0x000100DC      0x0001  query
+;  107  ARANGE?      0x00AA  0x0002  0x0854      0x00010854      0x0001  query
+;  108  AZERO?       0x00AB  0x0002  0x0534      0x00010534      0x0001  query
+;  109  BEEP?        0x00AC  0x0000  0x7C3C      0x00007C3C      0x0001  token/keyword
+;  110  CALSTR?      0x00AD  0x0001  0xE4F2      0x0001E4F2      0x0001  egyszerű parancs
+;  111  DEFEAT?      0x00AE  0x0001  0xE032      0x0001E032      0x0001  egyszerű parancs
+;  112  DEFKEY?      0x00AF  0x0000  0x6E1C      0x00006E1C      0x0001  token/keyword
+;  113  DELAY?       0x00B1  0x0002  0x0734      0x00010734      0x0001  query
+;  114  DIAGNOST     0x00B2  0x0004  0xE58A      0x0001E58A      0x0001  CAL/privilegizált
+;  115  DISP?        0x00B4  0x0000  0x80AC      0x000080AC      0x0001  token/keyword
+;  116  EMASK?       0x00B5  0x0000  0x3450      0x00003450      0x0001  token/keyword
+;  117  END?         0x00B6  0x0001  0xE63C      0x0001E63C      0x0001  egyszerű parancs
+;  118  EXTOUT?      0x00B7  0x0001  0xE1AE      0x0001E1AE      0x0001  egyszerű parancs
+;  119  FIXEDZ?      0x00B8  0x0002  0x06CE      0x000106CE      0x0001  query
+;  120  FSOURCE?     0x00B9  0x0002  0x0B02      0x00010B02      0x0001  query
+;  121  FUNC?        0x00BA  0x0001  0xEFB0      0x0001EFB0      0x0001  egyszerű parancs
+;  122  INBUF?       0x00BB  0x0005  0xB764      0x0001B764      0x0001  math/stack
+;  123  LEVEL?       0x00BC  0x0001  0xE8C8      0x0001E8C8      0x0001  egyszerű parancs
+;  124  LFILTER?     0x00BD  0x0001  0xE132      0x0001E132      0x0001  egyszerű parancs
+;  125  LFREQ?       0x00BE  0x0001  0xEA76      0x0001EA76      0x0001  egyszerű parancs
+;  126  LOCK?        0x00BF  0x0005  0xB01A      0x0001B01A      0x0001  math/stack
+;  127  MATH?        0x00C0  0x0001  0xE414      0x0001E414      0x0001  egyszerű parancs
+;  128  MMATH?       0x00C1  0x0001  0xE336      0x0001E336      0x0001  egyszerű parancs
+;  129  MEM?         0x00C2  0x0001  0xE55E      0x0001E55E      0x0001  egyszerű parancs
+;  130  MENU?        0x00C3  0x0000  0x5430      0x00005430      0x0001  token/keyword
+;  131  MFORMAT?     0x00C4  0x0002  0x034C      0x0001034C      0x0001  query
+;  132  MSIZE        0x00C5  0x0002  0x7AAA      0x00017AAA      0x0001  query
+;  133  NDIG?        0x00C6  0x0002  0x026C      0x0001026C      0x0001  query
+;  134  NPLC?        0x00C7  0x0002  0x0000      0x00000000      0x0001  query
+;  135  NRDGS?       0x00C8  0x0001  0xEDB0      0x0001EDB0      0x0001  egyszerű parancs
+;  136  OCOMP?       0x00C9  0x0002  0x04CE      0x000104CE      0x0001  query
+;  137  OFORMAT?     0x00CA  0x0002  0x02E6      0x000102E6      0x0001  query
+;  138  QFORMAT?     0x00CB  0x0001  0xDCB4      0x0001DCB4      0x0001  egyszerű parancs
+;  139  RANGE?       0x00CC  0x0001  0xF2E0      0x0001F2E0      0x0001  egyszerű parancs
+;  140  RATIO?       0x00CD  0x0001  0xDD4A      0x0001DD4A      0x0001  egyszerű parancs
+;  141  RES?         0x00CE  0x0002  0x09AC      0x000109AC      0x0000  query
+;  142  RQS?         0x00CF  0x0000  0x41EE      0x000041EE      0x0001  token/keyword
+;  143  SETACV?      0x00D0  0x0002  0x0A24      0x00010A24      0x0001  query
+;  144  SLOPE?       0x00D1  0x0001  0xEF22      0x0001EF22      0x0001  egyszerű parancs
+;  145  SSRC?        0x00D2  0x0001  0xE7C2      0x0001E7C2      0x0001  egyszerű parancs
+;  146  SWEEP?       0x00D3  0x0001  0xDDCA      0x0001DDCA      0x0001  egyszerű parancs
+;  147  TARM?        0x00D4  0x0001  0xEB22      0x0001EB22      0x0001  egyszerű parancs
+;  148  TBUFF?       0x00D5  0x0001  0xE0AE      0x0001E0AE      0x0001  egyszerű parancs
+;  149  TIMER?       0x00D6  0x0002  0x059A      0x0001059A      0x0001  query
+;  150  TRIG?        0x00D7  0x0001  0xEC68      0x0001EC68      0x0001  egyszerű parancs
+;  151  NUM          0x00D8  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  152  NORM         0x00D9  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  153  ALPHA        0x00DA  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  154  OFF          0x00E1  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  155  ON           0x00E2  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  156  MSG          0x00E3  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  157  CLR          0x00E4  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  158  F0           0x00E9  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  159  F1           0x00EA  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  160  F2           0x00EB  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  161  F3           0x00EC  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  162  F4           0x00ED  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  163  F5           0x00EE  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  164  F6           0x00EF  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  165  F7           0x00F0  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  166  F8           0x00F1  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  167  F9           0x00F2  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  168  FAST         0x00F3  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  169  DIG          0x00F4  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  170  ASCII        0x00F5  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  171  SINT         0x00F6  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  172  DINT         0x00F7  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  173  SREAL        0x00F8  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  174  DREAL        0x00F9  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  175  AC           0x00FC  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  176  OHMS         0x00FD  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  177  ALL          0x00FE  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  178  AUTO         0x0102  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  179  SGL          0x0106  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  180  SYN          0x0107  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  181  EXT          0x0108  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  182  HOLD         0x0109  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  183  LINE         0x010B  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  184  MAIN         0x0113  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  185  AUX          0x0114  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  186  DC           0x0115  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  187  ICOMP        0x0118  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  188  ONCE         0x0119  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  189  BCOMP        0x011A  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  190  RCOMP        0x011B  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  191  NEG          0x011C  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  192  POS          0x011D  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  193  OPEN         0x011F  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  194  FRONT        0x0120  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  195  REAR         0x0121  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  196  ITG          0x0123  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  197  ANA          0x0127  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  198  RNDM         0x0128  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  199  SYNC         0x0129  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  200  ACTUAL       0x012B  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  201  NOM          0x012C  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  202  MAX          0x012D  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  203  MIN          0x012E  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  204  ATTENLO      0x0131  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  205  ATTENHI      0x0132  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  206  AMPLO        0x0133  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  207  AMPHI        0x0134  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  208  LIFO         0x0135  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  209  FIFO         0x0136  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  210  CTHRM        0x013A  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  211  DB           0x013B  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  212  DBM          0x013C  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  213  FILTER       0x013D  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  214  FTHRM        0x013E  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  215  NULL         0x013F  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  216  PERC         0x0140  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  217  PFAIL        0x0141  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  218  RMS          0x0142  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  219  SCALE        0x0143  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  220  STAT         0x0144  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  221  CTHRM2K      0x0145  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  222  CTHRM10K     0x0146  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  223  FTHRM2K      0x0147  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  224  FTHRM10K     0x0148  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  225  CRTD85       0x0149  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  226  CRTD92       0x014A  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  227  FRTD85       0x014B  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  228  FRTD92       0x014C  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  229  DEGREE       0x014D  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  230  LOWER        0x014E  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  231  MEAN         0x014F  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  232  NSAMP        0x0150  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  233  OFFSET       0x0151  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  234  REF          0x0152  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  235  SDEV         0x0153  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  236  UPPER        0x0154  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  237  HIRES        0x0155  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  238  PFAILNUM     0x0156  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  239  SHORT        0x0157  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  240  FULL         0x0158  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  241  DEFAULT      0x015A  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  242  CAL_NUM      0x015B  0x0002  0xFDF2      0x0001FDF2      0x0000  query
+;  243  T?           0x015C  0x0001  0xEC68      0x0001EC68      0x0001  egyszerű parancs
+;  244  R?           0x015D  0x0001  0xF2E0      0x0001F2E0      0x0001  egyszerű parancs
+;  245  RMATHV       0x015E  0x0005  0x3E88      0x00013E88      0x0000  math/stack
+;  246  PAUSED?      0x0160  0x0001  0x0462      0x00010462      0x0000  egyszerű parancs
+;  247  PAUSE?       0x0161  0x0001  0x0462      0x00010462      0x0000  egyszerű parancs
+;  248  RETURN       0x0162  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  249  DIM          0x0163  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;  250  REAL         0x0166  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;  251  INTEGER      0x0168  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;  252  SIZE?        0x016A  0x0001  0x7EA0      0x00017EA0      0x0000  egyszerű parancs
+;  253  SCROLL       0x0175  0x0000  0x7B2A      0x00007B2A      0x0001  token/keyword
+;  254  LEFT         0x0177  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  255  RIGHT        0x0178  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  256  WAIT         0x0179  0x0001  0x7B06      0x00017B06      0x0001  egyszerű parancs
+;  257  TERM         0x017A  0x0002  0xF0A2      0x0001F0A2      0x0001  query
+;  258  TONE         0x017B  0x0000  0x7CB4      0x00007CB4      0x0001  token/keyword
+;  259  CAT          0x017D  0x0001  0x7EC0      0x00017EC0      0x0000  egyszerű parancs
+;  260  LIST         0x017E  0x0001  0x8756      0x00018756      0x0000  egyszerű parancs
+;  261  DSP?         0x017F  0x0000  0x7FB2      0x00007FB2      0x0000  token/keyword
+;  262  R            0x0180  0x0003  0x15DE      0x000115DE      0x0001  mérési parancs
+;  263  T            0x0181  0x0003  0x31B6      0x000131B6      0x0001  mérési parancs
+;  264  BOMB?        0x0182  0x0001  0x76A6      0x000176A6      0x0000  egyszerű parancs
+;  265  U_RANGE      0x0183  0x0003  0x16D4      0x000116D4      0x0001  mérési parancs
+;  266  D_RANGE      0x0184  0x0003  0x1732      0x00011732      0x0001  mérési parancs
+;  267  MREAD        0x0185  0x0001  0x7BBA      0x00017BBA      0x0000  egyszerű parancs
+;  268  MWRITE       0x0186  0x0001  0x7BF6      0x00017BF6      0x0001  egyszerű parancs
+;  269  MADDR        0x0187  0x0001  0x7C8C      0x00017C8C      0x0000  egyszerű parancs
+;  270  JSR          0x0189  0x0001  0x7C28      0x00017C28      0x0001  egyszerű parancs
+;  271  CALLARRAY    0x018A  0x0001  0x7C58      0x00017C58      0x0001  egyszerű parancs
+;  272  ECHO         0x018C  0x0001  0xDB86      0x0001DB86      0x0000  egyszerű parancs
+;  273  ECHO2        0x018E  0x0001  0xDBAA      0x0001DBAA      0x0000  egyszerű parancs
+;  274  XYZZY        0x018F  0x0001  0x7BA0      0x00017BA0      0x0000  egyszerű parancs
+;  275  RMEM?_       0x0190  0x0001  0xBE08      0x0001BE08      0x0000  egyszerű parancs
+;  276  LOADREAL_    0x0191  0x0004  0xB58A      0x0001B58A      0x0001  CAL/privilegizált
+;  277  ANNUN_       0x0192  0x0000  0x8124      0x00008124      0x0001  token/keyword
+;  278  ADMEM_       0x0194  0x0004  0xB650      0x0001B650      0x0001  CAL/privilegizált
+;  279  ADCAL_       0x0195  0x0004  0xB68A      0x0001B68A      0x0001  CAL/privilegizált
+;  280  TRIGGER_     0x0196  0x0004  0xB592      0x0001B592      0x0001  CAL/privilegizált
+;  281  DCBD_        0x0197  0x0004  0xB5CC      0x0001B5CC      0x0001  CAL/privilegizált
+;  282  ACBD_        0x0198  0x0004  0xB616      0x0001B616      0x0001  CAL/privilegizált
+;  283  INGRD_       0x0199  0x0004  0xB6D4      0x0001B6D4      0x0001  CAL/privilegizált
+;  284  BUSOUT_      0x019A  0x0002  0xB36C      0x0001B36C      0x0001  query
+;  285  SYNCPARM_    0x019B  0x0003  0x97DE      0x000197DE      0x0001  mérési parancs
+;  286  JUNK_        0x019C  0x0000  0x3AB2      0x00003AB2      0x0002  token/keyword
+;  287  GREG_        0x019D  0x0001  0xA600      0x0001A600      0x0001  egyszerű parancs
+;  288  CRASH_       0x019E  0x0000  0x053C      0x0000053C      0x0001  token/keyword
+;  289  FILLBIN      0x019F  0x0001  0x83EE      0x000183EE      0x0001  egyszerű parancs
+;  290  FILL         0x01A2  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;  291  LET          0x01A4  0x0000  0x0000      0x00000000      0x0001  token/keyword
+;  292  IF           0x01A7  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  293  THEN         0x01A8  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  294  ELSE         0x01A9  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  295  ENDIF        0x01AA  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  296  FOR          0x01AB  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  297  TO           0x01AE  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  298  NEXT         0x01B0  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  299  WHILE        0x01B1  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  300  ENDWHILE     0x01B3  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  301  ENTER        0x01B4  0x0004  0xB6E8      0x0001B6E8      0x0001  CAL/privilegizált
+;  302  OUTPUT       0x01B6  0x0004  0xB75E      0x0001B75E      0x0001  CAL/privilegizált
+;  303  OUTDISP      0x01B7  0x0004  0xB80C      0x0001B80C      0x0001  CAL/privilegizált
+;  304  STEP         0x01B8  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  305  DSP          0x01BA  0x0001  0xDB0A      0x0001DB0A      0x0000  egyszerű parancs
+;  306  ALWAYS       0x01C1  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  307  EXOR         0x01C3  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  308  OR           0x01C5  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  309  AND          0x01C6  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  310  NOT          0x01C8  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  311  DIV          0x01D1  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  312  MOD          0x01D2  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  313  SIN          0x01D8  0x0005  0x694E      0x0001694E      0x0000  math/stack
+;  314  COS          0x01D9  0x0005  0x6956      0x00016956      0x0000  math/stack
+;  315  ATN          0x01DA  0x0005  0x695E      0x0001695E      0x0000  math/stack
+;  316  EXP          0x01DB  0x0005  0x6966      0x00016966      0x0000  math/stack
+;  317  LOG          0x01DC  0x0005  0x696E      0x0001696E      0x0000  math/stack
+;  318  LGT          0x01DD  0x0005  0x6976      0x00016976      0x0000  math/stack
+;  319  SQR          0x01DE  0x0005  0x697E      0x0001697E      0x0000  math/stack
+;  320  ABS          0x01DF  0x0005  0x6986      0x00016986      0x0000  math/stack
+;  321  BINCMP       0x01E0  0x0005  0x6618      0x00016618      0x0000  math/stack
+;  322  BINAND       0x01E1  0x0005  0x6600      0x00016600      0x0000  math/stack
+;  323  BINIOR       0x01E2  0x0005  0x6608      0x00016608      0x0000  math/stack
+;  324  BINEOR       0x01E3  0x0005  0x6610      0x00016610      0x0000  math/stack
+;  325  BIT          0x01E4  0x0005  0x662C      0x0001662C      0x0000  math/stack
+;  326  SHIFT        0x01E5  0x0005  0x6654      0x00016654      0x0000  math/stack
+;  327  ROTATE       0x01E6  0x0005  0x666C      0x0001666C      0x0000  math/stack
+;  328  IST          0x01E7  0x0004  0xE9F2      0x0001E9F2      0x0003  CAL/privilegizált
+;  329  CNF          0x01E8  0x0004  0xEA1C      0x0001EA1C      0x0003  CAL/privilegizált
+;  330  INX          0x01E9  0x0004  0xEA26      0x0001EA26      0x0003  CAL/privilegizált
+;  331  FTH          0x01EB  0x0004  0xEB2E      0x0001EB2E      0x0003  CAL/privilegizált
+;  332  STA          0x01EC  0x0004  0xEBD2      0x0001EBD2      0x0003  CAL/privilegizált
+;  333  OPN          0x01ED  0x0004  0xE7B0      0x0001E7B0      0x0003  CAL/privilegizált
+;  334  CLS          0x01EF  0x0004  0xE7E2      0x0001E7E2      0x0003  CAL/privilegizált
+;  335  RST          0x01F0  0x0004  0xEBC4      0x0001EBC4      0x0003  CAL/privilegizált
+;  336  FNC          0x01F2  0x0004  0xFD46      0x0001FD46      0x0003  CAL/privilegizált
+;  337  CIILMODE?    0x01F4  0x0004  0xE89A      0x0001E89A      0x0002  CAL/privilegizált
+;  338  CIIL?        0x01F5  0x0004  0xE814      0x0001E814      0x0002  CAL/privilegizált
+;  339  CANCIIL      0x01F6  0x0004  0xE9E4      0x0001E9E4      0x0002  CAL/privilegizált
+;  340  GETCIIL      0x01F7  0x0004  0xE996      0x0001E996      0x0002  CAL/privilegizált
+;  341  DCS          0x01F9  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  342  ACS          0x01FA  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  343  IMP          0x01FB  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  344  WAV          0x01FC  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  345  VOLT         0x01FD  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  346  VRMS         0x01FE  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  347  CURR         0x01FF  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  348  RESI         0x0200  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  349  SMPL         0x0201  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  350  PERI         0x0202  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  351  CH0          0x0203  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  352  CH00         0x0204  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  353  CH1          0x0205  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  354  CH01         0x0206  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  355  CH2          0x0207  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  356  CH02         0x0208  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  357  CH3          0x0209  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  358  CH03         0x020A  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  359  CH4          0x020B  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  360  CH04         0x020C  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  361  CH5          0x020D  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  362  CH05         0x020E  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  363  CH6          0x020F  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  364  CH06         0x0210  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  365  CH7          0x0211  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  366  CH07         0x0212  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  367  CH8          0x0213  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  368  CH08         0x0214  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  369  CH9          0x0215  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  370  CH09         0x0216  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  371  SET          0x021D  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  372  TWOW         0x021E  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  373  FORW         0x021F  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  374  TRSC         0x0220  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  375  INT          0x0221  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  376  TRSL         0x0222  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  377  ACPL         0x0223  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  378  DCPL         0x0224  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  379  SRX          0x0225  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  380  SRN          0x0226  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  381  MAXT         0x0227  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  382  GAWD         0x0228  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  383  SMPW         0x0229  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  384  TRDL         0x022A  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  385  TRLV         0x022B  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  386  RESP         0x022C  0x0000  0x0000      0x00000000      0x0000  token/keyword
+;  387  FRQW         0x022D  0x0000  0x0000      0x00000000      0x0000  token/keyword
+; Összesen: 388 bejegyzés

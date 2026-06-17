@@ -1,0 +1,5341 @@
+HP 3458A REV9 -- Rejtett GPIB parancsok disassembly
+======================================================================
+
+--- TOKEN-ONLY parancsok (nincs sajat handler, mas parancs argumentuma) ---
+  COMPRESS         cmd_id=0x002B  priv=1
+  CONT             cmd_id=0x002D  priv=1
+  DELSUB           cmd_id=0x0037  priv=0
+  PAUSE            cmd_id=0x006B  priv=1
+  SUBEND           cmd_id=0x0094  priv=1
+  END_MENU         cmd_id=0x00A0  priv=0
+  NUM              cmd_id=0x00D8  priv=0
+  NORM             cmd_id=0x00D9  priv=0
+  ALPHA            cmd_id=0x00DA  priv=0
+  OFF              cmd_id=0x00E1  priv=0
+  ON               cmd_id=0x00E2  priv=0
+  MSG              cmd_id=0x00E3  priv=0
+  CLR              cmd_id=0x00E4  priv=0
+  F0               cmd_id=0x00E9  priv=0
+  F1               cmd_id=0x00EA  priv=0
+  F2               cmd_id=0x00EB  priv=0
+  F3               cmd_id=0x00EC  priv=0
+  F4               cmd_id=0x00ED  priv=0
+  F5               cmd_id=0x00EE  priv=0
+  F6               cmd_id=0x00EF  priv=0
+  F7               cmd_id=0x00F0  priv=0
+  F8               cmd_id=0x00F1  priv=0
+  F9               cmd_id=0x00F2  priv=0
+  FAST             cmd_id=0x00F3  priv=0
+  DIG              cmd_id=0x00F4  priv=0
+  ASCII            cmd_id=0x00F5  priv=0
+  SINT             cmd_id=0x00F6  priv=0
+  DINT             cmd_id=0x00F7  priv=0
+  SREAL            cmd_id=0x00F8  priv=0
+  DREAL            cmd_id=0x00F9  priv=0
+  AC               cmd_id=0x00FC  priv=0
+  OHMS             cmd_id=0x00FD  priv=0
+  ALL              cmd_id=0x00FE  priv=0
+  AUTO             cmd_id=0x0102  priv=0
+  SGL              cmd_id=0x0106  priv=0
+  SYN              cmd_id=0x0107  priv=0
+  EXT              cmd_id=0x0108  priv=0
+  HOLD             cmd_id=0x0109  priv=0
+  MAIN             cmd_id=0x0113  priv=0
+  AUX              cmd_id=0x0114  priv=0
+  DC               cmd_id=0x0115  priv=0
+  ICOMP            cmd_id=0x0118  priv=0
+  BCOMP            cmd_id=0x011A  priv=0
+  RCOMP            cmd_id=0x011B  priv=0
+  NEG              cmd_id=0x011C  priv=0
+  POS              cmd_id=0x011D  priv=0
+  OPEN             cmd_id=0x011F  priv=0
+  FRONT            cmd_id=0x0120  priv=0
+  REAR             cmd_id=0x0121  priv=0
+  ITG              cmd_id=0x0123  priv=0
+  ANA              cmd_id=0x0127  priv=0
+  RNDM             cmd_id=0x0128  priv=0
+  SYNC             cmd_id=0x0129  priv=0
+  ACTUAL           cmd_id=0x012B  priv=0
+  NOM              cmd_id=0x012C  priv=0
+  MAX              cmd_id=0x012D  priv=0
+  MIN              cmd_id=0x012E  priv=0
+  ATTENLO          cmd_id=0x0131  priv=0
+  ATTENHI          cmd_id=0x0132  priv=0
+  AMPLO            cmd_id=0x0133  priv=0
+  AMPHI            cmd_id=0x0134  priv=0
+  LIFO             cmd_id=0x0135  priv=0
+  FIFO             cmd_id=0x0136  priv=0
+  CTHRM            cmd_id=0x013A  priv=0
+  DB               cmd_id=0x013B  priv=0
+  DBM              cmd_id=0x013C  priv=0
+  FILTER           cmd_id=0x013D  priv=0
+  FTHRM            cmd_id=0x013E  priv=0
+  NULL             cmd_id=0x013F  priv=0
+  PERC             cmd_id=0x0140  priv=0
+  PFAIL            cmd_id=0x0141  priv=0
+  RMS              cmd_id=0x0142  priv=0
+  STAT             cmd_id=0x0144  priv=0
+  CTHRM2K          cmd_id=0x0145  priv=0
+  CTHRM10K         cmd_id=0x0146  priv=0
+  FTHRM2K          cmd_id=0x0147  priv=0
+  FTHRM10K         cmd_id=0x0148  priv=0
+  CRTD85           cmd_id=0x0149  priv=0
+  CRTD92           cmd_id=0x014A  priv=0
+  FRTD85           cmd_id=0x014B  priv=0
+  FRTD92           cmd_id=0x014C  priv=0
+  DEGREE           cmd_id=0x014D  priv=0
+  LOWER            cmd_id=0x014E  priv=0
+  MEAN             cmd_id=0x014F  priv=0
+  NSAMP            cmd_id=0x0150  priv=0
+  OFFSET           cmd_id=0x0151  priv=0
+  REF              cmd_id=0x0152  priv=0
+  SDEV             cmd_id=0x0153  priv=0
+  UPPER            cmd_id=0x0154  priv=0
+  HIRES            cmd_id=0x0155  priv=0
+  PFAILNUM         cmd_id=0x0156  priv=0
+  SHORT            cmd_id=0x0157  priv=0
+  FULL             cmd_id=0x0158  priv=0
+  DEFAULT          cmd_id=0x015A  priv=0
+  RETURN           cmd_id=0x0162  priv=0
+  DIM              cmd_id=0x0163  priv=1
+  REAL             cmd_id=0x0166  priv=1
+  INTEGER          cmd_id=0x0168  priv=1
+  LEFT             cmd_id=0x0177  priv=0
+  RIGHT            cmd_id=0x0178  priv=0
+  FILL             cmd_id=0x01A2  priv=1
+  LET              cmd_id=0x01A4  priv=1
+  IF               cmd_id=0x01A7  priv=0
+  THEN             cmd_id=0x01A8  priv=0
+  ELSE             cmd_id=0x01A9  priv=0
+  ENDIF            cmd_id=0x01AA  priv=0
+  FOR              cmd_id=0x01AB  priv=0
+  TO               cmd_id=0x01AE  priv=0
+  NEXT             cmd_id=0x01B0  priv=0
+  WHILE            cmd_id=0x01B1  priv=0
+  ENDWHILE         cmd_id=0x01B3  priv=0
+  STEP             cmd_id=0x01B8  priv=0
+  ALWAYS           cmd_id=0x01C1  priv=0
+  EXOR             cmd_id=0x01C3  priv=0
+  OR               cmd_id=0x01C5  priv=0
+  AND              cmd_id=0x01C6  priv=0
+  NOT              cmd_id=0x01C8  priv=0
+  DIV              cmd_id=0x01D1  priv=0
+  MOD              cmd_id=0x01D2  priv=0
+  DCS              cmd_id=0x01F9  priv=0
+  ACS              cmd_id=0x01FA  priv=0
+  IMP              cmd_id=0x01FB  priv=0
+  WAV              cmd_id=0x01FC  priv=0
+  VOLT             cmd_id=0x01FD  priv=0
+  VRMS             cmd_id=0x01FE  priv=0
+  CURR             cmd_id=0x01FF  priv=0
+  RESI             cmd_id=0x0200  priv=0
+  SMPL             cmd_id=0x0201  priv=0
+  PERI             cmd_id=0x0202  priv=0
+  CH0              cmd_id=0x0203  priv=0
+  CH00             cmd_id=0x0204  priv=0
+  CH1              cmd_id=0x0205  priv=0
+  CH01             cmd_id=0x0206  priv=0
+  CH2              cmd_id=0x0207  priv=0
+  CH02             cmd_id=0x0208  priv=0
+  CH3              cmd_id=0x0209  priv=0
+  CH03             cmd_id=0x020A  priv=0
+  CH4              cmd_id=0x020B  priv=0
+  CH04             cmd_id=0x020C  priv=0
+  CH5              cmd_id=0x020D  priv=0
+  CH05             cmd_id=0x020E  priv=0
+  CH6              cmd_id=0x020F  priv=0
+  CH06             cmd_id=0x0210  priv=0
+  CH7              cmd_id=0x0211  priv=0
+  CH07             cmd_id=0x0212  priv=0
+  CH8              cmd_id=0x0213  priv=0
+  CH08             cmd_id=0x0214  priv=0
+  CH9              cmd_id=0x0215  priv=0
+  CH09             cmd_id=0x0216  priv=0
+  SET              cmd_id=0x021D  priv=0
+  TWOW             cmd_id=0x021E  priv=0
+  FORW             cmd_id=0x021F  priv=0
+  TRSC             cmd_id=0x0220  priv=0
+  INT              cmd_id=0x0221  priv=0
+  TRSL             cmd_id=0x0222  priv=0
+  ACPL             cmd_id=0x0223  priv=0
+  DCPL             cmd_id=0x0224  priv=0
+  SRX              cmd_id=0x0225  priv=0
+  SRN              cmd_id=0x0226  priv=0
+  MAXT             cmd_id=0x0227  priv=0
+  GAWD             cmd_id=0x0228  priv=0
+  SMPW             cmd_id=0x0229  priv=0
+  TRDL             cmd_id=0x022A  priv=0
+  TRLV             cmd_id=0x022B  priv=0
+  RESP             cmd_id=0x022C  priv=0
+  FRQW             cmd_id=0x022D  priv=0
+
+--- HANDLER-REL RENDELKEZO REJTETT PARANCSOK (123 db) ---
+
+[ACBAND]  handler=0x031094  priv=0  cmd_id=0x0010
+  31094  link.w   a6, #$0
+  31098  movea.l  $14(a6), a0
+  3109C  pea.l    (a0)
+  3109E  pea.l    $31d40(pc)
+  310A2  jsr      $58608.l
+  310A8  addq.l   #$8, a7
+  310AA  tst.b    d7
+  310AC  beq.b    $310b8
+  310AE  move.l   #$14, $13cc(a5)
+  310B6  bra.b    $310ea
+  310B8  movea.l  $14(a6), a1
+  310BC  pea.l    (a1)
+  310BE  pea.l    $31e3e(pc)
+  310C2  jsr      $58620.l
+  310C8  addq.l   #$8, a7
+  310CA  tst.b    d7
+  310CC  beq.b    $310d8
+  310CE  move.l   #$989680, $13cc(a5)
+  310D6  bra.b    $310ea
+  310D8  movea.l  $14(a6), a2
+  310DC  pea.l    (a2)
+  310DE  jsr      $585c8.l
+  310E4  addq.l   #$4, a7
+  310E6  move.l   d7, $13cc(a5)
+  310EA  tst.l    $13cc(a5)
+  310EE  bne.b    $310f8
+  310F0  move.l   #$1, $13cc(a5)
+  310F8  movea.l  $8(a6), a3
+  310FC  pea.l    (a3)
+  310FE  pea.l    $31d40(pc)
+  31102  jsr      $58608.l
+  31108  addq.l   #$8, a7
+  3110A  tst.b    d7
+  3110C  beq.b    $31118
+  3110E  move.l   #$1e8480, $13d0(a5)
+  31116  bra.b    $3114a
+  31118  movea.l  $8(a6), a4
+  3111C  pea.l    (a4)
+  3111E  pea.l    $31e3e(pc)
+  31122  jsr      $58620.l
+  31128  addq.l   #$8, a7
+  3112A  tst.b    d7
+  3112C  beq.b    $31138
+  3112E  move.l   #$989680, $13d0(a5)
+  31136  bra.b    $3114a
+  31138  movea.l  $8(a6), a0
+  3113C  pea.l    (a0)
+  3113E  jsr      $585c8.l
+  31144  addq.l   #$4, a7
+  31146  move.l   d7, $13d0(a5)
+  3114A  tst.l    $13d0(a5)
+  3114E  bne.b    $31158
+  31150  move.l   #$1, $13d0(a5)
+  31158  move.b   $1397(a5), d0
+  3115C  cmpi.b   #$7, d0
+  31160  blt.b    $3116a
+  31162  cmpi.b   #$b, d0
+  31166  bgt.b    $3116a
+  31168  bra.b    $3116c
+  3116A  bra.b    $3117a
+  3116C  move.b   $1397(a5), d1
+  31170  ext.w    d1
+  31172  move.w   d1, -(a7)
+  31174  jsr      $2ed6e(pc)
+  31178  addq.l   #$2, a7
+  3117A  unlk     a6
+  3117C  rts      
+
+[ACDCI]  handler=0x030A28  priv=1  cmd_id=0x0012
+  30A28  link.w   a6, #$fffe
+  30A2C  movea.l  $16(a6), a0
+  30A30  pea.l    (a0)
+  30A32  move.w   #$7, -(a7)
+  30A36  bsr.w    $2ffc8
+  30A3A  move.w   d7, -$2(a6)
+  30A3E  addq.l   #$6, a7
+  30A40  move.w   -$2(a6), d0
+  30A44  cmpi.w   #$a, d0
+  30A48  beq.w    $30b1e
+  30A4C  move.b   $1473(a5), d1
+  30A50  cmpi.b   #$7, d1
+  30A54  bne.b    $30a64
+  30A56  move.b   $1476(a5), d2
+  30A5A  ext.w    d2
+  30A5C  cmp.w    $8(a6), d2
+  30A60  bne.b    $30a64
+  30A62  bra.b    $30a74
+  30A64  move.w   $8(a6), -(a7)
+  30A68  move.w   -$2(a6), -(a7)
+  30A6C  jsr      $2d96a(pc)
+  30A70  addq.l   #$4, a7
+  30A72  bra.b    $30a8a
+  30A74  move.b   $1474(a5), d0
+  30A78  ext.w    d0
+  30A7A  cmp.w    -$2(a6), d0
+  30A7E  beq.b    $30a8a
+  30A80  move.w   -$2(a6), -(a7)
+  30A84  jsr      $2daae(pc)
+  30A88  addq.l   #$2, a7
+  30A8A  move.w   -$2(a6), -(a7)
+  30A8E  movea.l  $16(a6), a0
+  30A92  pea.l    (a0)
+  30A94  movea.l  $a(a6), a1
+  30A98  pea.l    (a1)
+  30A9A  jsr      $2ddee(pc)
+  30A9E  adda.l   #$a, a7
+  30AA4  move.b   $1391(a5), d0
+  30AA8  ext.w    d0
+  30AAA  move.w   d0, -(a7)
+  30AAC  move.w   #$7, -(a7)
+  30AB0  move.b   $13a3(a5), d1
+  30AB4  ext.w    d1
+  30AB6  move.w   d1, -(a7)
+  30AB8  jsr      $2efb8(pc)
+  30ABC  addq.l   #$6, a7
+  30ABE  move.w   $8(a6), -(a7)
+  30AC2  move.w   -$2(a6), -(a7)
+  30AC6  move.w   #$7, -(a7)
+  30ACA  movea.l  $a(a6), a0
+  30ACE  pea.l    (a0)
+  30AD0  jsr      $2e24c(pc)
+  30AD4  adda.l   #$a, a7
+  30ADA  move.b   $139f(a5), d0
+  30ADE  ext.w    d0
+  30AE0  move.w   d0, -(a7)
+  30AE2  move.w   #$2, -(a7)
+  30AE6  move.w   #$7, -(a7)
+  30AEA  jsr      $31ec6(pc)
+  30AEE  addq.l   #$6, a7
+  30AF0  move.b   #$7, $1397(a5)
+  30AF6  move.w   -$2(a6), d0
+  30AFA  move.b   d0, $139c(a5)
+  30AFE  move.w   $8(a6), d1
+  30B02  move.b   d1, $1395(a5)
+  30B06  movea.l  $a(a6), a0
+  30B0A  lea.l    $13ec(a5), a1
+  30B0E  move.l   (a0)+, (a1)+
+  30B10  move.l   (a0)+, (a1)+
+  30B12  tst.b    $13a2(a5)
+  30B16  beq.b    $30b1e
+  30B18  jsr      $51ebc.l
+  30B1E  unlk     a6
+  30B20  rts      
+
+[ADDRESS]  handler=0x05B7E4  priv=0  cmd_id=0x0018
+  5B7E4  link.w   a6, #$0
+  5B7E8  move.l   $121e80.l, d0  # SRAM 121E80
+  5B7EE  cmp.l    $124(a5), d0
+  5B7F2  bne.w    $5b80c
+  5B7F6  move.l   $2448.w, -(a7)
+  5B7FA  lea.l    $5b920(pc), a0
+  5B7FE  move.l   a0, -(a7)
+  5B800  jsr      $2f96.l
+  5B806  addq.l   #$8, a7
+  5B808  bra.w    $5b89a
+  5B80C  move.w   $8(a6), d0
+  5B810  cmpi.w   #$1f, d0
+  5B814  bgt.w    $5b822
+  5B818  tst.w    d0
+  5B81A  blt.w    $5b822
+  5B81E  bra.w    $5b838
+  5B822  move.l   $23f0.w, -(a7)
+  5B826  lea.l    $5b940(pc), a0
+  5B82A  move.l   a0, -(a7)
+  5B82C  jsr      $2f96.l
+  5B832  addq.l   #$8, a7
+  5B834  bra.w    $5b89a
+  5B838  move.b   #$93, $80006.l
+  5B840  move.w   $8(a6), d0
+  5B844  cmpi.w   #$1f, d0
+  5B848  bne.w    $5b858
+  5B84C  move.b   #$8a, $80006.l
+  5B854  bra.w    $5b892
+  5B858  move.b   #$a, $80006.l
+  5B860  clr.l    -(a7)
+  5B862  move.w   #$5, -(a7)
+  5B866  jsr      $188c8.l
+  5B86C  addq.l   #$6, a7
+  5B86E  move.w   $8(a6), d0
+  5B872  move.b   d0, $1caa(a5)
+  5B876  jsr      $5da0c.l
+  5B87C  move.w   #$5, -(a7)
+  5B880  jsr      $18918.l
+  5B886  addq.l   #$2, a7
+  5B888  move.w   $8(a6), d0
+  5B88C  move.b   d0, $80008.l
+  5B892  move.b   #$13, $80006.l
+  5B89A  unlk     a6
+  5B89C  rts      
+
+[AUXERR?]  handler=0x0037CC  priv=1  cmd_id=0x001E
+  037CC  link.w   a6, #$fffe
+  037D0  clr.l    -(a7)
+  037D2  move.w   #$3, -(a7)
+  037D6  jsr      $188c8.l
+  037DC  addq.l   #$6, a7
+  037DE  move.w   $638(a5), -$2(a6)
+  037E4  clr.w    $638(a5)
+  037E8  move.w   #$3, -(a7)
+  037EC  jsr      $18918.l
+  037F2  addq.l   #$2, a7
+  037F4  jsr      $1dc20.l
+  037FA  tst.b    d7
+  037FC  beq.b    $381e
+  037FE  move.w   -$2(a6), -(a7)
+  03802  lea.l    $3d12(pc), a0
+  03806  move.l   a0, -(a7)
+  03808  lea.l    $120f00.l, a1  # SRAM 120F00
+  0380E  move.l   a1, -(a7)
+  03810  jsr      $532de.l
+  03816  adda.l   #$a, a7
+  0381C  bra.b    $383c
+  0381E  move.w   -$2(a6), -(a7)
+  03822  lea.l    $3ca0(pc), a0
+  03826  move.l   a0, -(a7)
+  03828  lea.l    $120f00.l, a1  # SRAM 120F00
+  0382E  move.l   a1, -(a7)
+  03830  jsr      $532de.l
+  03836  adda.l   #$a, a7
+  0383C  clr.w    -(a7)
+  0383E  jsr      $1f530.l
+  03844  addq.l   #$2, a7
+  03846  unlk     a6
+  03848  rts      
+
+[CIIL]  handler=0x04E91E  priv=2  cmd_id=0x002A
+  4E91E  link.w   a6, #$0
+  4E922  bsr.w    $4e596
+  4E926  tst.b    d7
+  4E928  beq.w    $4e992
+  4E92C  jsr      $5af1a.l
+  4E932  tst.b    d7
+  4E934  beq.w    $4e950
+  4E938  tst.b    $1773(a5)
+  4E93C  bne.w    $4e94c
+  4E940  move.b   #$1, $1773(a5)
+  4E946  jsr      $1ce4.l
+  4E94C  bra.w    $4e992
+  4E950  move.b   #$1, $1773(a5)
+  4E956  move.w   #$1, -(a7)
+  4E95A  jsr      $4562.l
+  4E960  addq.l   #$2, a7
+  4E962  move.w   #$2, -(a7)
+  4E966  lea.l    $5018e(pc), a0
+  4E96A  move.l   a0, -(a7)
+  4E96C  jsr      $7f72.l
+  4E972  addq.l   #$6, a7
+  4E974  move.w   #$4, -(a7)
+  4E978  move.l   #$1, -(a7)
+  4E97E  jsr      $3308c.l
+  4E984  addq.l   #$6, a7
+  4E986  move.w   #$1, -(a7)
+  4E98A  jsr      $331b6.l
+  4E990  addq.l   #$2, a7
+  4E992  unlk     a6
+  4E994  rts      
+
+[CSB]  handler=0x004270  priv=1  cmd_id=0x002E
+  04270  link.w   a6, #$0
+  04274  clr.l    -(a7)
+  04276  move.w   #$6, -(a7)
+  0427A  jsr      $188c8.l
+  04280  addq.l   #$6, a7
+  04282  move.b   #$93, $80006.l
+  0428A  andi.w   #$fff0, $6b6(a5)
+  04290  move.w   $6b6(a5), d0
+  04294  move.b   d0, $8000a.l
+  0429A  move.b   $80006.l, d1
+  042A0  andi.b   #$4, d1
+  042A4  beq.b    $42ae
+  042A6  move.b   #$18, $80006.l
+  042AE  move.b   #$13, $80006.l
+  042B6  move.w   #$6, -(a7)
+  042BA  jsr      $18918.l
+  042C0  addq.l   #$2, a7
+  042C2  unlk     a6
+  042C4  rts      
+
+[DEFEAT]  handler=0x02FCAA  priv=1  cmd_id=0x0032
+  2FCAA  link.w   a6, #$0
+  2FCAE  move.w   $8(a6), d0
+  2FCB2  cmpi.w   #$ffff, d0
+  2FCB6  blt.b    $2fcc0
+  2FCB8  cmpi.w   #$1, d0
+  2FCBC  bgt.b    $2fcc0
+  2FCBE  bra.b    $2fcd4
+  2FCC0  move.l   $23f0.w, -(a7)
+  2FCC4  lea.l    $2fea0(pc), a0
+  2FCC8  move.l   a0, -(a7)
+  2FCCA  jsr      $2f96.l
+  2FCD0  addq.l   #$8, a7
+  2FCD2  bra.b    $2fcea
+  2FCD4  move.w   $8(a6), d0
+  2FCD8  cmpi.w   #$ffff, d0
+  2FCDC  bne.b    $2fce2
+  2FCDE  clr.w    $8(a6)
+  2FCE2  move.w   $8(a6), d1
+  2FCE6  move.b   d1, $1447(a5)
+  2FCEA  unlk     a6
+  2FCEC  rts      
+
+[DEFKEY]  handler=0x006DDC  priv=1  cmd_id=0x0034
+  06DDC  link.w   a6, #$ffb0
+  06DE0  tst.l    $8(a6)
+  06DE4  bne.b    $6df6
+  06DE6  move.w   $c(a6), -(a7)
+  06DEA  move.l   $8(a6), -(a7)
+  06DEE  bsr.w    $6c80
+  06DF2  addq.l   #$6, a7
+  06DF4  bra.b    $6e18
+  06DF6  move.l   $8(a6), -(a7)
+  06DFA  lea.l    -$50(a6), a0
+  06DFE  move.l   a0, -(a7)
+  06E00  jsr      $5336a.l
+  06E06  addq.l   #$8, a7
+  06E08  move.w   $c(a6), -(a7)
+  06E0C  lea.l    -$50(a6), a0
+  06E10  move.l   a0, -(a7)
+  06E12  bsr.w    $6c80
+  06E16  addq.l   #$6, a7
+  06E18  unlk     a6
+  06E1A  rts      
+
+[EXTOUT]  handler=0x032CF8  priv=0  cmd_id=0x0044
+  32CF8  link.w   a6, #$0
+  32CFC  move.w   $a(a6), d0
+  32D00  cmpi.w   #$ffff, d0
+  32D04  blt.b    $32d0e
+  32D06  cmpi.w   #$6, d0
+  32D0A  bgt.b    $32d0e
+  32D0C  bra.b    $32d24
+  32D0E  move.l   $23f0.w, -(a7)
+  32D12  lea.l    $32e58(pc), a0
+  32D16  move.l   a0, -(a7)
+  32D18  jsr      $2f96.l
+  32D1E  addq.l   #$8, a7
+  32D20  bra.w    $32dcc
+  32D24  move.w   $a(a6), d0
+  32D28  cmpi.w   #$ffff, d0
+  32D2C  bne.b    $32d34
+  32D2E  move.w   #$1, $a(a6)
+  32D34  move.w   $8(a6), d1
+  32D38  cmpi.w   #$ffff, d1
+  32D3C  blt.b    $32d46
+  32D3E  cmpi.w   #$1, d1
+  32D42  bgt.b    $32d46
+  32D44  bra.b    $32d5a
+  32D46  move.l   $23f0.w, -(a7)
+  32D4A  lea.l    $32e78(pc), a0
+  32D4E  move.l   a0, -(a7)
+  32D50  jsr      $2f96.l
+  32D56  addq.l   #$8, a7
+  32D58  bra.b    $32dcc
+  32D5A  move.w   $8(a6), d0
+  32D5E  cmpi.w   #$ffff, d0
+  32D62  bne.b    $32d68
+  32D64  clr.w    $8(a6)
+  32D68  move.b   $1397(a5), d1
+  32D6C  ext.w    d1
+  32D6E  move.w   d1, -(a7)
+  32D70  move.b   $1472(a5), d2
+  32D74  ext.w    d2
+  32D76  move.w   d2, -(a7)
+  32D78  move.w   $8(a6), -(a7)
+  32D7C  move.w   $a(a6), -(a7)
+  32D80  jsr      $2a546.l
+  32D86  addq.l   #$8, a7
+  32D88  move.b   $139d(a5), d0
+  32D8C  ext.w    d0
+  32D8E  move.w   d0, -(a7)
+  32D90  move.b   $1397(a5), d1
+  32D94  ext.w    d1
+  32D96  move.w   d1, -(a7)
+  32D98  move.l   $1478(a5), -(a7)
+  32D9C  jsr      $29d0c.l
+  32DA2  addq.l   #$8, a7
+  32DA4  move.w   $a(a6), d0
+  32DA8  cmpi.w   #$2, d0
+  32DAC  bne.b    $32dbc
+  32DAE  move.w   #$5, -(a7)
+  32DB2  jsr      $2b5a2(pc)
+  32DB6  addq.l   #$2, a7
+  32DB8  clr.w    $a(a6)
+  32DBC  move.w   $a(a6), d0
+  32DC0  move.b   d0, $13a4(a5)
+  32DC4  move.w   $8(a6), d1
+  32DC8  move.b   d1, $13a5(a5)
+  32DCC  unlk     a6
+  32DCE  rts      
+
+[FSOURCE]  handler=0x0314FA  priv=0  cmd_id=0x0048
+  314FA  link.w   a6, #$0
+  314FE  move.w   $8(a6), d0
+  31502  cmpi.w   #$ffff, d0
+  31506  blt.b    $3152c
+  31508  tst.w    d0
+  3150A  beq.b    $3152c
+  3150C  cmpi.w   #$1, d0
+  31510  beq.b    $3152c
+  31512  cmpi.w   #$4, d0
+  31516  beq.b    $3152c
+  31518  cmpi.w   #$5, d0
+  3151C  beq.b    $3152c
+  3151E  cmpi.w   #$6, d0
+  31522  beq.b    $3152c
+  31524  cmpi.w   #$8, d0
+  31528  bgt.b    $3152c
+  3152A  bra.b    $31542
+  3152C  move.l   $23f0.w, -(a7)
+  31530  lea.l    $31e7e(pc), a0
+  31534  move.l   a0, -(a7)
+  31536  jsr      $2f96.l
+  3153C  addq.l   #$8, a7
+  3153E  bra.w    $315da
+  31542  move.w   $8(a6), d0
+  31546  cmpi.w   #$ffff, d0
+  3154A  bne.b    $31552
+  3154C  move.w   #$2, $8(a6)
+  31552  move.w   $8(a6), d1
+  31556  move.b   d1, $139b(a5)
+  3155A  move.b   $1397(a5), d2
+  3155E  cmpi.b   #$d, d2
+  31562  beq.b    $3156c
+  31564  cmpi.b   #$e, d2
+  31568  beq.b    $3156c
+  3156A  bra.b    $315da
+  3156C  move.b   $139b(a5), d3
+  31570  cmpi.b   #$3, d3
+  31574  beq.b    $3157e
+  31576  cmpi.b   #$8, d3
+  3157A  beq.b    $3157e
+  3157C  bra.b    $31584
+  3157E  clr.b    $1395(a5)
+  31582  bra.b    $3158a
+  31584  move.b   #$1, $1395(a5)
+  3158A  move.w   $8(a6), d4
+  3158E  cmpi.w   #$7, d4
+  31592  beq.b    $3159c
+  31594  cmpi.w   #$8, d4
+  31598  beq.b    $3159c
+  3159A  bra.b    $315b8
+  3159C  tst.b    $139c(a5)
+  315A0  blt.b    $315a6
+  315A2  clr.b    $139c(a5)
+  315A6  move.b   #$e, $1397(a5)
+  315AC  move.w   #$e, -(a7)
+  315B0  jsr      $2ed6e(pc)
+  315B4  addq.l   #$2, a7
+  315B6  bra.b    $315da
+  315B8  move.b   $139c(a5), d0
+  315BC  ext.w    d0
+  315BE  cmpi.w   #$fffe, d0
+  315C2  bgt.b    $315ca
+  315C4  move.b   #$fe, $139c(a5)
+  315CA  move.b   #$d, $1397(a5)
+  315D0  move.w   #$d, -(a7)
+  315D4  jsr      $2ed6e(pc)
+  315D8  addq.l   #$2, a7
+  315DA  unlk     a6
+  315DC  rts      
+
+[GAL]  handler=0x04E9AA  priv=2  cmd_id=0x004C
+  4E9AA  link.w   a6, #$0
+  4E9AE  tst.b    $1773(a5)
+  4E9B2  beq.w    $4e9e0
+  4E9B6  clr.b    $1773(a5)
+  4E9BA  jsr      $29c86.l
+  4E9C0  move.w   #$1, -(a7)
+  4E9C4  clr.l    -(a7)
+  4E9C6  jsr      $7f72.l
+  4E9CC  addq.l   #$6, a7
+  4E9CE  jsr      $5af1a.l
+  4E9D4  tst.b    d7
+  4E9D6  beq.w    $4e9e0
+  4E9DA  jsr      $79da.l
+  4E9E0  unlk     a6
+  4E9E2  rts      
+
+[MCOUNT?]  handler=0x01DEFA  priv=0  cmd_id=0x0059
+  1DEFA  link.w   a6, #$fff0
+  1DEFE  tst.b    $e68(a5)
+  1DF02  beq.w    $1df0e
+  1DF06  clr.l    -$8(a6)
+  1DF0A  bra.w    $1df86
+  1DF0E  lea.l    -$c(a6), a0
+  1DF12  move.l   a0, -(a7)
+  1DF14  lea.l    -$10(a6), a1
+  1DF18  move.l   a1, -(a7)
+  1DF1A  jsr      $1d4d2.l
+  1DF20  addq.l   #$8, a7
+  1DF22  tst.b    $dd7(a5)
+  1DF26  beq.w    $1df30
+  1DF2A  move.l   -$10(a6), -$c(a6)
+  1DF30  move.l   -$10(a6), d0
+  1DF34  cmp.l    -$c(a6), d0
+  1DF38  bls.w    $1df54
+  1DF3C  sub.l    -$c(a6), d0
+  1DF40  move.l   d0, -(a7)
+  1DF42  move.l   $e28(a5), -(a7)
+  1DF46  jsr      $56308.l
+  1DF4C  move.l   d7, -$8(a6)
+  1DF50  bra.w    $1df7a
+  1DF54  move.l   $de0(a5), d1
+  1DF58  sub.l    -$c(a6), d1
+  1DF5C  movea.l  -$10(a6), a0
+  1DF60  lea.l    (a0, d1.l), a1
+  1DF64  move.l   a1, d2
+  1DF66  sub.l    $dec(a5), d2
+  1DF6A  move.l   d2, -(a7)
+  1DF6C  move.l   $e28(a5), -(a7)
+  1DF70  jsr      $56308.l
+  1DF76  move.l   d7, -$8(a6)
+  1DF7A  tst.b    $dd8(a5)
+  1DF7E  beq.w    $1df86
+  1DF82  clr.l    -$8(a6)
+  1DF86  jsr      $1dc20.l
+  1DF8C  tst.b    d7
+  1DF8E  beq.w    $1dfb2
+  1DF92  move.l   -$8(a6), -(a7)
+  1DF96  lea.l    $1f604(pc), a2
+  1DF9A  move.l   a2, -(a7)
+  1DF9C  lea.l    $f00(a5), a3
+  1DFA0  move.l   a3, -(a7)
+  1DFA2  jsr      $532de.l
+  1DFA8  adda.l   #$c, a7
+  1DFAE  bra.w    $1dfce
+  1DFB2  move.l   -$8(a6), -(a7)
+  1DFB6  lea.l    $1f600(pc), a0
+  1DFBA  move.l   a0, -(a7)
+  1DFBC  lea.l    $f00(a5), a1
+  1DFC0  move.l   a1, -(a7)
+  1DFC2  jsr      $532de.l
+  1DFC8  adda.l   #$c, a7
+  1DFCE  clr.w    -(a7)
+  1DFD0  jsr      $1f530.l
+  1DFD6  addq.l   #$2, a7
+  1DFD8  unlk     a6
+  1DFDA  rts      
+
+[MENU]  handler=0x0053D2  priv=1  cmd_id=0x005C
+  053D2  link.w   a6, #$0
+  053D6  move.w   $8(a6), d0
+  053DA  cmpi.w   #$ffff, d0
+  053DE  bne.b    $53e6
+  053E0  move.w   #$1, $8(a6)
+  053E6  move.w   $8(a6), d1
+  053EA  andi.w   #$fffe, d1
+  053EE  beq.b    $5404
+  053F0  move.l   $23f0.w, -(a7)
+  053F4  lea.l    $5a10(pc), a0
+  053F8  move.l   a0, -(a7)
+  053FA  jsr      $2f96.l
+  05400  addq.l   #$8, a7
+  05402  bra.b    $542c
+  05404  clr.l    -(a7)
+  05406  move.w   #$5, -(a7)
+  0540A  jsr      $188c8.l
+  05410  addq.l   #$6, a7
+  05412  move.w   $8(a6), d0
+  05416  move.b   d0, $1db4(a5)
+  0541A  jsr      $5da0c.l
+  05420  move.w   #$5, -(a7)
+  05424  jsr      $18918.l
+  0542A  addq.l   #$2, a7
+  0542C  unlk     a6
+  0542E  rts      
+
+[MMATH]  handler=0x0536DA  priv=0  cmd_id=0x0060
+  536DA  link.w   a6, #$0
+  536DE  move.w   $a(a6), -(a7)
+  536E2  jsr      $5390e.l
+  536E8  addq.l   #$2, a7
+  536EA  tst.w    d7
+  536EC  beq.w    $536f4
+  536F0  bra.w    $53812
+  536F4  move.w   $8(a6), -(a7)
+  536F8  jsr      $5390e.l
+  536FE  addq.l   #$2, a7
+  53700  tst.w    d7
+  53702  beq.w    $5370a
+  53706  bra.w    $53812
+  5370A  move.w   $a(a6), d0
+  5370E  cmpi.w   #$ffff, d0
+  53712  beq.w    $53720
+  53716  tst.w    d0
+  53718  beq.w    $53720
+  5371C  bra.w    $53746
+  53720  move.w   $8(a6), d1
+  53724  cmpi.w   #$ffff, d1
+  53728  beq.w    $53736
+  5372C  tst.w    d1
+  5372E  beq.w    $53736
+  53732  bra.w    $53746
+  53736  move.b   $ccc(a5), d2
+  5373A  andi.b   #$1, d2
+  5373E  beq.w    $53746
+  53742  bra.w    $5374a
+  53746  bra.w    $5374e
+  5374A  bra.w    $53812
+  5374E  move.w   $a(a6), d3
+  53752  cmpi.w   #$e, d3
+  53756  beq.w    $53766
+  5375A  cmpi.w   #$b, d3
+  5375E  beq.w    $53766
+  53762  bra.w    $5377c
+  53766  move.w   #$1, -(a7)
+  5376A  clr.w    -(a7)
+  5376C  move.w   $a(a6), -(a7)
+  53770  jsr      $55ecc.l
+  53776  addq.l   #$6, a7
+  53778  clr.w    $a(a6)
+  5377C  move.w   $8(a6), d0
+  53780  cmpi.w   #$e, d0
+  53784  beq.w    $53794
+  53788  cmpi.w   #$b, d0
+  5378C  beq.w    $53794
+  53790  bra.w    $537ac
+  53794  move.w   #$2, -(a7)
+  53798  move.w   $8(a6), -(a7)
+  5379C  move.w   $a(a6), -(a7)
+  537A0  jsr      $55ecc.l
+  537A6  addq.l   #$6, a7
+  537A8  clr.w    $8(a6)
+  537AC  ori.b    #$10, $ccc(a5)
+  537B2  lea.l    $144c(a5), a0
+  537B6  move.l   a0, -(a7)
+  537B8  move.w   $a(a6), d0
+  537BC  addi.w   #$64, d0
+  537C0  move.w   d0, -(a7)
+  537C2  jsr      $5585e.l
+  537C8  addq.l   #$6, a7
+  537CA  andi.b   #$fe, $ccc(a5)
+  537D0  lea.l    $1454(a5), a0
+  537D4  move.l   a0, -(a7)
+  537D6  move.w   $8(a6), d0
+  537DA  addi.w   #$64, d0
+  537DE  move.w   d0, -(a7)
+  537E0  jsr      $5585e.l
+  537E6  addq.l   #$6, a7
+  537E8  tst.b    $144c(a5)
+  537EC  bne.w    $537fc
+  537F0  tst.b    $1454(a5)
+  537F4  bne.w    $537fc
+  537F8  bra.w    $53800
+  537FC  bra.w    $53806
+  53800  andi.b   #$ef, $ccc(a5)
+  53806  move.b   #$1, $dc2(a5)
+  5380C  move.b   #$1, $17f0(a5)
+  53812  unlk     a6
+  53814  rts      
+
+[MSIZE?]  handler=0x027AB2  priv=0  cmd_id=0x0061
+  27AB2  link.w   a6, #$fff2
+  27AB6  lea.l    -$6(a6), a0
+  27ABA  move.l   a0, d0
+  27ABC  movea.l  d0, a1
+  27ABE  move.l   a1, -(a7)
+  27AC0  clr.l    -(a7)
+  27AC2  move.w   #$1, -(a7)
+  27AC6  move.w   #$2, -(a7)
+  27ACA  lea.l    $758.l, a2  # IO 00758
+  27AD0  move.l   a2, -(a7)
+  27AD2  jsr      $19cb4.l
+  27AD8  move.w   d7, -$2(a6)
+  27ADC  adda.l   #$10, a7
+  27AE2  lea.l    -$e(a6), a3
+  27AE6  move.l   a3, -(a7)
+  27AE8  clr.w    -(a7)
+  27AEA  jsr      $19dea.l
+  27AF0  addq.l   #$6, a7
+  27AF2  tst.w    -$2(a6)
+  27AF6  bne.b    $27b04
+  27AF8  move.l   -$6(a6), -(a7)
+  27AFC  jsr      $19cd0.l
+  27B02  addq.l   #$4, a7
+  27B04  movea.l  $120118.l, a0  # SRAM 120118
+  27B0A  lea.l    $12b000.l, a1  # SRAM 12B000
+  27B10  move.l   a1, d0
+  27B12  movea.l  d0, a2
+  27B14  lea.l    $2(a0), a3
+  27B18  move.l   a3, d1
+  27B1A  sub.l    a2, d1
+  27B1C  move.l   d1, -$a(a6)
+  27B20  jsr      $1dc20.l
+  27B26  tst.b    d7
+  27B28  beq.b    $27b58
+  27B2A  move.l   -$e(a6), -(a7)
+  27B2E  move.l   -$a(a6), -(a7)
+  27B32  lea.l    $27d9a(pc), a4
+  27B36  move.l   a4, -(a7)
+  27B38  lea.l    $f00(a5), a1
+  27B3C  move.l   a1, -(a7)
+  27B3E  jsr      $532de.l
+  27B44  adda.l   #$10, a7
+  27B4A  move.w   #$5, -(a7)
+  27B4E  jsr      $1f530.l
+  27B54  addq.l   #$2, a7
+  27B56  bra.b    $27b82
+  27B58  move.l   -$e(a6), -(a7)
+  27B5C  move.l   -$a(a6), -(a7)
+  27B60  lea.l    $27da8(pc), a0
+  27B64  move.l   a0, -(a7)
+  27B66  lea.l    $f00(a5), a1
+  27B6A  move.l   a1, -(a7)
+  27B6C  jsr      $532de.l
+  27B72  adda.l   #$10, a7
+  27B78  clr.w    -(a7)
+  27B7A  jsr      $1f530.l
+  27B80  addq.l   #$2, a7
+  27B82  unlk     a6
+  27B84  rts      
+
+[OCOMP]  handler=0x031494  priv=1  cmd_id=0x0066
+  31494  link.w   a6, #$0
+  31498  move.w   $8(a6), d0
+  3149C  cmpi.w   #$ffff, d0
+  314A0  blt.b    $314aa
+  314A2  cmpi.w   #$1, d0
+  314A6  bgt.b    $314aa
+  314A8  bra.b    $314be
+  314AA  move.l   $23f0.w, -(a7)
+  314AE  lea.l    $31e46(pc), a0
+  314B2  move.l   a0, -(a7)
+  314B4  jsr      $2f96.l
+  314BA  addq.l   #$8, a7
+  314BC  bra.b    $314f6
+  314BE  move.w   $8(a6), d0
+  314C2  cmpi.w   #$ffff, d0
+  314C6  bne.b    $314ce
+  314C8  move.w   #$1, $8(a6)
+  314CE  move.w   $8(a6), d1
+  314D2  move.b   d1, $139f(a5)
+  314D6  move.b   $1397(a5), d2
+  314DA  cmpi.b   #$3, d2
+  314DE  beq.b    $314e8
+  314E0  cmpi.b   #$4, d2
+  314E4  beq.b    $314e8
+  314E6  bra.b    $314f6
+  314E8  move.b   $1397(a5), d3
+  314EC  ext.w    d3
+  314EE  move.w   d3, -(a7)
+  314F0  jsr      $2ed6e(pc)
+  314F4  addq.l   #$2, a7
+  314F6  unlk     a6
+  314F8  rts      
+
+[OPT?]  handler=0x0175DA  priv=2  cmd_id=0x006A
+  175DA  link.w   a6, #$fffc
+  175DE  jsr      $4e596.l
+  175E4  tst.b    d7
+  175E6  beq.b    $175f0
+  175E8  move.w   #$2bc, -$2(a6)
+  175EE  bra.b    $175f4
+  175F0  clr.w    -$2(a6)
+  175F4  lea.l    $10000.l, a0  # IO 10000
+  175FA  move.l   a0, d0
+  175FC  asl.l    #$1, d0
+  175FE  lea.l    $12fffe.l, a1  # SRAM 12FFFE
+  17604  move.l   $120118.l, d1  # SRAM 120118
+  1760A  lea.l    (a1, d0.l), a2
+  1760E  cmp.l    a2, d1
+  17610  bne.b    $1761a
+  17612  move.w   #$1, -$4(a6)
+  17618  bra.b    $1761e
+  1761A  clr.w    -$4(a6)
+  1761E  jsr      $1dc20.l
+  17624  tst.b    d7
+  17626  beq.b    $1764c
+  17628  move.w   -$2(a6), -(a7)
+  1762C  move.w   -$4(a6), -(a7)
+  17630  lea.l    $17b52(pc), a3
+  17634  move.l   a3, -(a7)
+  17636  lea.l    $120f00.l, a4  # SRAM 120F00
+  1763C  move.l   a4, -(a7)
+  1763E  jsr      $532de.l
+  17644  adda.l   #$c, a7
+  1764A  bra.b    $1766e
+  1764C  move.w   -$2(a6), -(a7)
+  17650  move.w   -$4(a6), -(a7)
+  17654  lea.l    $17b4c(pc), a0
+  17658  move.l   a0, -(a7)
+  1765A  lea.l    $120f00.l, a1  # SRAM 120F00
+  17660  move.l   a1, -(a7)
+  17662  jsr      $532de.l
+  17668  adda.l   #$c, a7
+  1766E  clr.w    -(a7)
+  17670  jsr      $1f530.l
+  17676  addq.l   #$2, a7
+  17678  unlk     a6
+  1767A  rts      
+
+[PURGE]  handler=0x0047F0  priv=0  cmd_id=0x006F
+  047F0  link.w   a6, #$fffc
+  047F4  movea.l  $8(a6), a0
+  047F8  lea.l    $16(a0), a1
+  047FC  move.l   a1, -$4(a6)
+  04800  movea.l  -$4(a6), a2
+  04804  tst.l    (a2)
+  04806  beq.b    $4844
+  04808  clr.l    -(a7)
+  0480A  move.w   #$8, -(a7)
+  0480E  jsr      $188c8.l
+  04814  addq.l   #$6, a7
+  04816  movea.l  -$4(a6), a0
+  0481A  move.l   (a0), d0
+  0481C  lea.l    $6bc(a5), a1
+  04820  cmp.l    a1, d0
+  04822  beq.b    $4832
+  04824  move.l   $11c(a5), -(a7)
+  04828  move.l   d0, -(a7)
+  0482A  jsr      $19dd8.l
+  04830  addq.l   #$8, a7
+  04832  movea.l  -$4(a6), a0
+  04836  clr.l    (a0)
+  04838  move.w   #$8, -(a7)
+  0483C  jsr      $18918.l
+  04842  addq.l   #$2, a7
+  04844  unlk     a6
+  04846  rts      
+
+[RATIO]  handler=0x031C46  priv=0  cmd_id=0x0074
+  31C46  link.w   a6, #$0
+  31C4A  move.w   $8(a6), d0
+  31C4E  cmpi.w   #$ffff, d0
+  31C52  blt.b    $31c5c
+  31C54  cmpi.w   #$1, d0
+  31C58  bgt.b    $31c5c
+  31C5A  bra.b    $31c70
+  31C5C  move.l   $23f0.w, -(a7)
+  31C60  lea.l    $31e46(pc), a0
+  31C64  move.l   a0, -(a7)
+  31C66  jsr      $2f96.l
+  31C6C  addq.l   #$8, a7
+  31C6E  bra.b    $31cb0
+  31C70  move.w   $8(a6), d0
+  31C74  cmpi.w   #$ffff, d0
+  31C78  bne.b    $31c80
+  31C7A  move.w   #$1, $8(a6)
+  31C80  move.w   $8(a6), d1
+  31C84  move.b   d1, $1448(a5)
+  31C88  move.b   $1397(a5), d2
+  31C8C  cmpi.b   #$1, d2
+  31C90  beq.b    $31ca2
+  31C92  cmpi.b   #$8, d2
+  31C96  blt.b    $31ca0
+  31C98  cmpi.b   #$b, d2
+  31C9C  bgt.b    $31ca0
+  31C9E  bra.b    $31ca2
+  31CA0  bra.b    $31cb0
+  31CA2  move.b   $1397(a5), d3
+  31CA6  ext.w    d3
+  31CA8  move.w   d3, -(a7)
+  31CAA  jsr      $2ed6e(pc)
+  31CAE  addq.l   #$2, a7
+  31CB0  unlk     a6
+  31CB2  rts      
+
+[RES]  handler=0x031790  priv=0  cmd_id=0x0075
+  31790  link.w   a6, #$0
+  31794  move.b   $1397(a5), d0
+  31798  cmpi.b   #$5, d0
+  3179C  ble.b    $317ae
+  3179E  cmpi.b   #$7, d0
+  317A2  blt.b    $317ac
+  317A4  cmpi.b   #$8, d0
+  317A8  bgt.b    $317ac
+  317AA  bra.b    $317ae
+  317AC  bra.b    $317ca
+  317AE  move.b   $139c(a5), d1
+  317B2  ext.w    d1
+  317B4  move.w   d1, -(a7)
+  317B6  pea.l    $145e(a5)
+  317BA  movea.l  $8(a6), a0
+  317BE  pea.l    (a0)
+  317C0  jsr      $2ddee(pc)
+  317C4  adda.l   #$a, a7
+  317CA  move.b   $1397(a5), d0
+  317CE  cmpi.b   #$1, d0
+  317D2  bne.b    $31808
+  317D4  move.b   $1708(a5), d1
+  317D8  ext.w    d1
+  317DA  muls.w   #$a, d1
+  317DE  move.b   $139c(a5), d2
+  317E2  ext.w    d2
+  317E4  subi.w   #$ffff, d2
+  317E8  asl.w    #$1, d2
+  317EA  add.w    d2, d1
+  317EC  lea.l    $4d0b0.l, a0
+  317F2  move.w   (a0, d1.w), -(a7)
+  317F6  move.w   #$2b, -(a7)
+  317FA  move.w   #$2, -(a7)
+  317FE  jsr      $2b178.l
+  31804  addq.l   #$6, a7
+  31806  bra.b    $31886
+  31808  move.b   $1397(a5), d0
+  3180C  cmpi.b   #$5, d0
+  31810  bne.b    $31844
+  31812  move.b   $1708(a5), d1
+  31816  ext.w    d1
+  31818  asl.w    #$4, d1
+  3181A  move.b   $139c(a5), d2
+  3181E  ext.w    d2
+  31820  subi.w   #$fff9, d2
+  31824  asl.w    #$1, d2
+  31826  add.w    d2, d1
+  31828  lea.l    $4d240.l, a0
+  3182E  move.w   (a0, d1.w), -(a7)
+  31832  move.w   #$2b, -(a7)
+  31836  move.w   #$2, -(a7)
+  3183A  jsr      $2b178.l
+  31840  addq.l   #$6, a7
+  31842  bra.b    $31886
+  31844  move.b   $1397(a5), d0
+  31848  cmpi.b   #$3, d0
+  3184C  beq.b    $31856
+  3184E  cmpi.b   #$4, d0
+  31852  beq.b    $31856
+  31854  bra.b    $31886
+  31856  move.b   $1708(a5), d1
+  3185A  ext.w    d1
+  3185C  muls.w   #$12, d1
+  31860  move.b   $139c(a5), d2
+  31864  ext.w    d2
+  31866  subq.w   #$1, d2
+  31868  asl.w    #$1, d2
+  3186A  add.w    d2, d1
+  3186C  lea.l    $4d158.l, a0
+  31872  move.w   (a0, d1.w), -(a7)
+  31876  move.w   #$2b, -(a7)
+  3187A  move.w   #$2, -(a7)
+  3187E  jsr      $2b178.l
+  31884  addq.l   #$6, a7
+  31886  move.b   $1391(a5), d0
+  3188A  ext.w    d0
+  3188C  move.w   d0, -(a7)
+  3188E  move.b   $1397(a5), d1
+  31892  ext.w    d1
+  31894  move.w   d1, -(a7)
+  31896  move.b   $13a3(a5), d2
+  3189A  ext.w    d2
+  3189C  move.w   d2, -(a7)
+  3189E  jsr      $2efb8(pc)
+  318A2  addq.l   #$6, a7
+  318A4  move.b   $1395(a5), d0
+  318A8  ext.w    d0
+  318AA  move.w   d0, -(a7)
+  318AC  move.b   $139c(a5), d1
+  318B0  ext.w    d1
+  318B2  move.w   d1, -(a7)
+  318B4  move.b   $1397(a5), d2
+  318B8  ext.w    d2
+  318BA  move.w   d2, -(a7)
+  318BC  movea.l  $8(a6), a0
+  318C0  pea.l    (a0)
+  318C2  jsr      $2e24c(pc)
+  318C6  adda.l   #$a, a7
+  318CC  tst.b    $145c(a5)
+  318D0  beq.b    $31922
+  318D2  move.b   $1395(a5), d0
+  318D6  ext.w    d0
+  318D8  move.w   d0, -(a7)
+  318DA  move.b   $139c(a5), d1
+  318DE  ext.w    d1
+  318E0  move.w   d1, -(a7)
+  318E2  move.b   $1397(a5), d2
+  318E6  ext.w    d2
+  318E8  move.w   d2, -(a7)
+  318EA  jsr      $3349c(pc)
+  318EE  addq.l   #$6, a7
+  318F0  move.b   $1397(a5), d0
+  318F4  cmpi.b   #$8, d0
+  318F8  bgt.b    $31912
+  318FA  move.w   $13b0(a5), -(a7)
+  318FE  move.l   $13c4(a5), -(a7)
+  31902  jsr      $291b0.l
+  31908  addq.l   #$6, a7
+  3190A  jsr      $2943e.l
+  31910  bra.b    $31922
+  31912  move.w   $13b0(a5), -(a7)
+  31916  move.l   $13c4(a5), -(a7)
+  3191A  jsr      $2958c.l
+
+[RQS]  handler=0x004138  priv=1  cmd_id=0x007C
+  04138  link.w   a6, #$0
+  0413C  move.w   $8(a6), d0
+  04140  cmpi.w   #$ffff, d0
+  04144  bne.b    $414a
+  04146  clr.w    $8(a6)
+  0414A  move.w   $8(a6), d1
+  0414E  andi.w   #$ff00, d1
+  04152  beq.b    $4168
+  04154  move.l   $23f0.w, -(a7)
+  04158  lea.l    $42c6(pc), a0
+  0415C  move.l   a0, -(a7)
+  0415E  jsr      $2f96.l
+  04164  addq.l   #$8, a7
+  04166  bra.b    $4172
+  04168  move.w   $8(a6), -(a7)
+  0416C  bsr.w    $3e78
+  04170  addq.l   #$2, a7
+  04172  unlk     a6
+  04174  rts      
+
+[RSTATE]  handler=0x004412  priv=1  cmd_id=0x007D
+  04412  link.w   a6, #$ffe2
+  04416  movea.l  $8(a6), a0
+  0441A  movea.l  $16(a0), a1
+  0441E  move.l   a1, -$1e(a6)
+  04422  movea.l  -$1e(a6), a2
+  04426  move.l   a2, -$1a(a6)
+  0442A  tst.l    -$1e(a6)
+  0442E  bne.b    $4464
+  04430  lea.l    $2(a0), a3
+  04434  move.l   a3, -(a7)
+  04436  lea.l    $4978(pc), a4
+  0443A  move.l   a4, -(a7)
+  0443C  lea.l    -$14(a6), a3
+  04440  move.l   a3, -(a7)
+  04442  jsr      $532de.l
+  04448  adda.l   #$c, a7
+  0444E  move.l   $23d4.w, -(a7)
+  04452  lea.l    -$14(a6), a0
+  04456  move.l   a0, -(a7)
+  04458  jsr      $2f96.l
+  0445E  addq.l   #$8, a7
+  04460  bra.w    $455e
+  04464  move.l   -$1a(a6), -(a7)
+  04468  bsr.w    $42f8
+  0446C  addq.l   #$4, a7
+  0446E  movea.l  -$1e(a6), a0
+  04472  move.w   $e4(a0), d0
+  04476  cmp.w    d7, d0
+  04478  beq.b    $4490
+  0447A  move.l   $274e.w, -(a7)
+  0447E  lea.l    $4982(pc), a1
+  04482  move.l   a1, -(a7)
+  04484  jsr      $2f96.l
+  0448A  addq.l   #$8, a7
+  0448C  bra.w    $455e
+  04490  movea.l  -$1a(a6), a0
+  04494  move.b   $18(a0), d0
+  04498  cmp.b    $13a6(a5), d0
+  0449C  beq.b    $44ae
+  0449E  move.b   $18(a0), d1
+  044A2  ext.w    d1
+  044A4  move.w   d1, -(a7)
+  044A6  jsr      $7bcc.l
+  044AC  addq.l   #$2, a7
+  044AE  movea.l  -$1a(a6), a0
+  044B2  move.b   $14(a0), d0
+  044B6  cmp.b    $13a2(a5), d0
+  044BA  beq.b    $44ce
+  044BC  move.b   $14(a0), d1
+  044C0  ext.w    d1
+  044C2  move.w   d1, -(a7)
+  044C4  clr.l    -(a7)
+  044C6  jsr      $7f72.l
+  044CC  addq.l   #$6, a7
+  044CE  movea.l  -$1a(a6), a0
+  044D2  move.w   $20(a0), d0
+  044D6  cmp.w    $13ae(a5), d0
+  044DA  beq.b    $44e8
+  044DC  move.w   $20(a0), -(a7)
+  044E0  jsr      $33ba.l
+  044E6  addq.l   #$2, a7
+  044E8  movea.l  -$1a(a6), a0
+  044EC  move.b   $1e(a0), d0
+  044F0  cmp.b    $13ac(a5), d0
+  044F4  beq.b    $4508
+  044F6  move.b   $1e(a0), d1
+  044FA  clr.l    d2
+  044FC  move.b   d1, d2
+  044FE  move.w   d2, -(a7)
+  04500  jsr      $4138.l
+  04506  addq.l   #$2, a7
+  04508  movea.l  -$1a(a6), a0
+  0450C  move.b   (a0), d0
+  0450E  ext.w    d0
+  04510  move.w   d0, -(a7)
+  04512  jsr      $5b6c6.l
+  04518  addq.l   #$2, a7
+  0451A  move.b   $13aa(a5), -$16(a6)
+  04520  move.w   #$e4, -(a7)
+  04524  move.l   -$1a(a6), -(a7)
+  04528  pea.l    $138e(a5)
+  0452C  jsr      $533bc.l
+  04532  adda.l   #$a, a7
+  04538  move.b   -$16(a6), $13aa(a5)
+  0453E  movea.l  -$1a(a6), a0
+  04542  move.b   $1c(a0), d0
+  04546  ext.w    d0
+  04548  move.w   d0, -(a7)
+  0454A  jsr      $5af96.l
+  04550  addq.l   #$2, a7
+  04552  jsr      $2f4ae.l
+  04558  jsr      $1a914.l
+  0455E  unlk     a6
+  04560  rts      
+
+[SMATH]  handler=0x054284  priv=0  cmd_id=0x0087
+  54284  link.w   a6, #$fff0
+  54288  lea.l    -$8(a6), a1
+  5428C  movea.l  $8(a6), a0
+  54290  move.l   (a0)+, (a1)+
+  54292  move.l   (a0)+, (a1)+
+  54294  move.w   $14(a6), d7
+  54298  bra.w    $54500
+  5429C  clr.l    -(a7)
+  5429E  pea.l    -$10(a6)
+  542A2  jsr      $585b4.l
+  542A8  addq.l   #$8, a7
+  542AA  pea.l    -$8(a6)
+  542AE  pea.l    -$10(a6)
+  542B2  jsr      $58650.l
+  542B8  addq.l   #$8, a7
+  542BA  tst.b    d7
+  542BC  beq.w    $542ec
+  542C0  move.l   #$7ffffffd, -(a7)
+  542C6  pea.l    -$10(a6)
+  542CA  jsr      $585b4.l
+  542D0  addq.l   #$8, a7
+  542D2  pea.l    -$8(a6)
+  542D6  pea.l    -$10(a6)
+  542DA  jsr      $58608.l
+  542E0  addq.l   #$8, a7
+  542E2  tst.b    d7
+  542E4  beq.w    $542ec
+  542E8  bra.w    $542f0
+  542EC  bra.w    $54304
+  542F0  pea.l    -$8(a6)
+  542F4  jsr      $585c8.l
+  542FA  addq.l   #$4, a7
+  542FC  move.l   d7, $13dc(a5)
+  54300  bra.w    $54318
+  54304  move.l   $23f0.w, -(a7)
+  54308  lea.l    $1d71e.l, a0  # IO 1D71E
+  5430E  move.l   a0, -(a7)
+  54310  jsr      $2042.l
+  54316  addq.l   #$8, a7
+  54318  bra.w    $5453a
+  5431C  lea.l    -$8(a6), a0
+  54320  lea.l    $13f4(a5), a1
+  54324  move.l   (a0)+, (a1)+
+  54326  move.l   (a0)+, (a1)+
+  54328  bra.w    $5453a
+  5432C  lea.l    -$8(a6), a2
+  54330  lea.l    $1820(a5), a3
+  54334  move.l   (a2)+, (a3)+
+  54336  move.l   (a2)+, (a3)+
+  54338  bra.w    $5453a
+  5433C  pea.l    $1810(a5)
+  54340  pea.l    -$8(a6)
+  54344  pea.l    $1800(a5)
+  54348  jsr      $58568.l
+  5434E  adda.l   #$c, a7
+  54354  bra.w    $5453a
+  54358  lea.l    -$8(a6), a4
+  5435C  lea.l    $1828(a5), a0
+  54360  move.l   (a4)+, (a0)+
+  54362  move.l   (a4)+, (a0)+
+  54364  bra.w    $5453a
+  54368  lea.l    -$8(a6), a1
+  5436C  lea.l    $1810(a5), a2
+  54370  move.l   (a1)+, (a2)+
+  54372  move.l   (a1)+, (a2)+
+  54374  bra.w    $5453a
+  54378  lea.l    -$8(a6), a3
+  5437C  lea.l    $13fc(a5), a4
+  54380  move.l   (a3)+, (a4)+
+  54382  move.l   (a3)+, (a4)+
+  54384  bra.w    $5453a
+  54388  pea.l    -$8(a6)
+  5438C  pea.l    -$10(a6)
+  54390  jsr      $58668.l
+  54396  addq.l   #$8, a7
+  54398  pea.l    -$10(a6)
+  5439C  pea.l    $560a0(pc)
+  543A0  jsr      $58620.l
+  543A6  addq.l   #$8, a7
+  543A8  tst.b    d7
+  543AA  beq.w    $543be
+  543AE  lea.l    -$8(a6), a0
+  543B2  lea.l    $1414(a5), a1
+  543B6  move.l   (a0)+, (a1)+
+  543B8  move.l   (a0)+, (a1)+
+  543BA  bra.w    $543d2
+  543BE  move.l   $23f0.w, -(a7)
+  543C2  lea.l    $1d737.l, a2  # IO 1D737
+  543C8  move.l   a2, -(a7)
+  543CA  jsr      $2042.l
+  543D0  addq.l   #$8, a7
+  543D2  bra.w    $5453a
+  543D6  pea.l    -$8(a6)
+  543DA  pea.l    -$10(a6)
+  543DE  jsr      $58668.l
+  543E4  addq.l   #$8, a7
+  543E6  pea.l    -$10(a6)
+  543EA  pea.l    $560a0(pc)
+  543EE  jsr      $58620.l
+  543F4  addq.l   #$8, a7
+  543F6  tst.b    d7
+  543F8  beq.w    $5440c
+  543FC  lea.l    -$8(a6), a0
+  54400  lea.l    $1404(a5), a1
+  54404  move.l   (a0)+, (a1)+
+  54406  move.l   (a0)+, (a1)+
+  54408  bra.w    $54420
+  5440C  move.l   $23f0.w, -(a7)
+  54410  lea.l    $aaaaaaaa.l, a2
+
+[SSAC]  handler=0x030C02  priv=1  cmd_id=0x008A
+  30C02  link.w   a6, #$fffe
+  30C06  movea.l  $16(a6), a0
+  30C0A  pea.l    (a0)
+  30C0C  move.w   #$c, -(a7)
+  30C10  bsr.w    $2ffc8
+  30C14  move.w   d7, -$2(a6)
+  30C18  addq.l   #$6, a7
+  30C1A  move.w   -$2(a6), d0
+  30C1E  cmpi.w   #$a, d0
+  30C22  beq.w    $30cde
+  30C26  move.b   $1473(a5), d1
+  30C2A  cmpi.b   #$c, d1
+  30C2E  bne.b    $30c3e
+  30C30  move.b   $1476(a5), d2
+  30C34  ext.w    d2
+  30C36  cmp.w    $8(a6), d2
+  30C3A  bne.b    $30c3e
+  30C3C  bra.b    $30c4e
+  30C3E  move.w   $8(a6), -(a7)
+  30C42  move.w   -$2(a6), -(a7)
+  30C46  jsr      $2d278(pc)
+  30C4A  addq.l   #$4, a7
+  30C4C  bra.b    $30c64
+  30C4E  move.b   $1474(a5), d0
+  30C52  ext.w    d0
+  30C54  cmp.w    -$2(a6), d0
+  30C58  beq.b    $30c64
+  30C5A  move.w   -$2(a6), -(a7)
+  30C5E  jsr      $2daae(pc)
+  30C62  addq.l   #$2, a7
+  30C64  move.b   $1391(a5), d0
+  30C68  ext.w    d0
+  30C6A  move.w   d0, -(a7)
+  30C6C  move.w   #$c, -(a7)
+  30C70  move.b   $13a3(a5), d1
+  30C74  ext.w    d1
+  30C76  move.w   d1, -(a7)
+  30C78  jsr      $2efb8(pc)
+  30C7C  addq.l   #$6, a7
+  30C7E  move.w   $8(a6), -(a7)
+  30C82  move.w   -$2(a6), -(a7)
+  30C86  move.w   #$c, -(a7)
+  30C8A  movea.l  $a(a6), a0
+  30C8E  pea.l    (a0)
+  30C90  jsr      $2e24c(pc)
+  30C94  adda.l   #$a, a7
+  30C9A  move.b   $139f(a5), d0
+  30C9E  ext.w    d0
+  30CA0  move.w   d0, -(a7)
+  30CA2  move.w   #$2, -(a7)
+  30CA6  move.w   #$c, -(a7)
+  30CAA  jsr      $31ec6(pc)
+  30CAE  addq.l   #$6, a7
+  30CB0  move.b   #$c, $1397(a5)
+  30CB6  move.w   -$2(a6), d0
+  30CBA  move.b   d0, $139c(a5)
+  30CBE  move.w   $8(a6), d1
+  30CC2  move.b   d1, $1395(a5)
+  30CC6  movea.l  $a(a6), a0
+  30CCA  lea.l    $13ec(a5), a1
+  30CCE  move.l   (a0)+, (a1)+
+  30CD0  move.l   (a0)+, (a1)+
+  30CD2  tst.b    $13a2(a5)
+  30CD6  beq.b    $30cde
+  30CD8  jsr      $51ebc.l
+  30CDE  unlk     a6
+  30CE0  rts      
+
+[SSDC]  handler=0x030C02  priv=1  cmd_id=0x008B  (== SSAC)
+  30C02  link.w   a6, #$fffe
+  30C06  movea.l  $16(a6), a0
+  30C0A  pea.l    (a0)
+  30C0C  move.w   #$c, -(a7)
+  30C10  bsr.w    $2ffc8
+  30C14  move.w   d7, -$2(a6)
+  30C18  addq.l   #$6, a7
+  30C1A  move.w   -$2(a6), d0
+  30C1E  cmpi.w   #$a, d0
+  30C22  beq.w    $30cde
+  30C26  move.b   $1473(a5), d1
+  30C2A  cmpi.b   #$c, d1
+  30C2E  bne.b    $30c3e
+  30C30  move.b   $1476(a5), d2
+  30C34  ext.w    d2
+  30C36  cmp.w    $8(a6), d2
+  30C3A  bne.b    $30c3e
+  30C3C  bra.b    $30c4e
+  30C3E  move.w   $8(a6), -(a7)
+  30C42  move.w   -$2(a6), -(a7)
+  30C46  jsr      $2d278(pc)
+  30C4A  addq.l   #$4, a7
+  30C4C  bra.b    $30c64
+  30C4E  move.b   $1474(a5), d0
+  30C52  ext.w    d0
+  30C54  cmp.w    -$2(a6), d0
+  30C58  beq.b    $30c64
+  30C5A  move.w   -$2(a6), -(a7)
+  30C5E  jsr      $2daae(pc)
+  30C62  addq.l   #$2, a7
+  30C64  move.b   $1391(a5), d0
+  30C68  ext.w    d0
+  30C6A  move.w   d0, -(a7)
+  30C6C  move.w   #$c, -(a7)
+  30C70  move.b   $13a3(a5), d1
+  30C74  ext.w    d1
+  30C76  move.w   d1, -(a7)
+  30C78  jsr      $2efb8(pc)
+  30C7C  addq.l   #$6, a7
+  30C7E  move.w   $8(a6), -(a7)
+  30C82  move.w   -$2(a6), -(a7)
+  30C86  move.w   #$c, -(a7)
+  30C8A  movea.l  $a(a6), a0
+  30C8E  pea.l    (a0)
+  30C90  jsr      $2e24c(pc)
+  30C94  adda.l   #$a, a7
+  30C9A  move.b   $139f(a5), d0
+  30C9E  ext.w    d0
+  30CA0  move.w   d0, -(a7)
+  30CA2  move.w   #$2, -(a7)
+  30CA6  move.w   #$c, -(a7)
+  30CAA  jsr      $31ec6(pc)
+  30CAE  addq.l   #$6, a7
+  30CB0  move.b   #$c, $1397(a5)
+  30CB6  move.w   -$2(a6), d0
+  30CBA  move.b   d0, $139c(a5)
+  30CBE  move.w   $8(a6), d1
+  30CC2  move.b   d1, $1395(a5)
+  30CC6  movea.l  $a(a6), a0
+  30CCA  lea.l    $13ec(a5), a1
+  30CCE  move.l   (a0)+, (a1)+
+  30CD0  move.l   (a0)+, (a1)+
+  30CD2  tst.b    $13a2(a5)
+  30CD6  beq.b    $30cde
+  30CD8  jsr      $51ebc.l
+  30CDE  unlk     a6
+  30CE0  rts      
+
+[SSPARM?]  handler=0x01E70E  priv=1  cmd_id=0x008C
+  1E70E  link.w   a6, #$ffee
+  1E712  lea.l    -$2(a6), a0
+  1E716  move.l   a0, -(a7)
+  1E718  lea.l    -$6(a6), a1
+  1E71C  move.l   a1, -(a7)
+  1E71E  lea.l    -$a(a6), a2
+  1E722  move.l   a2, -(a7)
+  1E724  lea.l    -$c(a6), a3
+  1E728  move.l   a3, -(a7)
+  1E72A  lea.l    -$e(a6), a4
+  1E72E  move.l   a4, -(a7)
+  1E730  move.l   $143a(a5), -(a7)
+  1E734  move.w   $1434(a5), -(a7)
+  1E738  move.l   $1436(a5), -(a7)
+  1E73C  jsr      $2c79a.l
+  1E742  adda.l   #$1e, a7
+  1E748  jsr      $1dc20.l
+  1E74E  tst.b    d7
+  1E750  beq.w    $1e760
+  1E754  lea.l    $1f6e4(pc), a0
+  1E758  move.l   a0, -$12(a6)
+  1E75C  bra.w    $1e768
+  1E760  lea.l    $1f5b0(pc), a1
+  1E764  move.l   a1, -$12(a6)
+  1E768  movea.l  -$12(a6), a2
+  1E76C  move.l   a2, -(a7)
+  1E76E  lea.l    $f00(a5), a3
+  1E772  move.l   a3, -(a7)
+  1E774  jsr      $532de.l
+  1E77A  addq.l   #$8, a7
+  1E77C  move.l   -$a(a6), -(a7)
+  1E780  move.w   -$c(a6), -(a7)
+  1E784  move.w   -$e(a6), -(a7)
+  1E788  lea.l    $1f6ec(pc), a0
+  1E78C  move.l   a0, -(a7)
+  1E78E  lea.l    $1090(a5), a1
+  1E792  move.l   a1, -(a7)
+  1E794  jsr      $532de.l
+  1E79A  adda.l   #$10, a7
+  1E7A0  lea.l    $1090(a5), a0
+  1E7A4  move.l   a0, -(a7)
+  1E7A6  lea.l    $f00(a5), a1
+  1E7AA  move.l   a1, -(a7)
+  1E7AC  jsr      $5344e.l
+  1E7B2  addq.l   #$8, a7
+  1E7B4  clr.w    -(a7)
+  1E7B6  jsr      $1f530.l
+  1E7BC  addq.l   #$2, a7
+  1E7BE  unlk     a6
+  1E7C0  rts      
+
+[SSTATE]  handler=0x00433A  priv=1  cmd_id=0x008F
+  0433A  link.w   a6, #$fff2
+  0433E  movea.l  $8(a6), a0
+  04342  movea.l  $16(a0), a1
+  04346  move.l   a1, -$6(a6)
+  0434A  move.l   -$6(a6), d0
+  0434E  lea.l    $6bc(a5), a2
+  04352  cmp.l    a2, d0
+  04354  bne.b    $435c
+  04356  move.l   a2, -$a(a6)
+  0435A  bra.b    $43ce
+  0435C  tst.l    -$6(a6)
+  04360  beq.b    $4372
+  04362  move.l   $11c(a5), -(a7)
+  04366  move.l   -$6(a6), -(a7)
+  0436A  jsr      $19dd8.l
+  04370  addq.l   #$8, a7
+  04372  lea.l    -$a(a6), a0
+  04376  move.l   a0, -(a7)
+  04378  clr.l    -(a7)
+  0437A  move.w   #$1, -(a7)
+  0437E  move.w   #$1, -(a7)
+  04382  move.l   #$e6, -(a7)
+  04388  jsr      $19cb4.l
+  0438E  move.w   d7, -$2(a6)
+  04392  adda.l   #$10, a7
+  04398  tst.w    -$2(a6)
+  0439C  beq.b    $43b4
+  0439E  move.l   $2420.w, -(a7)
+  043A2  lea.l    $4970(pc), a1
+  043A6  move.l   a1, -(a7)
+  043A8  jsr      $2f96.l
+  043AE  addq.l   #$8, a7
+  043B0  bra.w    $440e
+  043B4  lea.l    -$a(a6), a0
+  043B8  move.l   a0, -(a7)
+  043BA  move.l   $11c(a5), -(a7)
+  043BE  move.l   -$a(a6), -(a7)
+  043C2  jsr      $19cda.l
+  043C8  adda.l   #$c, a7
+  043CE  move.w   #$e4, -(a7)
+  043D2  pea.l    $138e(a5)
+  043D6  move.l   -$a(a6), -(a7)
+  043DA  jsr      $533bc.l
+  043E0  adda.l   #$a, a7
+  043E6  movea.l  -$a(a6), a0
+  043EA  move.l   -$a(a6), -(a7)
+  043EE  lea.l    $e4(a0), a1
+  043F2  move.l   a1, -$e(a6)
+  043F6  bsr.w    $42f8
+  043FA  movea.l  -$e(a6), a2
+  043FE  move.w   d7, (a2)
+  04400  addq.l   #$4, a7
+  04402  movea.l  $8(a6), a3
+  04406  lea.l    $16(a3), a4
+  0440A  move.l   -$a(a6), (a4)
+  0440E  unlk     a6
+  04410  rts      
+
+[STB?]  handler=0x004176  priv=1  cmd_id=0x0091
+  04176  link.w   a6, #$fffe
+  0417A  move.w   $6b6(a5), d0
+  0417E  andi.w   #$ff, d0
+  04182  move.w   d0, -$2(a6)
+  04186  move.b   $80006.l, d1
+  0418C  andi.b   #$4, d1
+  04190  beq.b    $4198
+  04192  ori.w    #$40, -$2(a6)
+  04198  jsr      $1dc20.l
+  0419E  tst.b    d7
+  041A0  beq.b    $41c2
+  041A2  move.w   -$2(a6), -(a7)
+  041A6  lea.l    $42e8(pc), a0
+  041AA  move.l   a0, -(a7)
+  041AC  lea.l    $120f00.l, a1  # SRAM 120F00
+  041B2  move.l   a1, -(a7)
+  041B4  jsr      $532de.l
+  041BA  adda.l   #$a, a7
+  041C0  bra.b    $41e0
+  041C2  move.w   -$2(a6), -(a7)
+  041C6  lea.l    $42ec(pc), a0
+  041CA  move.l   a0, -(a7)
+  041CC  lea.l    $120f00.l, a1  # SRAM 120F00
+  041D2  move.l   a1, -(a7)
+  041D4  jsr      $532de.l
+  041DA  adda.l   #$a, a7
+  041E0  clr.w    -(a7)
+  041E2  jsr      $1f530.l
+  041E8  addq.l   #$2, a7
+  041EA  unlk     a6
+  041EC  rts      
+
+[SUB]  handler=0x018818  priv=1  cmd_id=0x0092
+  18818  link.w   a6, #$0
+  1881C  unlk     a6
+  1881E  rts      
+
+[SWEEP]  handler=0x030DA8  priv=0  cmd_id=0x0095
+  30DA8  link.w   a6, #$fff0
+  30DAC  move.l   $8(a6), d0
+  30DB0  cmpi.l   #$ffffffff, d0
+  30DB6  bne.b    $30dc0
+  30DB8  move.l   #$400, $8(a6)
+  30DC0  movea.l  $c(a6), a0
+  30DC4  pea.l    (a0)
+  30DC6  pea.l    $31cca(pc)
+  30DCA  jsr      $585d8.l
+  30DD0  addq.l   #$8, a7
+  30DD2  tst.b    d7
+  30DD4  beq.b    $30de2
+  30DD6  movea.l  $c(a6), a1
+  30DDA  lea.l    $31d86(pc), a2
+  30DDE  move.l   (a2)+, (a1)+
+  30DE0  move.l   (a2)+, (a1)+
+  30DE2  movea.l  $c(a6), a3
+  30DE6  pea.l    (a3)
+  30DE8  pea.l    $31d40(pc)
+  30DEC  jsr      $58608.l
+  30DF2  addq.l   #$8, a7
+  30DF4  tst.b    d7
+  30DF6  beq.b    $30e04
+  30DF8  movea.l  $c(a6), a4
+  30DFC  lea.l    $31d8e(pc), a0
+  30E00  move.l   (a0)+, (a4)+
+  30E02  move.l   (a0)+, (a4)+
+  30E04  move.l   $8(a6), d1
+  30E08  cmpi.l   #$1, d1
+  30E0E  blt.b    $30e1a
+  30E10  cmpi.l   #$ffffff, d1
+  30E16  bgt.b    $30e1a
+  30E18  bra.b    $30e30
+  30E1A  move.l   $23f0.w, -(a7)
+  30E1E  lea.l    $31d96(pc), a2
+  30E22  move.l   a2, -(a7)
+  30E24  jsr      $2f96.l
+  30E2A  addq.l   #$8, a7
+  30E2C  bra.w    $30fec
+  30E30  movea.l  $c(a6), a0
+  30E34  pea.l    (a0)
+  30E36  pea.l    $31dc4(pc)
+  30E3A  jsr      $58650.l
+  30E40  addq.l   #$8, a7
+  30E42  tst.b    d7
+  30E44  beq.w    $30e76
+  30E48  move.l   #$1770, -(a7)
+  30E4E  pea.l    -$10(a6)
+  30E52  jsr      $585b4.l
+  30E58  addq.l   #$8, a7
+  30E5A  movea.l  $c(a6), a1
+  30E5E  pea.l    (a1)
+  30E60  pea.l    -$10(a6)
+  30E64  jsr      $58638.l
+  30E6A  addq.l   #$8, a7
+  30E6C  tst.b    d7
+  30E6E  beq.w    $30e76
+  30E72  bra.w    $30e8c
+  30E76  move.l   $23f0.w, -(a7)
+  30E7A  lea.l    $31dcc(pc), a2
+  30E7E  move.l   a2, -(a7)
+  30E80  jsr      $2f96.l
+  30E86  addq.l   #$8, a7
+  30E88  bra.w    $30fec
+  30E8C  move.l   $8(a6), $143a(a5)
+  30E92  movea.l  $c(a6), a0
+  30E96  pea.l    (a0)
+  30E98  pea.l    $31df0(pc)
+  30E9C  pea.l    -$10(a6)
+  30EA0  jsr      $58568.l
+  30EA6  adda.l   #$c, a7
+  30EAC  pea.l    -$10(a6)
+  30EB0  pea.l    $31df8(pc)
+  30EB4  pea.l    -$8(a6)
+  30EB8  jsr      $58530.l
+  30EBE  adda.l   #$c, a7
+  30EC4  pea.l    -$8(a6)
+  30EC8  pea.l    $31e00(pc)
+  30ECC  jsr      $58608.l
+  30ED2  addq.l   #$8, a7
+  30ED4  tst.b    d7
+  30ED6  beq.b    $30ee4
+  30ED8  lea.l    $31e00(pc), a1
+  30EDC  lea.l    -$8(a6), a2
+  30EE0  move.l   (a1)+, (a2)+
+  30EE2  move.l   (a1)+, (a2)+
+  30EE4  pea.l    -$8(a6)
+  30EE8  pea.l    $31e08(pc)
+  30EEC  jsr      $58620.l
+  30EF2  addq.l   #$8, a7
+  30EF4  tst.b    d7
+  30EF6  beq.w    $30f8a
+  30EFA  pea.l    -$8(a6)
+  30EFE  pea.l    $31e10(pc)
+  30F02  pea.l    -$8(a6)
+  30F06  jsr      $5854c.l
+  30F0C  adda.l   #$c, a7
+  30F12  pea.l    -$8(a6)
+  30F16  pea.l    $31e18(pc)
+  30F1A  pea.l    -$10(a6)
+  30F1E  jsr      $58568.l
+  30F24  adda.l   #$c, a7
+  30F2A  pea.l    -$10(a6)
+  30F2E  jsr      $585c8.l
+  30F34  addq.l   #$4, a7
+  30F36  move.l   d7, -$5556(a5)
+
+[TBUFF]  handler=0x033D86  priv=0  cmd_id=0x0099
+  33D86  link.w   a6, #$0
+  33D8A  move.w   $8(a6), d0
+  33D8E  cmpi.w   #$ffff, d0
+  33D92  blt.b    $33d9c
+  33D94  cmpi.w   #$1, d0
+  33D98  bgt.b    $33d9c
+  33D9A  bra.b    $33db2
+  33D9C  move.l   $23f0.w, -(a7)
+  33DA0  lea.l    $3401a(pc), a0
+  33DA4  move.l   a0, -(a7)
+  33DA6  jsr      $2f96.l
+  33DAC  addq.l   #$8, a7
+  33DAE  bra.w    $33e42
+  33DB2  move.w   $8(a6), d0
+  33DB6  cmpi.w   #$ffff, d0
+  33DBA  bne.b    $33dc0
+  33DBC  clr.w    $8(a6)
+  33DC0  move.b   $1473(a5), d1
+  33DC4  cmpi.b   #$8, d1
+  33DC8  ble.b    $33dfe
+  33DCA  move.b   $1397(a5), d2
+  33DCE  ext.w    d2
+  33DD0  move.w   d2, -(a7)
+  33DD2  move.b   $1390(a5), d3
+  33DD6  ext.w    d3
+  33DD8  move.w   d3, -(a7)
+  33DDA  jsr      $2945a.l
+  33DE0  addq.l   #$4, a7
+  33DE2  move.b   $1397(a5), d0
+  33DE6  ext.w    d0
+  33DE8  move.w   d0, -(a7)
+  33DEA  move.b   $1391(a5), d1
+  33DEE  ext.w    d1
+  33DF0  move.w   d1, -(a7)
+  33DF2  move.l   $13bc(a5), -(a7)
+  33DF6  jsr      $294da.l
+  33DFC  addq.l   #$8, a7
+  33DFE  move.w   $8(a6), -(a7)
+  33E02  jsr      $29178.l
+  33E08  addq.l   #$2, a7
+  33E0A  jsr      $2943e.l
+  33E10  move.b   $138f(a5), d0
+  33E14  cmpi.b   #$2, d0
+  33E18  bne.b    $33e3a
+  33E1A  move.w   #$6, -(a7)
+  33E1E  jsr      $2b5a2.l
+  33E24  addq.l   #$2, a7
+  33E26  move.w   $8(a6), d0
+  33E2A  lsl.w    #$8, d0
+  33E2C  ori.w    #$7, d0
+  33E30  move.w   d0, -(a7)
+  33E32  jsr      $2b5a2.l
+  33E38  addq.l   #$2, a7
+  33E3A  move.w   $8(a6), d0
+  33E3E  move.b   d0, $1396(a5)
+  33E42  unlk     a6
+  33E44  rts      
+
+[TEMP?]  handler=0x02FB8C  priv=1  cmd_id=0x009A
+  2FB8C  link.w   a6, #$ffea
+  2FB90  jsr      $28a0e(pc)
+  2FB94  lea.l    -$e(a6), a0
+  2FB98  move.l   a0, -(a7)
+  2FB9A  jsr      $49678.l
+  2FBA0  addq.l   #$4, a7
+  2FBA2  move.l   #$a, -(a7)
+  2FBA8  pea.l    -$16(a6)
+  2FBAC  jsr      $585b4.l
+  2FBB2  addq.l   #$8, a7
+  2FBB4  pea.l    -$16(a6)
+  2FBB8  pea.l    -$e(a6)
+  2FBBC  pea.l    -$16(a6)
+  2FBC0  jsr      $58568.l
+  2FBC6  adda.l   #$c, a7
+  2FBCC  pea.l    -$16(a6)
+  2FBD0  pea.l    $2fe8a(pc)
+  2FBD4  pea.l    -$16(a6)
+  2FBD8  jsr      $58530.l
+  2FBDE  adda.l   #$c, a7
+  2FBE4  pea.l    -$16(a6)
+  2FBE8  jsr      $585c8.l
+  2FBEE  addq.l   #$4, a7
+  2FBF0  move.w   d7, -$2(a6)
+  2FBF4  move.w   d7, -(a7)
+  2FBF6  lea.l    $2fe92(pc), a0
+  2FBFA  move.l   a0, -(a7)
+  2FBFC  lea.l    $1090(a5), a1
+  2FC00  move.l   a1, -(a7)
+  2FC02  jsr      $532de.l
+  2FC08  adda.l   #$a, a7
+  2FC0E  lea.l    $1090(a5), a0
+  2FC12  move.l   a0, -$6(a6)
+  2FC16  movea.l  -$6(a6), a1
+  2FC1A  tst.b    (a1)
+  2FC1C  beq.b    $2fc28
+  2FC1E  movea.l  -$6(a6), a2
+  2FC22  addq.l   #$1, -$6(a6)
+  2FC26  bra.b    $2fc16
+  2FC28  movea.l  -$6(a6), a3
+  2FC2C  clr.b    $1(a3)
+  2FC30  move.l   #$ffffffff, d0
+  2FC36  movea.l  -$6(a6), a4
+  2FC3A  move.b   (a3, d0.l), (a4)
+  2FC3E  move.l   #$ffffffff, d1
+  2FC44  move.b   #$2e, (a3, d1.l)
+  2FC4A  jsr      $1dc20.l
+  2FC50  tst.w    d7
+  2FC52  beq.b    $2fc5e
+  2FC54  lea.l    $2fe96(pc), a0
+  2FC58  move.l   a0, -$16(a6)
+  2FC5C  bra.b    $2fc66
+  2FC5E  lea.l    $2fe72(pc), a2
+  2FC62  move.l   a2, -$16(a6)
+  2FC66  movea.l  -$16(a6), a1
+  2FC6A  move.l   a1, -(a7)
+  2FC6C  lea.l    $f00(a5), a4
+  2FC70  move.l   a4, -(a7)
+  2FC72  jsr      $532de.l
+  2FC78  addq.l   #$8, a7
+  2FC7A  lea.l    $1090(a5), a0
+  2FC7E  move.l   a0, -(a7)
+  2FC80  lea.l    $f00(a5), a1
+  2FC84  move.l   a1, -(a7)
+  2FC86  jsr      $5344e.l
+  2FC8C  addq.l   #$8, a7
+  2FC8E  clr.w    -(a7)
+  2FC90  jsr      $1f530.l
+  2FC96  addq.l   #$2, a7
+  2FC98  move.b   $1397(a5), d0
+  2FC9C  ext.w    d0
+  2FC9E  move.w   d0, -(a7)
+  2FCA0  jsr      $2ed6e(pc)
+  2FCA4  addq.l   #$2, a7
+  2FCA6  unlk     a6
+  2FCA8  rts      
+
+[TERM?]  handler=0x020C00  priv=1  cmd_id=0x009B
+  20C00  link.w   a6, #$0
+  20C04  jsr      $1dc20.l
+  20C0A  tst.w    d7
+  20C0C  beq.w    $20c62
+  20C10  lea.l    $20dbc(pc), a0
+  20C14  move.l   a0, -(a7)
+  20C16  lea.l    $f00(a5), a1
+  20C1A  move.l   a1, -(a7)
+  20C1C  jsr      $532de.l
+  20C22  addq.l   #$8, a7
+  20C24  move.b   $1444(a5), d0
+  20C28  addq.b   #$1, d0
+  20C2A  cmpi.b   #$1, d0
+  20C2E  bne.w    $20c4a
+  20C32  lea.l    $20dc2(pc), a0
+  20C36  move.l   a0, -(a7)
+  20C38  lea.l    $f00(a5), a1
+  20C3C  move.l   a1, -(a7)
+  20C3E  jsr      $5344e.l
+  20C44  addq.l   #$8, a7
+  20C46  bra.w    $20c5e
+  20C4A  lea.l    $20dc8(pc), a0
+  20C4E  move.l   a0, -(a7)
+  20C50  lea.l    $f00(a5), a1
+  20C54  move.l   a1, -(a7)
+  20C56  jsr      $5344e.l
+  20C5C  addq.l   #$8, a7
+  20C5E  bra.w    $20c84
+  20C62  move.b   $1444(a5), d0
+  20C66  addq.b   #$1, d0
+  20C68  ext.w    d0
+  20C6A  move.w   d0, -(a7)
+  20C6C  lea.l    $20cc4(pc), a0
+  20C70  move.l   a0, -(a7)
+  20C72  lea.l    $f00(a5), a1
+  20C76  move.l   a1, -(a7)
+  20C78  jsr      $532de.l
+  20C7E  adda.l   #$a, a7
+  20C84  clr.w    -(a7)
+  20C86  jsr      $1f530.l
+  20C8C  addq.l   #$2, a7
+  20C8E  unlk     a6
+  20C90  rts      
+
+[NMR]  handler=0x03FB78  priv=1  cmd_id=0x00A2
+  3FB78  link.w   a6, #$fffe
+  3FB7C  movea.l  $a(a6), a0
+  3FB80  pea.l    (a0)
+  3FB82  jsr      $585c8.l
+  3FB88  addq.l   #$4, a7
+  3FB8A  andi.w   #$3f, d7
+  3FB8E  move.w   d7, -$2(a6)
+  3FB92  andi.b   #$fc, $14ad(a5)
+  3FB98  andi.b   #$f, $14ae(a5)
+  3FB9E  lsr.w    #$4, d7
+  3FBA0  or.b     d7, $14ad(a5)
+  3FBA4  move.w   -$2(a6), d0
+  3FBA8  andi.w   #$f, d0
+  3FBAC  lsl.w    #$4, d0
+  3FBAE  or.b     d0, $14ae(a5)
+  3FBB2  jsr      $2a33c.l
+  3FBB8  unlk     a6
+  3FBBA  rts      
+
+[NMR?]  handler=0x03FAFE  priv=1  cmd_id=0x00A4
+  3FAFE  link.w   a6, #$fffe
+  3FB02  clr.l    d0
+  3FB04  move.b   $14ad(a5), d0
+  3FB08  lsl.w    #$4, d0
+  3FB0A  clr.l    d1
+  3FB0C  move.b   $14ae(a5), d1
+  3FB10  lsr.w    #$4, d1
+  3FB12  or.w     d1, d0
+  3FB14  move.w   d0, -$2(a6)
+  3FB18  andi.w   #$3f, -$2(a6)
+  3FB1E  jsr      $1dc20.l
+  3FB24  tst.b    d7
+  3FB26  beq.w    $3fb4c
+  3FB2A  move.w   -$2(a6), -(a7)
+  3FB2E  lea.l    $3ffba(pc), a0
+  3FB32  move.l   a0, -(a7)
+  3FB34  lea.l    $120f00.l, a1  # SRAM 120F00
+  3FB3A  move.l   a1, -(a7)
+  3FB3C  jsr      $532de.l
+  3FB42  adda.l   #$a, a7
+  3FB48  bra.w    $3fb6a
+  3FB4C  move.w   -$2(a6), -(a7)
+  3FB50  lea.l    $3ffca(pc), a0
+  3FB54  move.l   a0, -(a7)
+  3FB56  lea.l    $120f00.l, a1  # SRAM 120F00
+  3FB5C  move.l   a1, -(a7)
+  3FB5E  jsr      $532de.l
+  3FB64  adda.l   #$a, a7
+  3FB6A  clr.w    -(a7)
+  3FB6C  jsr      $1f530.l
+  3FB72  addq.l   #$2, a7
+  3FB74  unlk     a6
+  3FB76  rts      
+
+[HELP]  handler=0x017544  priv=1  cmd_id=0x00A5
+  17544  link.w   a6, #$0
+  17548  move.w   #$6, -(a7)
+  1754C  lea.l    $17b2e(pc), a0
+  17550  move.l   a0, -(a7)
+  17552  jsr      $1d8b8.l
+  17558  addq.l   #$6, a7
+  1755A  unlk     a6
+  1755C  rts      
+
+[ACBAND?]  handler=0x020930  priv=1  cmd_id=0x00A7
+  20930  link.w   a6, #$fffc
+  20934  jsr      $1dc20.l
+  2093A  tst.w    d7
+  2093C  beq.w    $2094c
+  20940  lea.l    $20d68(pc), a0
+  20944  move.l   a0, -$4(a6)
+  20948  bra.w    $20954
+  2094C  lea.l    $20c98(pc), a1
+  20950  move.l   a1, -$4(a6)
+  20954  movea.l  -$4(a6), a2
+  20958  move.l   a2, -(a7)
+  2095A  lea.l    $f00(a5), a3
+  2095E  move.l   a3, -(a7)
+  20960  jsr      $532de.l
+  20966  addq.l   #$8, a7
+  20968  move.l   $13d0(a5), -(a7)
+  2096C  move.l   $13cc(a5), -(a7)
+  20970  lea.l    $20d70(pc), a0
+  20974  move.l   a0, -(a7)
+  20976  lea.l    $1090(a5), a1
+  2097A  move.l   a1, -(a7)
+  2097C  jsr      $532de.l
+  20982  adda.l   #$10, a7
+  20988  lea.l    $1090(a5), a0
+  2098C  move.l   a0, -(a7)
+  2098E  lea.l    $f00(a5), a1
+  20992  move.l   a1, -(a7)
+  20994  jsr      $5344e.l
+  2099A  addq.l   #$8, a7
+  2099C  move.w   #$7, -(a7)
+  209A0  jsr      $1f530.l
+  209A6  addq.l   #$2, a7
+  209A8  unlk     a6
+  209AA  rts      
+
+[ADDRESS?]  handler=0x05B89E  priv=1  cmd_id=0x00A8
+  5B89E  link.w   a6, #$0
+  5B8A2  jsr      $1dc20.l
+  5B8A8  tst.b    d7
+  5B8AA  beq.w    $5b8d4
+  5B8AE  move.b   $1caa(a5), d0
+  5B8B2  ext.w    d0
+  5B8B4  move.w   d0, -(a7)
+  5B8B6  lea.l    $5b95e(pc), a0
+  5B8BA  move.l   a0, -(a7)
+  5B8BC  lea.l    $120f00.l, a1  # SRAM 120F00
+  5B8C2  move.l   a1, -(a7)
+  5B8C4  jsr      $532de.l
+  5B8CA  adda.l   #$a, a7
+  5B8D0  bra.w    $5b8f6
+  5B8D4  move.b   $1caa(a5), d0
+  5B8D8  ext.w    d0
+  5B8DA  move.w   d0, -(a7)
+  5B8DC  lea.l    $5b932(pc), a0
+  5B8E0  move.l   a0, -(a7)
+  5B8E2  lea.l    $120f00.l, a1  # SRAM 120F00
+  5B8E8  move.l   a1, -(a7)
+  5B8EA  jsr      $532de.l
+  5B8F0  adda.l   #$a, a7
+  5B8F6  clr.w    -(a7)
+  5B8F8  jsr      $1f530.l
+  5B8FE  addq.l   #$2, a7
+  5B900  unlk     a6
+  5B902  rts      
+
+[DEFEAT?]  handler=0x01E032  priv=1  cmd_id=0x00AE
+  1E032  link.w   a6, #$fffc
+  1E036  jsr      $1dc20.l
+  1E03C  tst.b    d7
+  1E03E  beq.w    $1e080
+  1E042  tst.b    $1447(a5)
+  1E046  bne.w    $1e056
+  1E04A  lea.l    $1f5d0(pc), a0
+  1E04E  move.l   a0, -$4(a6)
+  1E052  bra.w    $1e05e
+  1E056  lea.l    $1f5cc(pc), a1
+  1E05A  move.l   a1, -$4(a6)
+  1E05E  movea.l  -$4(a6), a2
+  1E062  move.l   a2, -(a7)
+  1E064  lea.l    $1f616(pc), a3
+  1E068  move.l   a3, -(a7)
+  1E06A  lea.l    $f00(a5), a4
+  1E06E  move.l   a4, -(a7)
+  1E070  jsr      $532de.l
+  1E076  adda.l   #$c, a7
+  1E07C  bra.w    $1e0a0
+  1E080  move.b   $1447(a5), d0
+  1E084  ext.w    d0
+  1E086  move.w   d0, -(a7)
+  1E088  lea.l    $1f5c8(pc), a0
+  1E08C  move.l   a0, -(a7)
+  1E08E  lea.l    $f00(a5), a1
+  1E092  move.l   a1, -(a7)
+  1E094  jsr      $532de.l
+  1E09A  adda.l   #$a, a7
+  1E0A0  clr.w    -(a7)
+  1E0A2  jsr      $1f530.l
+  1E0A8  addq.l   #$2, a7
+  1E0AA  unlk     a6
+  1E0AC  rts      
+
+[DEFKEY?]  handler=0x006E1C  priv=1  cmd_id=0x00AF
+  06E1C  link.w   a6, #$ffd2
+  06E20  move.w   $8(a6), d0
+  06E24  cmpi.w   #$ffff, d0
+  06E28  bne.b    $6e2e
+  06E2A  clr.w    $8(a6)
+  06E2E  tst.w    $8(a6)
+  06E32  blt.w    $6e46
+  06E36  move.w   $8(a6), d1
+  06E3A  cmpi.w   #$9, d1
+  06E3E  bgt.w    $6e46
+  06E42  bra.w    $6e5c
+  06E46  move.l   $23f0.w, -(a7)
+  06E4A  lea.l    $6f62(pc), a0
+  06E4E  move.l   a0, -(a7)
+  06E50  jsr      $2f96.l
+  06E56  addq.l   #$8, a7
+  06E58  bra.w    $6f18
+  06E5C  move.b   #$22, -$2e(a6)
+  06E62  move.w   #$28, -(a7)
+  06E66  move.w   $8(a6), d0
+  06E6A  ext.l    d0
+  06E6C  move.l   d0, -(a7)
+  06E6E  move.l   #$29, -(a7)
+  06E74  jsr      $562b2.l
+  06E7A  lea.l    $1b10(a5), a0
+  06E7E  lea.l    (a0, d7.l), a1
+  06E82  move.l   a1, -(a7)
+  06E84  lea.l    -$2e(a6), a2
+  06E88  lea.l    $1(a2), a3
+  06E8C  move.l   a3, -(a7)
+  06E8E  jsr      $533bc.l
+  06E94  adda.l   #$a, a7
+  06E9A  clr.b    -$5(a6)
+  06E9E  lea.l    -$2e(a6), a0
+  06EA2  move.l   a0, -(a7)
+  06EA4  jsr      $5343e.l
+  06EAA  move.w   d7, -$2(a6)
+  06EAE  addq.l   #$4, a7
+  06EB0  move.w   -$2(a6), d0
+  06EB4  ext.l    d0
+  06EB6  lea.l    -$2e(a6), a1
+  06EBA  move.b   #$22, (a1, d0.l)
+  06EC0  move.w   -$2(a6), d1
+  06EC4  addq.w   #$1, d1
+  06EC6  ext.l    d1
+  06EC8  clr.b    (a1, d1.l)
+  06ECC  jsr      $1dc20.l
+  06ED2  tst.b    d7
+  06ED4  beq.b    $6efa
+  06ED6  lea.l    -$2e(a6), a2
+  06EDA  move.l   a2, -(a7)
+  06EDC  move.w   $8(a6), -(a7)
+  06EE0  lea.l    $6fb6(pc), a3
+  06EE4  move.l   a3, -(a7)
+  06EE6  lea.l    $f00(a5), a4
+  06EEA  move.l   a4, -(a7)
+  06EEC  jsr      $532de.l
+  06EF2  adda.l   #$e, a7
+  06EF8  bra.b    $6f0e
+  06EFA  lea.l    -$2e(a6), a0
+  06EFE  move.l   a0, -(a7)
+  06F00  lea.l    $f00(a5), a1
+  06F04  move.l   a1, -(a7)
+  06F06  jsr      $5336a.l
+  06F0C  addq.l   #$8, a7
+  06F0E  clr.w    -(a7)
+  06F10  jsr      $1f530.l
+  06F16  addq.l   #$2, a7
+  06F18  unlk     a6
+  06F1A  rts      
+
+[DIAGNOST]  handler=0x04E58A  priv=1  cmd_id=0x00B2
+  4E58A  link.w   a6, #$0
+  4E58E  unlk     a6
+  4E590  rts      
+
+[EXTOUT?]  handler=0x01E1AE  priv=1  cmd_id=0x00B7
+  1E1AE  link.w   a6, #$0
+  1E1B2  jsr      $1dc20.l
+  1E1B8  tst.b    d7
+  1E1BA  beq.w    $1e2f8
+  1E1BE  lea.l    $1f636(pc), a0
+  1E1C2  move.l   a0, -(a7)
+  1E1C4  lea.l    $f00(a5), a1
+  1E1C8  move.l   a1, -(a7)
+  1E1CA  jsr      $532de.l
+  1E1D0  addq.l   #$8, a7
+  1E1D2  move.b   $13a4(a5), d7
+  1E1D6  ext.w    d7
+  1E1D8  bra.w    $1e29c
+  1E1DC  lea.l    $1f5d0(pc), a0
+  1E1E0  move.l   a0, -(a7)
+  1E1E2  lea.l    $f00(a5), a1
+  1E1E6  move.l   a1, -(a7)
+  1E1E8  jsr      $5344e.l
+  1E1EE  addq.l   #$8, a7
+  1E1F0  bra.w    $1e2c0
+  1E1F4  lea.l    $1f63e(pc), a0
+  1E1F8  move.l   a0, -(a7)
+  1E1FA  lea.l    $f00(a5), a1
+  1E1FE  move.l   a1, -(a7)
+  1E200  jsr      $5344e.l
+  1E206  addq.l   #$8, a7
+  1E208  bra.w    $1e2c0
+  1E20C  lea.l    $1f644(pc), a0
+  1E210  move.l   a0, -(a7)
+  1E212  lea.l    $f00(a5), a1
+  1E216  move.l   a1, -(a7)
+  1E218  jsr      $5344e.l
+  1E21E  addq.l   #$8, a7
+  1E220  bra.w    $1e2c0
+  1E224  lea.l    $1f64a(pc), a0
+  1E228  move.l   a0, -(a7)
+  1E22A  lea.l    $f00(a5), a1
+  1E22E  move.l   a1, -(a7)
+  1E230  jsr      $5344e.l
+  1E236  addq.l   #$8, a7
+  1E238  bra.w    $1e2c0
+  1E23C  lea.l    $1f650(pc), a0
+  1E240  move.l   a0, -(a7)
+  1E242  lea.l    $f00(a5), a1
+  1E246  move.l   a1, -(a7)
+  1E248  jsr      $5344e.l
+  1E24E  addq.l   #$8, a7
+  1E250  bra.w    $1e2c0
+  1E254  lea.l    $1f656(pc), a0
+  1E258  move.l   a0, -(a7)
+  1E25A  lea.l    $f00(a5), a1
+  1E25E  move.l   a1, -(a7)
+  1E260  jsr      $5344e.l
+  1E266  addq.l   #$8, a7
+  1E268  bra.w    $1e2c0
+  1E26C  lea.l    $1f65a(pc), a0
+  1E270  move.l   a0, -(a7)
+  1E272  lea.l    $f00(a5), a1
+  1E276  move.l   a1, -(a7)
+  1E278  jsr      $5344e.l
+  1E27E  addq.l   #$8, a7
+  1E280  bra.w    $1e2c0
+  1E284  lea.l    $1f660(pc), a0
+  1E288  move.l   a0, -(a7)
+  1E28A  lea.l    $f00(a5), a1
+  1E28E  move.l   a1, -(a7)
+  1E290  jsr      $5344e.l
+  1E296  addq.l   #$8, a7
+  1E298  bra.w    $1e2c0
+  1E29C  cmpi.w   #$6, d7
+  1E2A0  bgt.b    $1e284
+  1E2A2  cmpi.w   #$0, d7
+  1E2A6  blt.b    $1e284
+  1E2A8  asl.w    #$1, d7
+  1E2AA  move.w   $1e2b2(pc, d7.w), d7
+  1E2AE  jmp      $1e2b2(pc, d7.w)
+  1E2B2  dc.w     $ff2a
+
+[FSOURCE?]  handler=0x020B02  priv=1  cmd_id=0x00B9
+  20B02  link.w   a6, #$0
+  20B06  jsr      $1dc20.l
+  20B0C  tst.w    d7
+  20B0E  beq.w    $20bd2
+  20B12  move.b   $139b(a5), d7
+  20B16  ext.w    d7
+  20B18  bra.w    $20b94
+  20B1C  lea.l    $20d9c(pc), a0
+  20B20  move.l   a0, -(a7)
+  20B22  lea.l    $1090(a5), a1
+  20B26  move.l   a1, -(a7)
+  20B28  jsr      $532de.l
+  20B2E  addq.l   #$8, a7
+  20B30  bra.w    $20bb0
+  20B34  lea.l    $20da2(pc), a0
+  20B38  move.l   a0, -(a7)
+  20B3A  lea.l    $1090(a5), a1
+  20B3E  move.l   a1, -(a7)
+  20B40  jsr      $532de.l
+  20B46  addq.l   #$8, a7
+  20B48  bra.w    $20bb0
+  20B4C  lea.l    $20da6(pc), a0
+  20B50  move.l   a0, -(a7)
+  20B52  lea.l    $1090(a5), a1
+  20B56  move.l   a1, -(a7)
+  20B58  jsr      $532de.l
+  20B5E  addq.l   #$8, a7
+  20B60  bra.w    $20bb0
+  20B64  lea.l    $20daa(pc), a0
+  20B68  move.l   a0, -(a7)
+  20B6A  lea.l    $1090(a5), a1
+  20B6E  move.l   a1, -(a7)
+  20B70  jsr      $532de.l
+  20B76  addq.l   #$8, a7
+  20B78  bra.w    $20bb0
+  20B7C  lea.l    $20d8c(pc), a0
+  20B80  move.l   a0, -(a7)
+  20B82  lea.l    $1090(a5), a1
+  20B86  move.l   a1, -(a7)
+  20B88  jsr      $532de.l
+  20B8E  addq.l   #$8, a7
+  20B90  bra.w    $20bb0
+  20B94  cmpi.w   #$2, d7
+  20B98  beq.b    $20b34
+  20B9A  cmpi.w   #$3, d7
+  20B9E  beq.w    $20b1c
+  20BA2  cmpi.w   #$7, d7
+  20BA6  beq.b    $20b4c
+  20BA8  cmpi.w   #$8, d7
+  20BAC  beq.b    $20b64
+  20BAE  bra.b    $20b7c
+  20BB0  lea.l    $1090(a5), a0
+  20BB4  move.l   a0, -(a7)
+  20BB6  lea.l    $20db0(pc), a1
+  20BBA  move.l   a1, -(a7)
+  20BBC  lea.l    $f00(a5), a2
+  20BC0  move.l   a2, -(a7)
+  20BC2  jsr      $532de.l
+  20BC8  adda.l   #$c, a7
+  20BCE  bra.w    $20bf2
+  20BD2  move.b   $139b(a5), d0
+  20BD6  ext.w    d0
+  20BD8  move.w   d0, -(a7)
+  20BDA  lea.l    $20cc4(pc), a0
+  20BDE  move.l   a0, -(a7)
+  20BE0  lea.l    $f00(a5), a1
+  20BE4  move.l   a1, -(a7)
+  20BE6  jsr      $532de.l
+  20BEC  adda.l   #$a, a7
+  20BF2  clr.w    -(a7)
+  20BF4  jsr      $1f530.l
+  20BFA  addq.l   #$2, a7
+  20BFC  unlk     a6
+  20BFE  rts      
+
+[MMATH?]  handler=0x01E336  priv=1  cmd_id=0x00C1
+  1E336  link.w   a6, #$0
+  1E33A  jsr      $1dc20.l
+  1E340  tst.b    d7
+  1E342  beq.w    $1e3a6
+  1E346  move.b   $ccc(a5), d0
+  1E34A  andi.b   #$10, d0
+  1E34E  beq.w    $1e38e
+  1E352  move.w   #$2, -(a7)
+  1E356  jsr      $552f0.l
+  1E35C  movea.l  d7, a0
+  1E35E  addq.l   #$2, a7
+  1E360  move.l   a0, -(a7)
+  1E362  move.w   #$1, -(a7)
+  1E366  jsr      $552f0.l
+  1E36C  movea.l  d7, a1
+  1E36E  addq.l   #$2, a7
+  1E370  move.l   a1, -(a7)
+  1E372  lea.l    $1f67a(pc), a2
+  1E376  move.l   a2, -(a7)
+  1E378  lea.l    $f00(a5), a3
+  1E37C  move.l   a3, -(a7)
+  1E37E  jsr      $532de.l
+  1E384  adda.l   #$10, a7
+  1E38A  bra.w    $1e3a2
+  1E38E  lea.l    $1f686(pc), a0
+  1E392  move.l   a0, -(a7)
+  1E394  lea.l    $f00(a5), a1
+  1E398  move.l   a1, -(a7)
+  1E39A  jsr      $532de.l
+  1E3A0  addq.l   #$8, a7
+  1E3A2  bra.w    $1e406
+  1E3A6  move.b   $ccc(a5), d0
+  1E3AA  andi.b   #$10, d0
+  1E3AE  beq.w    $1e3ea
+  1E3B2  move.w   #$2, -(a7)
+  1E3B6  jsr      $555be.l
+  1E3BC  addq.l   #$2, a7
+  1E3BE  move.w   d7, -(a7)
+  1E3C0  move.w   #$1, -(a7)
+  1E3C4  jsr      $555be.l
+  1E3CA  addq.l   #$2, a7
+  1E3CC  move.w   d7, -(a7)
+  1E3CE  lea.l    $1f694(pc), a0
+  1E3D2  move.l   a0, -(a7)
+  1E3D4  lea.l    $f00(a5), a1
+  1E3D8  move.l   a1, -(a7)
+  1E3DA  jsr      $532de.l
+  1E3E0  adda.l   #$c, a7
+  1E3E6  bra.w    $1e406
+  1E3EA  clr.w    -(a7)
+  1E3EC  clr.w    -(a7)
+  1E3EE  lea.l    $1f694(pc), a0
+  1E3F2  move.l   a0, -(a7)
+  1E3F4  lea.l    $f00(a5), a1
+  1E3F8  move.l   a1, -(a7)
+  1E3FA  jsr      $532de.l
+  1E400  adda.l   #$c, a7
+  1E406  clr.w    -(a7)
+  1E408  jsr      $1f530.l
+  1E40E  addq.l   #$2, a7
+  1E410  unlk     a6
+  1E412  rts      
+
+[MENU?]  handler=0x005430  priv=1  cmd_id=0x00C3
+  05430  link.w   a6, #$fffc
+  05434  jsr      $1dc20.l
+  0543A  tst.b    d7
+  0543C  beq.b    $5476
+  0543E  tst.b    $1db4(a5)
+  05442  bne.b    $544e
+  05444  lea.l    $5a2e(pc), a0
+  05448  move.l   a0, -$4(a6)
+  0544C  bra.b    $5456
+  0544E  lea.l    $5a34(pc), a1
+  05452  move.l   a1, -$4(a6)
+  05456  movea.l  -$4(a6), a2
+  0545A  move.l   a2, -(a7)
+  0545C  lea.l    $5a3a(pc), a3
+  05460  move.l   a3, -(a7)
+  05462  lea.l    $f00(a5), a4
+  05466  move.l   a4, -(a7)
+  05468  jsr      $532de.l
+  0546E  adda.l   #$c, a7
+  05474  bra.b    $5496
+  05476  clr.l    d0
+  05478  move.b   $1db4(a5), d0
+  0547C  move.w   d0, -(a7)
+  0547E  lea.l    $5a42(pc), a0
+  05482  move.l   a0, -(a7)
+  05484  lea.l    $f00(a5), a1
+  05488  move.l   a1, -(a7)
+  0548A  jsr      $532de.l
+  05490  adda.l   #$a, a7
+  05496  clr.w    -(a7)
+  05498  jsr      $1f530.l
+  0549E  addq.l   #$2, a7
+  054A0  unlk     a6
+  054A2  rts      
+
+[MSIZE]  handler=0x027AAA  priv=1  cmd_id=0x00C5
+  27AAA  link.w   a6, #$0
+  27AAE  unlk     a6
+  27AB0  rts      
+
+[OCOMP?]  handler=0x0204CE  priv=1  cmd_id=0x00C9
+  204CE  link.w   a6, #$0
+  204D2  jsr      $1dc20.l
+  204D8  tst.w    d7
+  204DA  beq.w    $20506
+  204DE  lea.l    $20d08(pc), a0
+  204E2  move.l   a0, -(a7)
+  204E4  lea.l    $f00(a5), a1
+  204E8  move.l   a1, -(a7)
+  204EA  jsr      $532de.l
+  204F0  addq.l   #$8, a7
+  204F2  move.b   $139f(a5), d0
+  204F6  ext.w    d0
+  204F8  move.w   d0, -(a7)
+  204FA  jsr      $20460.l
+  20500  addq.l   #$2, a7
+  20502  bra.w    $20526
+  20506  move.b   $139f(a5), d0
+  2050A  ext.w    d0
+  2050C  move.w   d0, -(a7)
+  2050E  lea.l    $20cc4(pc), a0
+  20512  move.l   a0, -(a7)
+  20514  lea.l    $f00(a5), a1
+  20518  move.l   a1, -(a7)
+  2051A  jsr      $532de.l
+  20520  adda.l   #$a, a7
+  20526  clr.w    -(a7)
+  20528  jsr      $1f530.l
+  2052E  addq.l   #$2, a7
+  20530  unlk     a6
+  20532  rts      
+
+[RATIO?]  handler=0x01DD4A  priv=1  cmd_id=0x00CD
+  1DD4A  link.w   a6, #$fffc
+  1DD4E  jsr      $1dc20.l
+  1DD54  tst.b    d7
+  1DD56  beq.w    $1dd9c
+  1DD5A  move.b   $1448(a5), d0
+  1DD5E  cmpi.b   #$1, d0
+  1DD62  bne.w    $1dd72
+  1DD66  lea.l    $1f5cc(pc), a0
+  1DD6A  move.l   a0, -$4(a6)
+  1DD6E  bra.w    $1dd7a
+  1DD72  lea.l    $1f5d0(pc), a1
+  1DD76  move.l   a1, -$4(a6)
+  1DD7A  movea.l  -$4(a6), a2
+  1DD7E  move.l   a2, -(a7)
+  1DD80  lea.l    $1f5d4(pc), a3
+  1DD84  move.l   a3, -(a7)
+  1DD86  lea.l    $f00(a5), a4
+  1DD8A  move.l   a4, -(a7)
+  1DD8C  jsr      $532de.l
+  1DD92  adda.l   #$c, a7
+  1DD98  bra.w    $1ddbc
+  1DD9C  move.b   $1448(a5), d0
+  1DDA0  ext.w    d0
+  1DDA2  move.w   d0, -(a7)
+  1DDA4  lea.l    $1f5c8(pc), a0
+  1DDA8  move.l   a0, -(a7)
+  1DDAA  lea.l    $f00(a5), a1
+  1DDAE  move.l   a1, -(a7)
+  1DDB0  jsr      $532de.l
+  1DDB6  adda.l   #$a, a7
+  1DDBC  clr.w    -(a7)
+  1DDBE  jsr      $1f530.l
+  1DDC4  addq.l   #$2, a7
+  1DDC6  unlk     a6
+  1DDC8  rts      
+
+[RES?]  handler=0x0209AC  priv=0  cmd_id=0x00CE
+  209AC  link.w   a6, #$fffc
+  209B0  jsr      $1dc20.l
+  209B6  tst.w    d7
+  209B8  beq.w    $209c8
+  209BC  lea.l    $20d76(pc), a0
+  209C0  move.l   a0, -$4(a6)
+  209C4  bra.w    $209d0
+  209C8  lea.l    $20c98(pc), a1
+  209CC  move.l   a1, -$4(a6)
+  209D0  movea.l  -$4(a6), a2
+  209D4  move.l   a2, -(a7)
+  209D6  lea.l    $f00(a5), a3
+  209DA  move.l   a3, -(a7)
+  209DC  jsr      $532de.l
+  209E2  addq.l   #$8, a7
+  209E4  pea.l    $13ec(a5)
+  209E8  lea.l    $20c9a(pc), a0
+  209EC  move.l   a0, -(a7)
+  209EE  lea.l    $1090(a5), a1
+  209F2  move.l   a1, -(a7)
+  209F4  jsr      $532de.l
+  209FA  adda.l   #$c, a7
+  20A00  lea.l    $1090(a5), a0
+  20A04  move.l   a0, -(a7)
+  20A06  lea.l    $f00(a5), a1
+  20A0A  move.l   a1, -(a7)
+  20A0C  jsr      $5344e.l
+  20A12  addq.l   #$8, a7
+  20A14  move.w   #$4, -(a7)
+  20A18  jsr      $1f530.l
+  20A1E  addq.l   #$2, a7
+  20A20  unlk     a6
+  20A22  rts      
+
+[RQS?]  handler=0x0041EE  priv=1  cmd_id=0x00CF
+  041EE  link.w   a6, #$0
+  041F2  jsr      $1dc20.l
+  041F8  tst.b    d7
+  041FA  beq.b    $4224
+  041FC  clr.l    d0
+  041FE  move.b   $13ac(a5), d0
+  04202  andi.w   #$ff, d0
+  04206  move.w   d0, -(a7)
+  04208  lea.l    $42f0(pc), a0
+  0420C  move.l   a0, -(a7)
+  0420E  lea.l    $120f00.l, a1  # SRAM 120F00
+  04214  move.l   a1, -(a7)
+  04216  jsr      $532de.l
+  0421C  adda.l   #$a, a7
+  04222  bra.b    $424a
+  04224  clr.l    d0
+  04226  move.b   $13ac(a5), d0
+  0422A  andi.w   #$ff, d0
+  0422E  move.w   d0, -(a7)
+  04230  lea.l    $42ec(pc), a0
+  04234  move.l   a0, -(a7)
+  04236  lea.l    $120f00.l, a1  # SRAM 120F00
+  0423C  move.l   a1, -(a7)
+  0423E  jsr      $532de.l
+  04244  adda.l   #$a, a7
+  0424A  clr.w    -(a7)
+  0424C  jsr      $1f530.l
+  04252  addq.l   #$2, a7
+  04254  unlk     a6
+  04256  rts      
+
+[SWEEP?]  handler=0x01DDCA  priv=1  cmd_id=0x00D3
+  1DDCA  link.w   a6, #$ffe4
+  1DDCE  move.w   $1434(a5), d0
+  1DDD2  ext.l    d0
+  1DDD4  move.l   d0, -$4(a6)
+  1DDD8  andi.l   #$ffff, -$4(a6)
+  1DDE0  move.l   $1436(a5), d1
+  1DDE4  cmpi.l   #$ffffffff, d1
+  1DDEA  bne.w    $1de1a
+  1DDEE  move.l   -$4(a6), -(a7)
+  1DDF2  pea.l    -$14(a6)
+  1DDF6  jsr      $585b4.l
+  1DDFC  addq.l   #$8, a7
+  1DDFE  pea.l    -$14(a6)
+  1DE02  pea.l    $1f5de(pc)
+  1DE06  pea.l    -$c(a6)
+  1DE0A  jsr      $58568.l
+  1DE10  adda.l   #$c, a7
+  1DE16  bra.w    $1de9a
+  1DE1A  move.l   $1436(a5), -(a7)
+  1DE1E  pea.l    -$14(a6)
+  1DE22  jsr      $585b4.l
+  1DE28  addq.l   #$8, a7
+  1DE2A  pea.l    -$14(a6)
+  1DE2E  pea.l    $1f5e6(pc)
+  1DE32  pea.l    -$14(a6)
+  1DE36  jsr      $58568.l
+  1DE3C  adda.l   #$c, a7
+  1DE42  move.l   -$4(a6), -(a7)
+  1DE46  pea.l    -$1c(a6)
+  1DE4A  jsr      $585b4.l
+  1DE50  addq.l   #$8, a7
+  1DE52  pea.l    -$1c(a6)
+  1DE56  pea.l    -$14(a6)
+  1DE5A  pea.l    -$1c(a6)
+  1DE5E  jsr      $58530.l
+  1DE64  adda.l   #$c, a7
+  1DE6A  pea.l    -$1c(a6)
+  1DE6E  pea.l    $1f5ee(pc)
+  1DE72  pea.l    -$1c(a6)
+  1DE76  jsr      $58530.l
+  1DE7C  adda.l   #$c, a7
+  1DE82  pea.l    $1f5de(pc)
+  1DE86  pea.l    -$1c(a6)
+  1DE8A  pea.l    -$c(a6)
+  1DE8E  jsr      $58568.l
+  1DE94  adda.l   #$c, a7
+  1DE9A  jsr      $1dc20.l
+  1DEA0  tst.b    d7
+  1DEA2  beq.w    $1deca
+  1DEA6  move.l   $143a(a5), -(a7)
+  1DEAA  pea.l    -$c(a6)
+  1DEAE  lea.l    $1f5f6(pc), a0
+  1DEB2  move.l   a0, -(a7)
+  1DEB4  lea.l    $f00(a5), a1
+  1DEB8  move.l   a1, -(a7)
+  1DEBA  jsr      $532de.l
+  1DEC0  adda.l   #$10, a7
+  1DEC6  bra.w    $1deea
+  1DECA  move.l   $143a(a5), -(a7)
+  1DECE  pea.l    -$c(a6)
+  1DED2  lea.l    $1f5fc(pc), a0
+  1DED6  move.l   a0, -(a7)
+  1DED8  lea.l    $f00(a5), a1
+  1DEDC  move.l   a1, -(a7)
+  1DEDE  jsr      $532de.l
+  1DEE4  adda.l   #$10, a7
+  1DEEA  move.w   #$6, -(a7)
+  1DEEE  jsr      $1f530.l
+  1DEF4  addq.l   #$2, a7
+  1DEF6  unlk     a6
+  1DEF8  rts      
+
+[TBUFF?]  handler=0x01E0AE  priv=1  cmd_id=0x00D5
+  1E0AE  link.w   a6, #$fffc
+  1E0B2  jsr      $1dc20.l
+  1E0B8  tst.b    d7
+  1E0BA  beq.w    $1e0fc
+  1E0BE  tst.b    $1396(a5)
+  1E0C2  bne.w    $1e0d2
+  1E0C6  lea.l    $1f5d0(pc), a0
+  1E0CA  move.l   a0, -$4(a6)
+  1E0CE  bra.w    $1e0da
+  1E0D2  lea.l    $1f5cc(pc), a1
+  1E0D6  move.l   a1, -$4(a6)
+  1E0DA  movea.l  -$4(a6), a2
+  1E0DE  move.l   a2, -(a7)
+  1E0E0  lea.l    $1f620(pc), a3
+  1E0E4  move.l   a3, -(a7)
+  1E0E6  lea.l    $f00(a5), a4
+  1E0EA  move.l   a4, -(a7)
+  1E0EC  jsr      $532de.l
+  1E0F2  adda.l   #$c, a7
+  1E0F8  bra.w    $1e11c
+  1E0FC  move.b   $1396(a5), d0
+  1E100  ext.w    d0
+  1E102  move.w   d0, -(a7)
+  1E104  lea.l    $1f5c8(pc), a0
+  1E108  move.l   a0, -(a7)
+  1E10A  lea.l    $f00(a5), a1
+  1E10E  move.l   a1, -(a7)
+  1E110  jsr      $532de.l
+  1E116  adda.l   #$a, a7
+  1E11C  clr.w    -(a7)
+  1E11E  jsr      $1f530.l
+  1E124  addq.l   #$2, a7
+  1E126  unlk     a6
+  1E128  rts      
+
+[CAL_NUM]  handler=0x02FDF2  priv=0  cmd_id=0x015B
+  2FDF2  link.w   a6, #$0
+  2FDF6  move.w   #$deaf, $121780.l  # SRAM 121780
+  2FDFE  move.w   #$bad1, $120c90.l  # SRAM 120C90
+  2FE06  move.w   #$ace, $121782.l  # SRAM 121782
+  2FE0E  move.w   #$bead, $120c92.l  # SRAM 120C92
+  2FE16  move.l   #$1, -(a7)
+  2FE1C  lea.l    $61a.l, a0  # IO 0061A
+  2FE22  move.l   a0, -(a7)
+  2FE24  jsr      $5bc2c.l
+  2FE2A  addq.l   #$8, a7
+  2FE2C  clr.l    -(a7)
+  2FE2E  lea.l    $626.l, a0  # IO 00626
+  2FE34  move.l   a0, -(a7)
+  2FE36  jsr      $5bc2c.l
+  2FE3C  addq.l   #$8, a7
+  2FE3E  clr.l    -(a7)
+  2FE40  lea.l    $62a.l, a0  # IO 0062A
+  2FE46  move.l   a0, -(a7)
+  2FE48  jsr      $5bc2c.l
+  2FE4E  addq.l   #$8, a7
+  2FE50  jsr      $5d3a0.l
+  2FE56  clr.w    $121782.l  # SRAM 121782
+  2FE5C  clr.w    $120c92.l  # SRAM 120C92
+  2FE62  clr.w    $121780.l  # SRAM 121780
+  2FE68  clr.w    $120c90.l  # SRAM 120C90
+  2FE6E  unlk     a6
+  2FE70  rts      
+
+[T?]  handler=0x01EC68  priv=1  cmd_id=0x015C
+  1EC68  link.w   a6, #$0
+  1EC6C  jsr      $1dc20.l
+  1EC72  tst.b    d7
+  1EC74  beq.w    $1ed82
+  1EC78  lea.l    $1f77c(pc), a0
+  1EC7C  move.l   a0, -(a7)
+  1EC7E  lea.l    $f00(a5), a1
+  1EC82  move.l   a1, -(a7)
+  1EC84  jsr      $532de.l
+  1EC8A  addq.l   #$8, a7
+  1EC8C  move.b   $1390(a5), d7
+  1EC90  ext.w    d7
+  1EC92  bra.w    $1ed56
+  1EC96  lea.l    $1f70a(pc), a0
+  1EC9A  move.l   a0, -(a7)
+  1EC9C  lea.l    $f00(a5), a1
+  1ECA0  move.l   a1, -(a7)
+  1ECA2  jsr      $5344e.l
+  1ECA8  addq.l   #$8, a7
+  1ECAA  bra.w    $1ed7e
+  1ECAE  lea.l    $1f75e(pc), a0
+  1ECB2  move.l   a0, -(a7)
+  1ECB4  lea.l    $f00(a5), a1
+  1ECB8  move.l   a1, -(a7)
+  1ECBA  jsr      $5344e.l
+  1ECC0  addq.l   #$8, a7
+  1ECC2  bra.w    $1ed7e
+  1ECC6  lea.l    $1f782(pc), a0
+  1ECCA  move.l   a0, -(a7)
+  1ECCC  lea.l    $f00(a5), a1
+  1ECD0  move.l   a1, -(a7)
+  1ECD2  jsr      $5344e.l
+  1ECD8  addq.l   #$8, a7
+  1ECDA  bra.w    $1ed7e
+  1ECDE  lea.l    $1f710(pc), a0
+  1ECE2  move.l   a0, -(a7)
+  1ECE4  lea.l    $f00(a5), a1
+  1ECE8  move.l   a1, -(a7)
+  1ECEA  jsr      $5344e.l
+  1ECF0  addq.l   #$8, a7
+  1ECF2  bra.w    $1ed7e
+  1ECF6  lea.l    $1f770(pc), a0
+  1ECFA  move.l   a0, -(a7)
+  1ECFC  lea.l    $f00(a5), a1
+  1ED00  move.l   a1, -(a7)
+  1ED02  jsr      $5344e.l
+  1ED08  addq.l   #$8, a7
+  1ED0A  bra.w    $1ed7e
+  1ED0E  lea.l    $1f786(pc), a0
+  1ED12  move.l   a0, -(a7)
+  1ED14  lea.l    $f00(a5), a1
+  1ED18  move.l   a1, -(a7)
+  1ED1A  jsr      $5344e.l
+  1ED20  addq.l   #$8, a7
+  1ED22  bra.w    $1ed7e
+  1ED26  lea.l    $1f78c(pc), a0
+  1ED2A  move.l   a0, -(a7)
+  1ED2C  lea.l    $f00(a5), a1
+  1ED30  move.l   a1, -(a7)
+  1ED32  jsr      $5344e.l
+  1ED38  addq.l   #$8, a7
+  1ED3A  bra.w    $1ed7e
+  1ED3E  lea.l    $1f660(pc), a0
+  1ED42  move.l   a0, -(a7)
+  1ED44  lea.l    $f00(a5), a1
+  1ED48  move.l   a1, -(a7)
+  1ED4A  jsr      $5344e.l
+  1ED50  addq.l   #$8, a7
+  1ED52  bra.w    $1ed7e
+  1ED56  cmpi.w   #$8, d7
+  1ED5A  bgt.b    $1ed3e
+  1ED5C  cmpi.w   #$1, d7
+  1ED60  blt.b    $1ed3e
+  1ED62  subq.w   #$1, d7
+  1ED64  asl.w    #$1, d7
+  1ED66  move.w   $1ed6e(pc, d7.w), d7
+  1ED6A  jmp      $1ed6e(pc, d7.w)
+  1ED6E  dc.w     $ff28
+
+[R?]  handler=0x01F2E0  priv=1  cmd_id=0x015D
+  1F2E0  link.w   a6, #$fffc
+  1F2E4  jsr      $1dc20.l
+  1F2EA  tst.b    d7
+  1F2EC  beq.w    $1f2fc
+  1F2F0  lea.l    $1f7fc(pc), a0
+  1F2F4  move.l   a0, -$4(a6)
+  1F2F8  bra.w    $1f304
+  1F2FC  lea.l    $1f5b0(pc), a1
+  1F300  move.l   a1, -$4(a6)
+  1F304  movea.l  -$4(a6), a2
+  1F308  move.l   a2, -(a7)
+  1F30A  lea.l    $f00(a5), a3
+  1F30E  move.l   a3, -(a7)
+  1F310  jsr      $532de.l
+  1F316  addq.l   #$8, a7
+  1F318  move.b   $139c(a5), d0
+  1F31C  ext.w    d0
+  1F31E  move.w   d0, -(a7)
+  1F320  jsr      $1f336.l
+  1F326  addq.l   #$2, a7
+  1F328  clr.w    -(a7)
+  1F32A  jsr      $1f530.l
+  1F330  addq.l   #$2, a7
+  1F332  unlk     a6
+  1F334  rts      
+
+[RMATHV]  handler=0x053E88  priv=0  cmd_id=0x015E
+  53E88  link.w   a6, #$ffe4
+  53E8C  movea.l  $8(a6), a0
+  53E90  move.w   $e(a0), d7
+  53E94  bra.w    $53ee0
+  53E98  movea.l  $8(a6), a1
+  53E9C  move.w   $c(a1), d0
+  53EA0  cmp.w    $8a00.l, d0  # IO 08A00
+  53EA6  bne.w    $53eb6
+  53EAA  lea.l    $16(a1), a2
+  53EAE  move.l   a2, -$4(a6)
+  53EB2  bra.w    $53ec2
+  53EB6  movea.l  $8(a6), a3
+  53EBA  movea.l  $16(a3), a4
+  53EBE  move.l   a4, -$4(a6)
+  53EC2  bra.w    $53ee8
+  53EC6  move.l   $2184.w, -(a7)
+  53ECA  lea.l    $5608e(pc), a0
+  53ECE  move.l   a0, -(a7)
+  53ED0  jsr      $2f96.l
+  53ED6  addq.l   #$8, a7
+  53ED8  bra.w    $54280
+  53EDC  bra.w    $53ee8
+  53EE0  cmpi.w   #$2, d7
+  53EE4  beq.b    $53e98
+  53EE6  bra.b    $53ec6
+  53EE8  move.w   $c(a6), d7
+  53EEC  bra.w    $54246
+  53EF0  move.l   $13dc(a5), -(a7)
+  53EF4  pea.l    -$14(a6)
+  53EF8  jsr      $585b4.l
+  53EFE  addq.l   #$8, a7
+  53F00  movea.l  -$4(a6), a0
+  53F04  lea.l    -$14(a6), a1
+  53F08  move.l   (a1)+, (a0)+
+  53F0A  move.l   (a1)+, (a0)+
+  53F0C  bra.w    $54280
+  53F10  movea.l  -$4(a6), a2
+  53F14  lea.l    $13f4(a5), a3
+  53F18  move.l   (a3)+, (a2)+
+  53F1A  move.l   (a3)+, (a2)+
+  53F1C  bra.w    $54280
+  53F20  movea.l  -$4(a6), a4
+  53F24  lea.l    $1820(a5), a1
+  53F28  move.l   (a1)+, (a4)+
+  53F2A  move.l   (a1)+, (a4)+
+  53F2C  bra.w    $54280
+  53F30  pea.l    $1810(a5)
+  53F34  pea.l    $5605e(pc)
+  53F38  jsr      $585d8.l
+  53F3E  addq.l   #$8, a7
+  53F40  tst.b    d7
+  53F42  beq.w    $53f56
+  53F46  movea.l  -$4(a6), a0
+  53F4A  lea.l    $5605e(pc), a3
+  53F4E  move.l   (a3)+, (a0)+
+  53F50  move.l   (a3)+, (a0)+
+  53F52  bra.w    $54014
+  53F56  tst.b    $1834(a5)
+  53F5A  beq.w    $53f6a
+  53F5E  tst.b    $1835(a5)
+  53F62  bne.w    $53f6a
+  53F66  bra.w    $53f6e
+  53F6A  bra.w    $53f7e
+  53F6E  movea.l  -$4(a6), a2
+  53F72  lea.l    $56066(pc), a1
+  53F76  move.l   (a1)+, (a2)+
+  53F78  move.l   (a1)+, (a2)+
+  53F7A  bra.w    $54014
+  53F7E  tst.b    $1834(a5)
+  53F82  bne.w    $53f92
+  53F86  tst.b    $1835(a5)
+  53F8A  beq.w    $53f92
+  53F8E  bra.w    $53f96
+  53F92  bra.w    $53fa6
+  53F96  movea.l  -$4(a6), a4
+  53F9A  lea.l    $56072(pc), a3
+  53F9E  move.l   (a3)+, (a4)+
+  53FA0  move.l   (a3)+, (a4)+
+  53FA2  bra.w    $54014
+  53FA6  tst.b    $1834(a5)
+  53FAA  beq.w    $53fba
+  53FAE  tst.b    $1835(a5)
+  53FB2  beq.w    $53fba
+  53FB6  bra.w    $53fbe
+  53FBA  bra.w    $53fce
+  53FBE  movea.l  -$4(a6), a0
+  53FC2  lea.l    $5607a(pc), a1
+  53FC6  move.l   (a1)+, (a0)+
+  53FC8  move.l   (a1)+, (a0)+
+  53FCA  bra.w    $54014
+  53FCE  jsr      $5a540.l
+  53FD4  tst.w    $5a53e.l
+  53FDA  beq.w    $54002
+  53FDE  pea.l    $1800(a5)
+  53FE2  pea.l    $1810(a5)
+  53FE6  movea.l  -$4(a6), a0
+  53FEA  pea.l    (a0)
+  53FEC  jsr      $58584.l
+  53FF2  adda.l   #$c, a7
+  53FF8  jsr      $5a594.l
+  53FFE  bra.w    $54014
+  54002  movea.l  -$4(a6), a0
+  54006  lea.l    $5607a(pc), a1
+  5400A  move.l   (a1)+, (a0)+
+  5400C  move.l   (a1)+, (a0)+
+  5400E  jsr      $3296.l
+  54014  bra.w    $54280
+
+[PAUSED?]  handler=0x010462  priv=0  cmd_id=0x0160
+  10462  link.w   a6, #$fffa
+  10466  bsr.w    $10254
+  1046A  move.b   d7, -$2(a6)
+  1046E  jsr      $1dc20.l
+  10474  tst.b    d7
+  10476  beq.b    $104b2
+  10478  tst.b    -$2(a6)
+  1047C  bne.b    $10488
+  1047E  lea.l    $1054c(pc), a0
+  10482  move.l   a0, -$6(a6)
+  10486  bra.b    $10490
+  10488  lea.l    $10550(pc), a1
+  1048C  move.l   a1, -$6(a6)
+  10490  movea.l  -$6(a6), a2
+  10494  move.l   a2, -(a7)
+  10496  lea.l    $10554(pc), a3
+  1049A  move.l   a3, -(a7)
+  1049C  lea.l    $120f00.l, a4  # SRAM 120F00
+  104A2  move.l   a4, -(a7)
+  104A4  jsr      $532de.l
+  104AA  adda.l   #$c, a7
+  104B0  bra.b    $104d4
+  104B2  clr.l    d0
+  104B4  move.b   -$2(a6), d0
+  104B8  move.w   d0, -(a7)
+  104BA  lea.l    $1055e(pc), a0
+  104BE  move.l   a0, -(a7)
+  104C0  lea.l    $120f00.l, a1  # SRAM 120F00
+  104C6  move.l   a1, -(a7)
+  104C8  jsr      $532de.l
+  104CE  adda.l   #$a, a7
+  104D4  clr.w    -(a7)
+  104D6  jsr      $1f530.l
+  104DC  addq.l   #$2, a7
+  104DE  unlk     a6
+  104E0  rts      
+
+[PAUSE?]  handler=0x010462  priv=0  cmd_id=0x0161  (== PAUSED?)
+  10462  link.w   a6, #$fffa
+  10466  bsr.w    $10254
+  1046A  move.b   d7, -$2(a6)
+  1046E  jsr      $1dc20.l
+  10474  tst.b    d7
+  10476  beq.b    $104b2
+  10478  tst.b    -$2(a6)
+  1047C  bne.b    $10488
+  1047E  lea.l    $1054c(pc), a0
+  10482  move.l   a0, -$6(a6)
+  10486  bra.b    $10490
+  10488  lea.l    $10550(pc), a1
+  1048C  move.l   a1, -$6(a6)
+  10490  movea.l  -$6(a6), a2
+  10494  move.l   a2, -(a7)
+  10496  lea.l    $10554(pc), a3
+  1049A  move.l   a3, -(a7)
+  1049C  lea.l    $120f00.l, a4  # SRAM 120F00
+  104A2  move.l   a4, -(a7)
+  104A4  jsr      $532de.l
+  104AA  adda.l   #$c, a7
+  104B0  bra.b    $104d4
+  104B2  clr.l    d0
+  104B4  move.b   -$2(a6), d0
+  104B8  move.w   d0, -(a7)
+  104BA  lea.l    $1055e(pc), a0
+  104BE  move.l   a0, -(a7)
+  104C0  lea.l    $120f00.l, a1  # SRAM 120F00
+  104C6  move.l   a1, -(a7)
+  104C8  jsr      $532de.l
+  104CE  adda.l   #$a, a7
+  104D4  clr.w    -(a7)
+  104D6  jsr      $1f530.l
+  104DC  addq.l   #$2, a7
+  104DE  unlk     a6
+  104E0  rts      
+
+[SIZE?]  handler=0x017EA0  priv=0  cmd_id=0x016A
+  17EA0  link.w   a6, #$0
+  17EA4  move.w   #$6, -(a7)
+  17EA8  movea.l  $8(a6), a0
+  17EAC  move.w   $1a(a0), d0
+  17EB0  addq.w   #$1, d0
+  17EB2  move.w   d0, -(a7)
+  17EB4  jsr      $1d8dc.l
+  17EBA  addq.l   #$4, a7
+  17EBC  unlk     a6
+  17EBE  rts      
+
+[SCROLL]  handler=0x007B2A  priv=1  cmd_id=0x0175
+  07B2A  link.w   a6, #$0
+  07B2E  move.w   $8(a6), d0
+  07B32  cmpi.w   #$1, d0
+  07B36  bne.b    $7b3c
+  07B38  bsr.b    $7adc
+  07B3A  bra.b    $7b48
+  07B3C  move.w   $8(a6), d0
+  07B40  cmpi.w   #$2, d0
+  07B44  bne.b    $7b48
+  07B46  bsr.b    $7b0c
+  07B48  unlk     a6
+  07B4A  rts      
+
+[WAIT]  handler=0x017B06  priv=1  cmd_id=0x0179
+  17B06  link.w   a6, #$fffe
+  17B0A  clr.w    -$2(a6)
+  17B0E  move.w   -$2(a6), d0
+  17B12  cmp.w    $8(a6), d0
+  17B16  bcc.b    $17b2a
+  17B18  move.w   #$3d9, -(a7)
+  17B1C  jsr      $8908.l
+  17B22  addq.l   #$2, a7
+  17B24  addq.w   #$1, -$2(a6)
+  17B28  bra.b    $17b0e
+  17B2A  unlk     a6
+  17B2C  rts      
+
+[TERM]  handler=0x02F0A2  priv=1  cmd_id=0x017A
+  2F0A2  link.w   a6, #$0
+  2F0A6  move.w   $8(a6), d0
+  2F0AA  cmpi.w   #$ffff, d0
+  2F0AE  blt.w    $2f0be
+  2F0B2  cmpi.w   #$2, d0
+  2F0B6  bgt.w    $2f0be
+  2F0BA  bra.w    $2f0d4
+  2F0BE  move.l   $23f0.w, -(a7)
+  2F0C2  lea.l    $2f43a(pc), a0
+  2F0C6  move.l   a0, -(a7)
+  2F0C8  jsr      $2f96.l
+  2F0CE  addq.l   #$8, a7
+  2F0D0  bra.w    $2f10a
+  2F0D4  move.w   $8(a6), d0
+  2F0D8  cmpi.w   #$ffff, d0
+  2F0DC  bne.w    $2f0e6
+  2F0E0  move.w   #$1, $8(a6)
+  2F0E6  move.w   $8(a6), d1
+  2F0EA  subq.w   #$1, d1
+  2F0EC  move.b   $1444(a5), d2
+  2F0F0  ext.w    d2
+  2F0F2  cmp.w    d1, d2
+  2F0F4  beq.w    $2f10a
+  2F0F8  move.l   $23f0.w, -(a7)
+  2F0FC  lea.l    $2f450(pc), a0
+  2F100  move.l   a0, -(a7)
+  2F102  jsr      $2f96.l
+  2F108  addq.l   #$8, a7
+  2F10A  unlk     a6
+  2F10C  rts      
+
+[TONE]  handler=0x007CB4  priv=1  cmd_id=0x017B
+  07CB4  link.w   a6, #$0
+  07CB8  move.w   #$2, -(a7)
+  07CBC  bsr.w    $7bcc
+  07CC0  addq.l   #$2, a7
+  07CC2  unlk     a6
+  07CC4  rts      
+
+[CAT]  handler=0x017EC0  priv=0  cmd_id=0x017D
+  17EC0  link.w   a6, #$fe62
+  17EC4  clr.b    -$19e(a6)
+  17EC8  move.l   $1b08(a5), -$e(a6)
+  17ECE  move.w   #$2, -$a(a6)
+  17ED4  tst.l    -$e(a6)
+  17ED8  beq.w    $18076
+  17EDC  clr.w    -$4(a6)
+  17EE0  movea.l  -$e(a6), a0
+  17EE4  move.w   $e(a0), d7
+  17EE8  bra.w    $17fee
+  17EEC  movea.l  -$e(a6), a1
+  17EF0  move.w   $c(a1), d0
+  17EF4  cmp.w    $8a00.l, d0  # IO 08A00
+  17EFA  bne.w    $17f0a
+  17EFE  lea.l    $185ec(pc), a2
+  17F02  move.l   a2, -$8(a6)
+  17F06  bra.w    $17f40
+  17F0A  movea.l  -$e(a6), a3
+  17F0E  move.w   $c(a3), d1
+  17F12  cmp.w    $8a02.l, d1  # IO 08A02
+  17F18  bne.w    $17f38
+  17F1C  lea.l    $185f2(pc), a4
+  17F20  move.l   a4, -$8(a6)
+  17F24  move.w   #$1, -$4(a6)
+  17F2A  move.w   $1a(a3), d2
+  17F2E  addq.w   #$1, d2
+  17F30  move.w   d2, -$2(a6)
+  17F34  bra.w    $17f40
+  17F38  lea.l    $185fa(pc), a0
+  17F3C  move.l   a0, -$8(a6)
+  17F40  bra.w    $1800c
+  17F44  movea.l  -$e(a6), a1
+  17F48  move.w   $c(a1), d3
+  17F4C  cmp.w    $8a00.l, d3  # IO 08A00
+  17F52  bne.w    $17f62
+  17F56  lea.l    $18600(pc), a2
+  17F5A  move.l   a2, -$8(a6)
+  17F5E  bra.w    $17f98
+  17F62  movea.l  -$e(a6), a4
+  17F66  move.w   $c(a4), d4
+  17F6A  cmp.w    $8a02.l, d4  # IO 08A02
+  17F70  bne.w    $17f90
+  17F74  lea.l    $18606(pc), a3
+  17F78  move.l   a3, -$8(a6)
+  17F7C  move.w   #$1, -$4(a6)
+  17F82  move.w   $1a(a4), d5
+  17F86  addq.w   #$1, d5
+  17F88  move.w   d5, -$2(a6)
+  17F8C  bra.w    $17f98
+  17F90  lea.l    $1860e(pc), a0
+  17F94  move.l   a0, -$8(a6)
+  17F98  bra.w    $1800c
+  17F9C  movea.l  -$e(a6), a1
+  17FA0  tst.l    $16(a1)
+  17FA4  bne.w    $17fb4
+  17FA8  lea.l    $18616(pc), a2
+  17FAC  move.l   a2, -$8(a6)
+  17FB0  bra.w    $17fbc
+  17FB4  lea.l    $1861e(pc), a3
+  17FB8  move.l   a3, -$8(a6)
+  17FBC  bra.w    $1800c
+  17FC0  movea.l  -$e(a6), a4
+  17FC4  tst.l    $16(a4)
+  17FC8  beq.w    $17fd8
+  17FCC  lea.l    $18624(pc), a0
+  17FD0  move.l   a0, -$8(a6)
+  17FD4  bra.w    $17fe0
+  17FD8  lea.l    $1862c(pc), a1
+  17FDC  move.l   a1, -$8(a6)
+  17FE0  bra.w    $1800c
+  17FE4  lea.l    $18634(pc), a2
+  17FE8  move.l   a2, -$8(a6)
+  17FEC  bra.b    $1800c
+  17FEE  cmpi.w   #$1, d7
+  17FF2  beq.w    $17eec
+  17FF6  cmpi.w   #$2, d7
+  17FFA  beq.w    $17f44
+  17FFE  cmpi.w   #$3, d7
+  18002  beq.b    $17f9c
+  18004  cmpi.w   #$4, d7
+  18008  beq.b    $17fc0
+  1800A  bra.b    $17fe4
+  1800C  move.l   -$8(a6), -(a7)
+  18010  lea.l    -$19e(a6), a3
+  18014  move.l   a3, -(a7)
+  18016  jsr      $5344e.l
+  1801C  addq.l   #$8, a7
+  1801E  movea.l  -$e(a6), a0
+  18022  lea.l    $2(a0), a1
+  18026  move.l   a1, -(a7)
+  18028  lea.l    -$19e(a6), a2
+  1802C  move.l   a2, -(a7)
+  1802E  jsr      $5344e.l
+  18034  addq.l   #$8, a7
+  18036  lea.l    $1863e(pc), a0
+  1803A  move.l   a0, -(a7)
+  1803C  lea.l    -$19e(a6), a1
+  18040  move.l   a1, -(a7)
+  18042  jsr      $5344e.l
+  18048  addq.l   #$8, a7
+  1804A  move.w   #$3, -$a(a6)
+
+[LIST]  handler=0x018756  priv=0  cmd_id=0x017E
+  18756  link.w   a6, #$fe6c
+  1875A  movea.l  $8(a6), a0
+  1875E  tst.l    $16(a0)
+  18762  bne.w    $1877c
+  18766  move.l   $22de.w, -(a7)
+  1876A  lea.l    $1886a(pc), a1
+  1876E  move.l   a1, -(a7)
+  18770  jsr      $2f96.l
+  18776  addq.l   #$8, a7
+  18778  bra.w    $18814
+  1877C  movea.l  $8(a6), a0
+  18780  tst.l    $1a(a0)
+  18784  bne.w    $1879e
+  18788  move.l   $22f8.w, -(a7)
+  1878C  lea.l    $1886a(pc), a1
+  18790  move.l   a1, -(a7)
+  18792  jsr      $2f96.l
+  18798  addq.l   #$8, a7
+  1879A  bra.w    $18814
+  1879E  move.w   #$18f, -(a7)
+  187A2  movea.l  $8(a6), a0
+  187A6  move.l   $1a(a0), -(a7)
+  187AA  lea.l    -$194(a6), a1
+  187AE  move.l   a1, -(a7)
+  187B0  jsr      $5337a.l
+  187B6  adda.l   #$a, a7
+  187BC  clr.b    -$5(a6)
+  187C0  lea.l    -$194(a6), a0
+  187C4  move.l   a0, -(a7)
+  187C6  jsr      $5343e.l
+  187CC  addq.l   #$4, a7
+  187CE  ext.l    d7
+  187D0  lea.l    -$194(a6), a1
+  187D4  lea.l    (a1, d7.l), a2
+  187D8  move.l   a2, -$4(a6)
+  187DC  subq.l   #$1, -$4(a6)
+  187E0  movea.l  -$4(a6), a3
+  187E4  move.b   (a3), d0
+  187E6  cmpi.b   #$3b, d0
+  187EA  beq.b    $187f4
+  187EC  movea.l  -$4(a6), a4
+  187F0  clr.b    (a4)
+  187F2  bra.b    $187dc
+  187F4  lea.l    -$194(a6), a0
+  187F8  move.l   a0, -(a7)
+  187FA  lea.l    $120f00.l, a1  # SRAM 120F00
+  18800  move.l   a1, -(a7)
+  18802  jsr      $5336a.l
+  18808  addq.l   #$8, a7
+  1880A  clr.w    -(a7)
+  1880C  jsr      $1f530.l
+  18812  addq.l   #$2, a7
+  18814  unlk     a6
+  18816  rts      
+
+[DSP?]  handler=0x007FB2  priv=0  cmd_id=0x017F
+  07FB2  link.w   a6, #$fef8
+  07FB6  bsr.w    $78f2
+  07FBA  tst.w    $8(a6)
+  07FBE  beq.w    $804e
+  07FC2  move.w   #$9, -(a7)
+  07FC6  lea.l    $a4c(a5), a0
+  07FCA  move.l   a0, -(a7)
+  07FCC  lea.l    -$108(a6), a1
+  07FD0  move.l   a1, -(a7)
+  07FD2  jsr      $533bc.l
+  07FD8  adda.l   #$a, a7
+  07FDE  move.w   #$f, -$4(a6)
+  07FE4  move.w   #$c, -$2(a6)
+  07FEA  move.w   -$4(a6), d0
+  07FEE  cmpi.w   #$b, d0
+  07FF2  blt.w    $8028
+  07FF6  ext.l    d0
+  07FF8  lea.l    $a4c(a5), a0
+  07FFC  move.b   (a0, d0.l), d1
+  08000  cmpi.b   #$20, d1
+  08004  beq.w    $8022
+  08008  move.w   -$2(a6), d2
+  0800C  subq.w   #$1, -$2(a6)
+  08010  ext.l    d2
+  08012  lea.l    -$108(a6), a1
+  08016  move.w   -$4(a6), d3
+  0801A  ext.l    d3
+  0801C  move.b   (a0, d3.l), (a1, d2.l)
+  08022  subq.w   #$1, -$4(a6)
+  08026  bra.b    $7fea
+  08028  move.w   -$2(a6), d4
+  0802C  cmpi.w   #$9, d4
+  08030  blt.w    $8046
+  08034  ext.l    d4
+  08036  lea.l    -$108(a6), a2
+  0803A  move.b   #$20, (a2, d4.l)
+  08040  subq.w   #$1, -$2(a6)
+  08044  bra.b    $8028
+  08046  clr.b    -$fb(a6)
+  0804A  bra.w    $8092
+  0804E  move.w   $b4c(a5), -(a7)
+  08052  lea.l    $a4c(a5), a3
+  08056  move.l   a3, -(a7)
+  08058  lea.l    -$108(a6), a4
+  0805C  lea.l    $1(a4), a0
+  08060  move.l   a0, -(a7)
+  08062  jsr      $533bc.l
+  08068  adda.l   #$a, a7
+  0806E  move.b   #$22, -$108(a6)
+  08074  move.w   $b4c(a5), d0
+  08078  addq.w   #$1, d0
+  0807A  ext.l    d0
+  0807C  lea.l    -$108(a6), a0
+  08080  move.b   #$22, (a0, d0.l)
+  08086  move.w   $b4c(a5), d1
+  0808A  addq.w   #$2, d1
+  0808C  ext.l    d1
+  0808E  clr.b    (a0, d1.l)
+  08092  bsr.w    $7906
+  08096  move.w   #$6, -(a7)
+  0809A  lea.l    -$108(a6), a0
+  0809E  move.l   a0, -(a7)
+  080A0  jsr      $1d8b8.l
+  080A6  addq.l   #$6, a7
+  080A8  unlk     a6
+  080AA  rts      
+
+[R]  handler=0x0315DE  priv=1  cmd_id=0x0180
+  315DE  link.w   a6, #$fffe
+  315E2  movea.l  $14(a6), a0
+  315E6  pea.l    (a0)
+  315E8  move.b   $1397(a5), d0
+  315EC  ext.w    d0
+  315EE  move.w   d0, -(a7)
+  315F0  bsr.w    $2ffc8
+  315F4  move.w   d7, -$2(a6)
+  315F8  addq.l   #$6, a7
+  315FA  move.w   -$2(a6), d1
+  315FE  cmpi.w   #$a, d1
+  31602  beq.w    $316d0
+  31606  move.b   $1397(a5), d2
+  3160A  cmpi.b   #$5, d2
+  3160E  ble.b    $31620
+  31610  cmpi.b   #$7, d2
+  31614  blt.b    $3161e
+  31616  cmpi.b   #$8, d2
+  3161A  bgt.b    $3161e
+  3161C  bra.b    $31620
+  3161E  bra.b    $3163a
+  31620  move.w   -$2(a6), -(a7)
+  31624  movea.l  $14(a6), a1
+  31628  pea.l    (a1)
+  3162A  movea.l  $8(a6), a2
+  3162E  pea.l    (a2)
+  31630  jsr      $2ddee(pc)
+  31634  adda.l   #$a, a7
+  3163A  move.b   $1474(a5), d0
+  3163E  ext.w    d0
+  31640  cmp.w    -$2(a6), d0
+  31644  beq.b    $31650
+  31646  move.w   -$2(a6), -(a7)
+  3164A  jsr      $2daae(pc)
+  3164E  addq.l   #$2, a7
+  31650  move.b   $1391(a5), d0
+  31654  ext.w    d0
+  31656  move.w   d0, -(a7)
+  31658  move.b   $1397(a5), d1
+  3165C  ext.w    d1
+  3165E  move.w   d1, -(a7)
+  31660  move.b   $13a3(a5), d2
+  31664  ext.w    d2
+  31666  move.w   d2, -(a7)
+  31668  jsr      $2efb8(pc)
+  3166C  addq.l   #$6, a7
+  3166E  move.b   $1395(a5), d0
+  31672  ext.w    d0
+  31674  move.w   d0, -(a7)
+  31676  move.w   -$2(a6), -(a7)
+  3167A  move.b   $1397(a5), d1
+  3167E  ext.w    d1
+  31680  move.w   d1, -(a7)
+  31682  movea.l  $8(a6), a0
+  31686  pea.l    (a0)
+  31688  jsr      $2e24c(pc)
+  3168C  adda.l   #$a, a7
+  31692  move.b   $139f(a5), d0
+  31696  ext.w    d0
+  31698  move.w   d0, -(a7)
+  3169A  move.b   $1477(a5), d1
+  3169E  ext.w    d1
+  316A0  move.w   d1, -(a7)
+  316A2  move.b   $1397(a5), d2
+  316A6  ext.w    d2
+  316A8  move.w   d2, -(a7)
+  316AA  jsr      $31ec6(pc)
+  316AE  addq.l   #$6, a7
+  316B0  move.w   -$2(a6), d0
+  316B4  move.b   d0, $139c(a5)
+  316B8  movea.l  $8(a6), a0
+  316BC  lea.l    $13ec(a5), a1
+  316C0  move.l   (a0)+, (a1)+
+  316C2  move.l   (a0)+, (a1)+
+  316C4  tst.b    $13a2(a5)
+  316C8  beq.b    $316d0
+  316CA  jsr      $51ebc.l
+  316D0  unlk     a6
+  316D2  rts      
+
+[T]  handler=0x0331B6  priv=1  cmd_id=0x0181
+  331B6  link.w   a6, #$0
+  331BA  move.w   $8(a6), d0
+  331BE  cmpi.w   #$ffff, d0
+  331C2  blt.b    $331d6
+  331C4  tst.w    d0
+  331C6  beq.b    $331d6
+  331C8  cmpi.w   #$6, d0
+  331CC  beq.b    $331d6
+  331CE  cmpi.w   #$8, d0
+  331D2  bgt.b    $331d6
+  331D4  bra.b    $331ec
+  331D6  move.l   $23f0.w, -(a7)
+  331DA  lea.l    $33f10(pc), a0
+  331DE  move.l   a0, -(a7)
+  331E0  jsr      $2f96.l
+  331E6  addq.l   #$8, a7
+  331E8  bra.w    $332d4
+  331EC  move.w   $8(a6), d0
+  331F0  cmpi.w   #$ffff, d0
+  331F4  bne.b    $331fc
+  331F6  move.w   #$3, $8(a6)
+  331FC  move.w   $8(a6), d1
+  33200  cmpi.w   #$3, d1
+  33204  bne.b    $33212
+  33206  move.b   $138f(a5), d2
+  3320A  cmpi.b   #$1, d2
+  3320E  beq.b    $33212
+  33210  bra.b    $33214
+  33212  bra.b    $3321a
+  33214  move.w   #$4, $8(a6)
+  3321A  move.b   $1473(a5), d3
+  3321E  cmpi.b   #$8, d3
+  33222  bgt.b    $33264
+  33224  move.b   $1390(a5), d4
+  33228  ext.w    d4
+  3322A  cmp.w    $8(a6), d4
+  3322E  beq.b    $3324e
+  33230  move.w   $8(a6), d5
+  33234  cmpi.w   #$3, d5
+  33238  bne.b    $33246
+  3323A  cmpi.b   #$4, d4
+  3323E  bne.b    $33246
+  33240  move.b   #$1, d6
+  33244  bra.b    $33248
+  33246  clr.b    d6
+  33248  tst.b    d6
+  3324A  bne.b    $3324e
+  3324C  bra.b    $33250
+  3324E  bra.b    $33262
+  33250  move.w   $8(a6), -(a7)
+  33254  jsr      $28fce.l
+  3325A  addq.l   #$2, a7
+  3325C  jsr      $2943e.l
+  33262  bra.b    $33278
+  33264  move.b   $1397(a5), d0
+  33268  ext.w    d0
+  3326A  move.w   d0, -(a7)
+  3326C  move.w   $8(a6), -(a7)
+  33270  jsr      $2945a.l
+  33276  addq.l   #$4, a7
+  33278  move.w   $8(a6), d0
+  3327C  move.b   d0, $1390(a5)
+  33280  cmpi.w   #$7, d0
+  33284  blt.b    $332a2
+  33286  move.b   $139c(a5), d1
+  3328A  ext.w    d1
+  3328C  move.w   d1, -(a7)
+  3328E  move.b   $1397(a5), d2
+  33292  ext.w    d2
+  33294  move.w   d2, -(a7)
+  33296  bsr.w    $32e9a
+  3329A  addq.l   #$4, a7
+  3329C  jsr      $28354.l
+  332A2  move.w   $8(a6), d0
+  332A6  cmpi.w   #$3, d0
+  332AA  bne.b    $332d4
+  332AC  move.w   #$a, -(a7)
+  332B0  jsr      $18918.l
+  332B6  addq.l   #$2, a7
+  332B8  move.b   #$1, $bb2(a5)
+  332BE  jsr      $39b7a(pc)
+  332C2  clr.b    $bb2(a5)
+  332C6  clr.l    -(a7)
+  332C8  move.w   #$a, -(a7)
+  332CC  jsr      $188c8.l
+  332D2  addq.l   #$6, a7
+  332D4  unlk     a6
+  332D6  rts      
+
+[BOMB?]  handler=0x0176A6  priv=0  cmd_id=0x0182
+  176A6  link.w   a6, #$0
+  176AA  move.w   #$80, -(a7)
+  176AE  lea.l    $121dc0.l, a0  # SRAM 121DC0
+  176B4  move.l   a0, -(a7)
+  176B6  lea.l    $120f00.l, a1  # SRAM 120F00
+  176BC  move.l   a1, -(a7)
+  176BE  jsr      $5337a.l
+  176C4  adda.l   #$a, a7
+  176CA  clr.b    $120f7f.l  # SRAM 120F7F
+  176D0  clr.w    -(a7)
+  176D2  jsr      $1f530.l
+  176D8  addq.l   #$2, a7
+  176DA  unlk     a6
+  176DC  rts      
+
+[U_RANGE]  handler=0x0316D4  priv=1  cmd_id=0x0183
+  316D4  link.w   a6, #$0
+  316D8  move.b   $1473(a5), d0
+  316DC  ext.w    d0
+  316DE  ext.l    d0
+  316E0  lea.l    $4bc4c.l, a0
+  316E6  move.b   $1474(a5), d1
+  316EA  cmp.b    (a0, d0.l), d1
+  316EE  beq.b    $3171a
+  316F0  ext.w    d1
+  316F2  addq.w   #$1, d1
+  316F4  move.w   d1, -(a7)
+  316F6  jsr      $2daae(pc)
+  316FA  addq.l   #$2, a7
+  316FC  move.b   $139f(a5), d0
+  31700  ext.w    d0
+  31702  move.w   d0, -(a7)
+  31704  move.b   $1477(a5), d1
+  31708  ext.w    d1
+  3170A  move.w   d1, -(a7)
+  3170C  move.b   $1397(a5), d2
+  31710  ext.w    d2
+  31712  move.w   d2, -(a7)
+  31714  jsr      $31ec6(pc)
+  31718  addq.l   #$6, a7
+  3171A  clr.w    -(a7)
+  3171C  bsr.w    $2fec6
+  31720  addq.l   #$2, a7
+  31722  tst.b    $13a2(a5)
+  31726  beq.b    $3172e
+  31728  jsr      $51ebc.l
+  3172E  unlk     a6
+  31730  rts      
+
+[D_RANGE]  handler=0x031732  priv=1  cmd_id=0x0184
+  31732  link.w   a6, #$0
+  31736  move.b   $1473(a5), d0
+  3173A  ext.w    d0
+  3173C  ext.l    d0
+  3173E  lea.l    $4bc2c.l, a0
+  31744  move.b   $1474(a5), d1
+  31748  cmp.b    (a0, d0.l), d1
+  3174C  beq.b    $31778
+  3174E  ext.w    d1
+  31750  subq.w   #$1, d1
+  31752  move.w   d1, -(a7)
+  31754  jsr      $2daae(pc)
+  31758  addq.l   #$2, a7
+  3175A  move.b   $139f(a5), d0
+  3175E  ext.w    d0
+  31760  move.w   d0, -(a7)
+  31762  move.b   $1477(a5), d1
+  31766  ext.w    d1
+  31768  move.w   d1, -(a7)
+  3176A  move.b   $1397(a5), d2
+  3176E  ext.w    d2
+  31770  move.w   d2, -(a7)
+  31772  jsr      $31ec6(pc)
+  31776  addq.l   #$6, a7
+  31778  clr.w    -(a7)
+  3177A  bsr.w    $2fec6
+  3177E  addq.l   #$2, a7
+  31780  tst.b    $13a2(a5)
+  31784  beq.b    $3178c
+  31786  jsr      $51ebc.l
+  3178C  unlk     a6
+  3178E  rts      
+
+[MADDR]  handler=0x017C8C  priv=0  cmd_id=0x0187
+  17C8C  link.w   a6, #$fff4
+  17C90  movea.l  $8(a6), a0
+  17C94  move.w   $e(a0), d7
+  17C98  bra.b    $17d04
+  17C9A  movea.l  $8(a6), a1
+  17C9E  move.w   $c(a1), d0
+  17CA2  cmp.w    $8a00.l, d0  # IO 08A00
+  17CA8  bne.b    $17cb4
+  17CAA  lea.l    $16(a1), a2
+  17CAE  move.l   a2, -$4(a6)
+  17CB2  bra.b    $17cbe
+  17CB4  movea.l  $8(a6), a3
+  17CB8  move.l   $16(a3), -$4(a6)
+  17CBE  bra.b    $17d1e
+  17CC0  movea.l  $8(a6), a4
+  17CC4  move.w   $c(a4), d1
+  17CC8  cmp.w    $8a00.l, d1  # IO 08A00
+  17CCE  bne.b    $17cda
+  17CD0  lea.l    $16(a4), a0
+  17CD4  move.l   a0, -$4(a6)
+  17CD8  bra.b    $17ce4
+  17CDA  movea.l  $8(a6), a1
+  17CDE  move.l   $16(a1), -$4(a6)
+  17CE4  bra.b    $17d1e
+  17CE6  movea.l  $8(a6), a2
+  17CEA  move.l   $16(a2), -$4(a6)
+  17CF0  bra.b    $17d1e
+  17CF2  movea.l  $8(a6), a3
+  17CF6  move.l   $16(a3), -$4(a6)
+  17CFC  bra.b    $17d1e
+  17CFE  clr.l    -$4(a6)
+  17D02  bra.b    $17d1e
+  17D04  cmpi.w   #$1, d7
+  17D08  beq.b    $17c9a
+  17D0A  cmpi.w   #$2, d7
+  17D0E  beq.b    $17cc0
+  17D10  cmpi.w   #$3, d7
+  17D14  beq.b    $17ce6
+  17D16  cmpi.w   #$4, d7
+  17D1A  beq.b    $17cf2
+  17D1C  bra.b    $17cfe
+  17D1E  move.w   #$6, -(a7)
+  17D22  move.l   -$4(a6), d2
+  17D26  move.l   d2, -(a7)
+  17D28  pea.l    -$c(a6)
+  17D2C  jsr      $585b4.l
+  17D32  addq.l   #$8, a7
+  17D34  pea.l    -$c(a6)
+  17D38  jsr      $1d900.l
+  17D3E  addq.l   #$6, a7
+  17D40  unlk     a6
+  17D42  rts      
+
+[JSR]  handler=0x017C28  priv=1  cmd_id=0x0189
+  17C28  link.w   a6, #$fff4
+  17C2C  lea.l    -$8(a6), a1
+  17C30  movea.l  $8(a6), a0
+  17C34  move.l   (a0)+, (a1)+
+  17C36  move.l   (a0)+, (a1)+
+  17C38  pea.l    -$8(a6)
+  17C3C  jsr      $585a0.l
+  17C42  addq.l   #$4, a7
+  17C44  andi.l   #$fffffffe, d7
+  17C4A  move.l   d7, -$c(a6)
+  17C4E  movea.l  -$c(a6), a0
+  17C52  jsr      (a0)
+  17C54  unlk     a6
+  17C56  rts      
+
+[ECHO]  handler=0x01DB86  priv=0  cmd_id=0x018C
+  1DB86  link.w   a6, #$0
+  1DB8A  move.l   $8(a6), -(a7)
+  1DB8E  lea.l    $f00(a5), a0
+  1DB92  move.l   a0, -(a7)
+  1DB94  jsr      $5336a.l
+  1DB9A  addq.l   #$8, a7
+  1DB9C  clr.w    -(a7)
+  1DB9E  jsr      $1f530.l
+  1DBA4  addq.l   #$2, a7
+  1DBA6  unlk     a6
+  1DBA8  rts      
+
+[ECHO2]  handler=0x01DBAA  priv=0  cmd_id=0x018E
+  1DBAA  link.w   a6, #$0
+  1DBAE  move.l   $8(a6), -(a7)
+  1DBB2  jsr      $5343e.l
+  1DBB8  addq.l   #$4, a7
+  1DBBA  subq.w   #$1, d7
+  1DBBC  ext.l    d7
+  1DBBE  movea.l  $8(a6), a0
+  1DBC2  clr.b    (a0, d7.l)
+  1DBC6  lea.l    $1(a0), a1
+  1DBCA  move.l   a1, -(a7)
+  1DBCC  lea.l    $f00(a5), a2
+  1DBD0  move.l   a2, -(a7)
+  1DBD2  jsr      $5336a.l
+  1DBD8  addq.l   #$8, a7
+  1DBDA  clr.w    -(a7)
+  1DBDC  jsr      $1f530.l
+  1DBE2  addq.l   #$2, a7
+  1DBE4  unlk     a6
+  1DBE6  rts      
+
+[XYZZY]  handler=0x017BA0  priv=0  cmd_id=0x018F
+  17BA0  link.w   a6, #$0
+  17BA4  move.w   #$6, -(a7)
+  17BA8  lea.l    $185c0(pc), a0
+  17BAC  move.l   a0, -(a7)
+  17BAE  jsr      $1d8b8.l
+  17BB4  addq.l   #$6, a7
+  17BB6  unlk     a6
+  17BB8  rts      
+
+[RMEM?_]  handler=0x01BE08  priv=0  cmd_id=0x0190
+  1BE08  link.w   a6, #$0
+  1BE0C  unlk     a6
+  1BE0E  rts      
+
+[LOADREAL_]  handler=0x04B58A  priv=1  cmd_id=0x0191
+  4B58A  link.w   a6, #$0
+  4B58E  unlk     a6
+  4B590  rts      
+
+[ANNUN_]  handler=0x008124  priv=1  cmd_id=0x0192
+  08124  link.w   a6, #$fffe
+  08128  move.w   #$28, -(a7)
+  0812C  lea.l    $b7a(a5), a0
+  08130  move.l   a0, -(a7)
+  08132  jsr      $533d4.l
+  08138  addq.l   #$6, a7
+  0813A  move.w   #$28, -(a7)
+  0813E  lea.l    $b52(a5), a0
+  08142  move.l   a0, -(a7)
+  08144  jsr      $533d4.l
+  0814A  addq.l   #$6, a7
+  0814C  clr.w    -$2(a6)
+  08150  move.w   -$2(a6), d0
+  08154  cmp.w    $c(a6), d0
+  08158  bge.b    $8178
+  0815A  ext.l    d0
+  0815C  asl.l    #$1, d0
+  0815E  movea.l  $8(a6), a0
+  08162  move.w   (a0, d0.l), d1
+  08166  ext.l    d1
+  08168  lea.l    $b52(a5), a1
+  0816C  move.b   #$1, (a1, d1.l)
+  08172  addq.w   #$1, -$2(a6)
+  08176  bra.b    $8150
+  08178  unlk     a6
+  0817A  rts      
+
+[ADMEM_]  handler=0x04B650  priv=1  cmd_id=0x0194
+  4B650  link.w   a6, #$fffe
+  4B654  clr.w    -$2(a6)
+  4B658  move.w   $c(a6), d0
+  4B65C  subq.w   #$1, d0
+  4B65E  move.w   -$2(a6), d1
+  4B662  cmp.w    d0, d1
+  4B664  bgt.b    $4b680
+  4B666  ext.l    d1
+  4B668  lea.l    $14a4(a5), a0
+  4B66C  movea.l  $8(a6), a1
+  4B670  addq.l   #$2, $8(a6)
+  4B674  move.w   (a1), d2
+  4B676  move.b   d2, (a0, d1.l)
+  4B67A  addq.w   #$1, -$2(a6)
+  4B67E  bra.b    $4b658
+  4B680  jsr      $2a33c.l
+  4B686  unlk     a6
+  4B688  rts      
+
+[ADCAL_]  handler=0x04B68A  priv=1  cmd_id=0x0195
+  4B68A  link.w   a6, #$fffe
+  4B68E  clr.w    -$2(a6)
+  4B692  move.w   $c(a6), d0
+  4B696  subq.w   #$1, d0
+  4B698  move.w   -$2(a6), d1
+  4B69C  cmp.w    d0, d1
+  4B69E  bhi.b    $4b6ba
+  4B6A0  ext.l    d1
+  4B6A2  lea.l    $14b0(a5), a0
+  4B6A6  movea.l  $8(a6), a1
+  4B6AA  addq.l   #$2, $8(a6)
+  4B6AE  move.w   (a1), d2
+  4B6B0  move.b   d2, (a0, d1.l)
+  4B6B4  addq.w   #$1, -$2(a6)
+  4B6B8  bra.b    $4b692
+  4B6BA  move.w   #$3, -(a7)
+  4B6BE  lea.l    $14b4(a5), a2
+  4B6C2  move.l   a2, -(a7)
+  4B6C4  move.w   #$22, -(a7)
+  4B6C8  jsr      $2b614.l
+  4B6CE  addq.l   #$8, a7
+  4B6D0  unlk     a6
+  4B6D2  rts      
+
+[TRIGGER_]  handler=0x04B592  priv=1  cmd_id=0x0196
+  4B592  link.w   a6, #$fffe
+  4B596  clr.w    -$2(a6)
+  4B59A  move.w   $c(a6), d0
+  4B59E  subq.w   #$1, d0
+  4B5A0  move.w   -$2(a6), d1
+  4B5A4  cmp.w    d0, d1
+  4B5A6  bgt.b    $4b5c2
+  4B5A8  ext.l    d1
+  4B5AA  lea.l    $147c(a5), a0
+  4B5AE  movea.l  $8(a6), a1
+  4B5B2  addq.l   #$2, $8(a6)
+  4B5B6  move.w   (a1), d2
+  4B5B8  move.b   d2, (a0, d1.l)
+  4B5BC  addq.w   #$1, -$2(a6)
+  4B5C0  bra.b    $4b59a
+  4B5C2  jsr      $2943e.l
+  4B5C8  unlk     a6
+  4B5CA  rts      
+
+[DCBD_]  handler=0x04B5CC  priv=1  cmd_id=0x0197
+  4B5CC  link.w   a6, #$fffe
+  4B5D0  clr.w    -$2(a6)
+  4B5D4  move.w   $c(a6), d0
+  4B5D8  subq.w   #$1, d0
+  4B5DA  move.w   -$2(a6), d1
+  4B5DE  cmp.w    d0, d1
+  4B5E0  bgt.b    $4b5fc
+  4B5E2  ext.l    d1
+  4B5E4  lea.l    $1490(a5), a0
+  4B5E8  movea.l  $8(a6), a1
+  4B5EC  addq.l   #$2, $8(a6)
+  4B5F0  move.w   (a1), d2
+  4B5F2  move.b   d2, (a0, d1.l)
+  4B5F6  addq.w   #$1, -$2(a6)
+  4B5FA  bra.b    $4b5d4
+  4B5FC  move.w   #$5, -(a7)
+  4B600  lea.l    $1498(a5), a2
+  4B604  move.l   a2, -(a7)
+  4B606  move.w   #$1f, -(a7)
+  4B60A  jsr      $2b614.l
+  4B610  addq.l   #$8, a7
+  4B612  unlk     a6
+  4B614  rts      
+
+[ACBD_]  handler=0x04B616  priv=1  cmd_id=0x0198
+  4B616  link.w   a6, #$fffe
+  4B61A  clr.w    -$2(a6)
+  4B61E  move.w   $c(a6), d0
+  4B622  subq.w   #$1, d0
+  4B624  move.w   -$2(a6), d1
+  4B628  cmp.w    d0, d1
+  4B62A  bgt.b    $4b646
+  4B62C  ext.l    d1
+  4B62E  lea.l    $149a(a5), a0
+  4B632  movea.l  $8(a6), a1
+  4B636  addq.l   #$2, $8(a6)
+  4B63A  move.w   (a1), d2
+  4B63C  move.b   d2, (a0, d1.l)
+  4B640  addq.w   #$1, -$2(a6)
+  4B644  bra.b    $4b61e
+  4B646  jsr      $28354.l
+  4B64C  unlk     a6
+  4B64E  rts      
+
+[INGRD_]  handler=0x04B6D4  priv=1  cmd_id=0x0199
+  4B6D4  link.w   a6, #$0
+  4B6D8  move.w   $8(a6), -(a7)
+  4B6DC  jsr      $2b5a2.l
+  4B6E2  addq.l   #$2, a7
+  4B6E4  unlk     a6
+  4B6E6  rts      
+
+[BUSOUT_]  handler=0x02B36C  priv=1  cmd_id=0x019A
+  2B36C  link.w   a6, #$0
+  2B370  move.l   $8(a6), d1
+  2B374  move.b   #$1, $1214f8.l  # SRAM 1214F8
+  2B37C  movea.l  #$8001e, a0
+  2B382  movea.l  #$c0001, a1
+  2B388  move.b   #$1, d2
+  2B38C  movea.l  #$70000, a2
+  2B392  movea.l  #$70003, a3
+  2B398  move.b   #$0, d3
+  2B39C  move.w   #$7fff, d5
+  2B3A0  move.w   #$8000, d6
+  2B3A4  bra.b    $2b3ae
+  2B3A6  btst.l   d2, (a1)
+  2B3A8  bne.w    $2b3c4
+  2B3AC  move.w   d0, (a0)
+  2B3AE  btst.l   d3, (a3)
+  2B3B0  beq.b    $2b3ae
+  2B3B2  move.w   (a2), d4
+  2B3B4  tst.w    d4
+  2B3B6  bgt.b    $2b3f8
+  2B3B8  cmpi.w   #$ffff, d4
+  2B3BC  blt.b    $2b3fc
+  2B3BE  move.w   (a2), d0
+  2B3C0  eor.w    d0, d4
+  2B3C2  bmi.b    $2b3ec
+  2B3C4  subq.l   #$1, d1
+  2B3C6  bne.b    $2b3a6
+  2B3C8  movem.l  d0-d6/a0-a4, -(a7)
+  2B3CC  move.b   #$1, $12127c.l  # SRAM 12127C
+  2B3D4  jsr      $2778c.l
+  2B3DA  movem.l  (a7)+, d0-d6/a0-a4
+  2B3DE  tst.b    d7
+  2B3E0  bne.w    $2b4d2
+  2B3E4  btst.l   d2, (a1)
+  2B3E6  bne.b    $2b3c4
+  2B3E8  move.w   d0, (a0)
+  2B3EA  bra.b    $2b402
+  2B3EC  tst.w    d0
+  2B3EE  bmi.b    $2b3f4
+  2B3F0  move.w   d6, d0
+  2B3F2  bra.b    $2b3c4
+  2B3F4  move.w   d5, d0
+  2B3F6  bra.b    $2b3c4
+  2B3F8  move.w   d5, d0
+  2B3FA  bra.b    $2b3fe
+  2B3FC  move.w   d6, d0
+  2B3FE  move.w   (a2), d4
+  2B400  bra.b    $2b3c4
+  2B402  move.b   #$4, $14c5(a5)
+  2B408  move.b   #$1, $177e(a5)
+  2B40E  jsr      $5b606.l
+  2B414  jsr      $87cc.l
+  2B41A  unlk     a6
+  2B41C  rts      
+
+[SYNCPARM_]  handler=0x0397DE  priv=1  cmd_id=0x019B
+  397DE  link.w   a6, #$0
+  397E2  move.w   #$118, -(a7)
+  397E6  bsr.w    $39172
+  397EA  addq.l   #$2, a7
+  397EC  unlk     a6
+  397EE  rts      
+
+[JUNK_]  handler=0x003AB2  priv=2  cmd_id=0x019C
+  03AB2  link.w   a6, #$0
+  03AB6  move.w   $8(a6), d7
+  03ABA  bra.w    $3be8
+  03ABE  move.l   $281c.w, -(a7)
+  03AC2  bsr.w    $3124
+  03AC6  addq.l   #$4, a7
+  03AC8  bra.w    $3c1c
+  03ACC  move.l   $2578.w, -(a7)
+  03AD0  lea.l    $3d94(pc), a0
+  03AD4  move.l   a0, -(a7)
+  03AD6  bsr.w    $2f96
+  03ADA  addq.l   #$8, a7
+  03ADC  bra.w    $3c1c
+  03AE0  move.l   $2540.w, -(a7)
+  03AE4  lea.l    $3d94(pc), a0
+  03AE8  move.l   a0, -(a7)
+  03AEA  bsr.w    $2f96
+  03AEE  addq.l   #$8, a7
+  03AF0  bra.w    $3c1c
+  03AF4  move.l   $2184.w, -(a7)
+  03AF8  lea.l    $3d94(pc), a0
+  03AFC  move.l   a0, -(a7)
+  03AFE  bsr.w    $2f96
+  03B02  addq.l   #$8, a7
+  03B04  bra.w    $3c1c
+  03B08  move.l   $2448.w, -(a7)
+  03B0C  lea.l    $3d94(pc), a0
+  03B10  move.l   a0, -(a7)
+  03B12  bsr.w    $2f96
+  03B16  addq.l   #$8, a7
+  03B18  bra.w    $3c1c
+  03B1C  move.l   $23d4.w, -(a7)
+  03B20  lea.l    $3d94(pc), a0
+  03B24  move.l   a0, -(a7)
+  03B26  bsr.w    $2f96
+  03B2A  addq.l   #$8, a7
+  03B2C  bra.w    $3c1c
+  03B30  move.l   $23f0.w, -(a7)
+  03B34  lea.l    $3d94(pc), a0
+  03B38  move.l   a0, -(a7)
+  03B3A  bsr.w    $2f96
+  03B3E  addq.l   #$8, a7
+  03B40  bra.w    $3c1c
+  03B44  move.l   $2420.w, -(a7)
+  03B48  lea.l    $3d94(pc), a0
+  03B4C  move.l   a0, -(a7)
+  03B4E  bsr.w    $2f96
+  03B52  addq.l   #$8, a7
+  03B54  bra.w    $3c1c
+  03B58  move.l   $2404.w, -(a7)
+  03B5C  lea.l    $3d94(pc), a0
+  03B60  move.l   a0, -(a7)
+  03B62  bsr.w    $2f96
+  03B66  addq.l   #$8, a7
+  03B68  bra.w    $3c1c
+  03B6C  move.l   $2590.w, -(a7)
+  03B70  lea.l    $3d94(pc), a0
+  03B74  move.l   a0, -(a7)
+  03B76  bsr.w    $2f96
+  03B7A  addq.l   #$8, a7
+  03B7C  bra.w    $3c1c
+  03B80  move.l   $25aa.w, -(a7)
+  03B84  lea.l    $3d94(pc), a0
+  03B88  move.l   a0, -(a7)
+  03B8A  bsr.w    $2f96
+  03B8E  addq.l   #$8, a7
+  03B90  bra.w    $3c1c
+  03B94  move.l   $2466.w, -(a7)
+  03B98  lea.l    $3d94(pc), a0
+  03B9C  move.l   a0, -(a7)
+  03B9E  bsr.w    $2f96
+  03BA2  addq.l   #$8, a7
+  03BA4  bra.w    $3c1c
+  03BA8  move.l   $252e.w, -(a7)
+  03BAC  lea.l    $3d94(pc), a0
+  03BB0  move.l   a0, -(a7)
+  03BB2  bsr.w    $2f96
+  03BB6  addq.l   #$8, a7
+  03BB8  bra.w    $3c1c
+  03BBC  move.l   $22de.w, -(a7)
+  03BC0  lea.l    $3d94(pc), a0
+  03BC4  move.l   a0, -(a7)
+  03BC6  bsr.w    $2f96
+  03BCA  addq.l   #$8, a7
+  03BCC  bra.w    $3c1c
+  03BD0  move.l   $274e.w, -(a7)
+  03BD4  lea.l    $3d94(pc), a0
+  03BD8  move.l   a0, -(a7)
+  03BDA  bsr.w    $2f96
+  03BDE  addq.l   #$8, a7
+  03BE0  bra.w    $3c1c
+  03BE4  bra.w    $3c1c
+  03BE8  cmpi.w   #$e, d7
+  03BEC  bgt.b    $3be4
+  03BEE  cmpi.w   #$0, d7
+  03BF2  blt.b    $3be4
+  03BF4  asl.w    #$1, d7
+  03BF6  move.w   $3bfe(pc, d7.w), d7
+  03BFA  jmp      $3bfe(pc, d7.w)
+  03BFE  dc.w     $fec0
+  03C00  dc.w     $fece
+  03C02  dc.w     $fee2
+  03C04  dc.w     $fef6
+
+[GREG_]  handler=0x01A600  priv=1  cmd_id=0x019D
+  1A600  link.w   a6, #$fff8
+  1A604  lea.l    -$8(a6), a1
+  1A608  movea.l  $8(a6), a0
+  1A60C  move.l   (a0)+, (a1)+
+  1A60E  move.l   (a0)+, (a1)+
+  1A610  pea.l    -$8(a6)
+  1A614  jsr      $19fe2.l
+  1A61A  addq.l   #$4, a7
+  1A61C  unlk     a6
+  1A61E  rts      
+
+[CRASH_]  handler=0x00053C  priv=1  cmd_id=0x019E
+  0053C  trap     #$b
+  0053E  ori.b    #$42, d0
+  00542  not.w    $4a61(a2, d6.l)
+  00548  bgt.b    $56a
+  0054A  move.w   $20313939.l, -(a0)
+  00550  move.w   d0, d0
+
+[FILLBIN]  handler=0x0183EE  priv=1  cmd_id=0x019F
+  183EE  link.w   a6, #$fffa
+  183F2  movea.l  $e(a6), a0
+  183F6  move.w   $1a(a0), d0
+  183FA  addq.w   #$1, d0
+  183FC  move.w   d0, -$6(a6)
+  18400  move.w   $e(a0), d7
+  18404  bra.b    $18442
+  18406  move.w   -$6(a6), d1
+  1840A  mulu.w   #$2, d1
+  1840E  move.w   d1, -$6(a6)
+  18412  bra.b    $18450
+  18414  move.w   -$6(a6), d2
+  18418  mulu.w   #$8, d2
+  1841C  move.w   d2, -$6(a6)
+  18420  bra.b    $18450
+  18422  movea.l  $e(a6), a1
+  18426  move.w   $e(a1), d3
+  1842A  move.w   d3, -(a7)
+  1842C  lea.l    $1864e(pc), a2
+  18430  move.l   a2, -(a7)
+  18432  jsr      $3328.l
+  18438  addq.l   #$6, a7
+  1843A  bra.w    $184be
+  1843E  bra.w    $18450
+  18442  cmpi.w   #$1, d7
+  18446  beq.b    $18406
+  18448  cmpi.w   #$2, d7
+  1844C  beq.b    $18414
+  1844E  bra.b    $18422
+  18450  move.w   $c(a6), d0
+  18454  cmp.w    -$6(a6), d0
+  18458  bls.b    $18484
+  1845A  move.l   $2632.w, -(a7)
+  1845E  clr.l    d1
+  18460  move.w   d0, d1
+  18462  move.l   d1, -(a7)
+  18464  jsr      $3236.l
+  1846A  addq.l   #$8, a7
+  1846C  tst.l    $8(a6)
+  18470  bne.b    $18480
+  18472  move.w   $c(a6), -(a7)
+  18476  clr.l    -(a7)
+  18478  jsr      $5b3bc.l
+  1847E  addq.l   #$6, a7
+  18480  bra.b    $184be
+  18482  bra.b    $184be
+  18484  movea.l  $e(a6), a0
+  18488  move.l   $16(a0), -$4(a6)
+  1848E  tst.l    $8(a6)
+  18492  beq.b    $184ae
+  18494  move.w   $c(a6), -(a7)
+  18498  move.l   $8(a6), -(a7)
+  1849C  move.l   -$4(a6), -(a7)
+  184A0  jsr      $533bc.l
+  184A6  adda.l   #$a, a7
+  184AC  bra.b    $184be
+  184AE  move.w   $c(a6), -(a7)
+  184B2  move.l   -$4(a6), -(a7)
+  184B6  jsr      $5b3bc.l
+  184BC  addq.l   #$6, a7
+  184BE  unlk     a6
+  184C0  rts      
+
+[ENTER]  handler=0x04B6E8  priv=1  cmd_id=0x01B4
+  4B6E8  link.w   a6, #$0
+  4B6EC  tst.b    $dc2(a5)
+  4B6F0  beq.b    $4b6f8
+  4B6F2  jsr      $19dfe.l
+  4B6F8  move.b   $ccc(a5), d0
+  4B6FC  andi.b   #$2, d0
+  4B700  beq.b    $4b710
+  4B702  tst.b    $e68(a5)
+  4B706  bne.b    $4b710
+  4B708  tst.b    $dd8(a5)
+  4B70C  bne.b    $4b710
+  4B70E  bra.b    $4b712
+  4B710  bra.b    $4b738
+  4B712  movea.l  $d84(a5), a0
+  4B716  jsr      (a0)
+  4B718  movea.l  $d88(a5), a1
+  4B71C  jsr      (a1)
+  4B71E  tst.b    $d80(a5)
+  4B722  beq.b    $4b72a
+  4B724  movea.l  $d8c(a5), a2
+  4B728  jsr      (a2)
+  4B72A  movea.l  $8(a6), a3
+  4B72E  lea.l    $da6(a5), a4
+  4B732  move.l   (a4)+, (a3)+
+  4B734  move.l   (a4)+, (a3)+
+  4B736  bra.b    $4b75a
+  4B738  clr.l    -(a7)
+  4B73A  movea.l  $8(a6), a0
+  4B73E  pea.l    (a0)
+  4B740  jsr      $585b4.l
+  4B746  addq.l   #$8, a7
+  4B748  move.l   $23f0.w, -(a7)
+  4B74C  lea.l    $4b9d2(pc), a1
+  4B750  move.l   a1, -(a7)
+  4B752  jsr      $2f96.l
+  4B758  addq.l   #$8, a7
+  4B75A  unlk     a6
+  4B75C  rts      
+
+[OUTPUT]  handler=0x04B75E  priv=1  cmd_id=0x01B6
+  4B75E  link.w   a6, #$ffec
+  4B762  move.l   $121e80.l, d0  # SRAM 121E80
+  4B768  cmp.l    $128(a5), d0
+  4B76C  beq.b    $4b77a
+  4B76E  move.w   $10e6(a5), d1
+  4B772  cmp.w    $10e8(a5), d1
+  4B776  beq.b    $4b77a
+  4B778  bra.b    $4b76e
+  4B77A  jsr      $5b5d8.l
+  4B780  movea.l  $8(a6), a0
+  4B784  lea.l    $da6(a5), a1
+  4B788  move.l   (a0)+, (a1)+
+  4B78A  move.l   (a0)+, (a1)+
+  4B78C  movea.l  $d90(a5), a2
+  4B790  jsr      (a2)
+  4B792  tst.b    $d82(a5)
+  4B796  beq.b    $4b79e
+  4B798  movea.l  $d94(a5), a3
+  4B79C  jsr      (a3)
+  4B79E  jsr      $1a21c.l
+  4B7A4  tst.b    $c8e(a5)
+  4B7A8  bne.b    $4b7b2
+  4B7AA  tst.b    $127a(a5)
+  4B7AE  bne.b    $4b7b2
+  4B7B0  bra.b    $4b7c8
+  4B7B2  move.b   $10ea(a5), $8000e.l
+  4B7BA  move.w   #$1, $10e8(a5)
+  4B7C0  clr.b    $c8e(a5)
+  4B7C4  clr.b    $127a(a5)
+  4B7C8  jsr      $5b606.l
+  4B7CE  move.l   $121e80.l, d0  # SRAM 121E80
+  4B7D4  cmp.l    $128(a5), d0
+  4B7D8  bne.b    $4b808
+  4B7DA  pea.l    $da6(a5)
+  4B7DE  lea.l    $4b9e0(pc), a0
+  4B7E2  move.l   a0, -(a7)
+  4B7E4  lea.l    -$14(a6), a1
+  4B7E8  move.l   a1, -(a7)
+  4B7EA  jsr      $532de.l
+  4B7F0  adda.l   #$c, a7
+  4B7F6  lea.l    -$14(a6), a0
+  4B7FA  move.l   a0, -(a7)
+  4B7FC  move.w   #$1, -(a7)
+  4B800  jsr      $7d9a.l
+  4B806  addq.l   #$6, a7
+  4B808  unlk     a6
+  4B80A  rts      
+
+[OUTDISP]  handler=0x04B80C  priv=1  cmd_id=0x01B7
+  4B80C  link.w   a6, #$ffde
+  4B810  movea.l  $8(a6), a0
+  4B814  pea.l    (a0)
+  4B816  pea.l    $4b9e4(pc)
+  4B81A  jsr      $58650.l
+  4B820  addq.l   #$8, a7
+  4B822  tst.b    d7
+  4B824  beq.w    $4b844
+  4B828  movea.l  $8(a6), a1
+  4B82C  pea.l    (a1)
+  4B82E  pea.l    $4b9ec(pc)
+  4B832  jsr      $58608.l
+  4B838  addq.l   #$8, a7
+  4B83A  tst.b    d7
+  4B83C  beq.w    $4b844
+  4B840  bra.w    $4b848
+  4B844  bra.w    $4b8c2
+  4B848  clr.w    -(a7)
+  4B84A  move.b   $139a(a5), d0
+  4B84E  ext.w    d0
+  4B850  move.w   d0, -(a7)
+  4B852  lea.l    -$1a(a6), a2
+  4B856  move.l   a2, -(a7)
+  4B858  movea.l  $8(a6), a3
+  4B85C  pea.l    (a3)
+  4B85E  pea.l    $4b9ec(pc)
+  4B862  pea.l    -$22(a6)
+  4B866  jsr      $58530.l
+  4B86C  adda.l   #$c, a7
+  4B872  pea.l    -$22(a6)
+  4B876  jsr      $513b0.l
+  4B87C  move.w   d7, -$6(a6)
+  4B880  adda.l   #$c, a7
+  4B886  clr.w    -$4(a6)
+  4B88A  move.w   -$4(a6), d1
+  4B88E  cmpi.w   #$8, d1
+  4B892  bge.w    $4b8be
+  4B896  ext.l    d1
+  4B898  lea.l    -$1a(a6), a4
+  4B89C  move.b   (a4, d1.l), d2
+  4B8A0  cmpi.b   #$31, d2
+  4B8A4  bne.w    $4b8b8
+  4B8A8  move.w   -$4(a6), d3
+  4B8AC  ext.l    d3
+  4B8AE  move.b   #$30, (a4, d3.l)
+  4B8B4  bra.w    $4b8be
+  4B8B8  addq.w   #$1, -$4(a6)
+  4B8BC  bra.b    $4b88a
+  4B8BE  bra.w    $4b998
+  4B8C2  movea.l  $8(a6), a0
+  4B8C6  pea.l    (a0)
+  4B8C8  pea.l    $4b9f4(pc)
+  4B8CC  jsr      $58638.l
+  4B8D2  addq.l   #$8, a7
+  4B8D4  tst.b    d7
+  4B8D6  beq.w    $4b8f6
+  4B8DA  movea.l  $8(a6), a1
+  4B8DE  pea.l    (a1)
+  4B8E0  pea.l    $4b9fc(pc)
+  4B8E4  jsr      $58620.l
+  4B8EA  addq.l   #$8, a7
+  4B8EC  tst.b    d7
+  4B8EE  beq.w    $4b8f6
+  4B8F2  bra.w    $4b8fa
+  4B8F6  bra.w    $4b974
+  4B8FA  clr.w    -(a7)
+  4B8FC  move.b   $139a(a5), d4
+  4B900  ext.w    d4
+  4B902  move.w   d4, -(a7)
+  4B904  lea.l    -$1a(a6), a2
+  4B908  move.l   a2, -(a7)
+  4B90A  movea.l  $8(a6), a3
+  4B90E  pea.l    (a3)
+  4B910  pea.l    $4b9ec(pc)
+  4B914  pea.l    -$22(a6)
+  4B918  jsr      $5854c.l
+  4B91E  adda.l   #$c, a7
+  4B924  pea.l    -$22(a6)
+  4B928  jsr      $513b0.l
+  4B92E  move.w   d7, -$6(a6)
+  4B932  adda.l   #$c, a7
+  4B938  clr.w    -$4(a6)
+  4B93C  move.w   -$4(a6), d5
+  4B940  cmpi.w   #$8, d5
+  4B944  bge.w    $4b970
+  4B948  ext.l    d5
+  4B94A  lea.l    -$1a(a6), a4
+  4B94E  move.b   (a4, d5.l), d6
+  4B952  cmpi.b   #$31, d6
+  4B956  bne.w    $4b96a
+  4B95A  move.w   -$4(a6), d0
+  4B95E  ext.l    d0
+  4B960  move.b   #$30, (a4, d0.l)
+  4B966  bra.w    $4b970
+  4B96A  addq.w   #$1, -$4(a6)
+  4B96E  bra.b    $4b93c
+  4B970  bra.w    $4b998
+  4B974  clr.w    -(a7)
+  4B976  move.b   $139a(a5), d2
+  4B97A  ext.w    d2
+  4B97C  move.w   d2, -(a7)
+  4B97E  lea.l    -$1a(a6), a0
+  4B982  move.l   a0, -(a7)
+  4B984  move.l   $8(a6), -(a7)
+  4B988  jsr      $513b0.l
+  4B98E  move.w   d7, -$6(a6)
+  4B992  adda.l   #$c, a7
+  4B998  move.w   -$6(a6), d1
+
+[DSP]  handler=0x01DB0A  priv=0  cmd_id=0x01BA
+  1DB0A  link.w   a6, #$ff00
+  1DB0E  move.l   $8(a6), -(a7)
+  1DB12  move.w   $c(a6), -(a7)
+  1DB16  lea.l    -$100(a6), a0
+  1DB1A  move.l   a0, -(a7)
+  1DB1C  jsr      $1d97a.l
+  1DB22  adda.l   #$a, a7
+  1DB28  tst.b    -$100(a6)
+  1DB2C  bne.b    $1db3c
+  1DB2E  move.w   #$1, -(a7)
+  1DB32  jsr      $79da.l
+  1DB38  addq.l   #$2, a7
+  1DB3A  bra.b    $1db4e
+  1DB3C  lea.l    -$100(a6), a0
+  1DB40  move.l   a0, -(a7)
+  1DB42  move.w   #$1, -(a7)
+  1DB46  jsr      $7d9a.l
+  1DB4C  addq.l   #$6, a7
+  1DB4E  unlk     a6
+  1DB50  rts      
+
+[SIN]  handler=0x05694E  priv=0  cmd_id=0x01D8
+  5694E  lea.l    $57760.l, a0
+  56954  bra.b    $5693a
+  56956  lea.l    $57780.l, a0
+  5695C  bra.b    $5693a
+  5695E  lea.l    $57bd0.l, a0
+  56964  bra.b    $5693a
+  56966  lea.l    $578d6.l, a0
+  5696C  bra.b    $5693a
+  5696E  lea.l    $579f4.l, a0
+  56974  bra.b    $5693a
+  56976  lea.l    $5698e.l, a0
+  5697C  bra.b    $5693a
+  5697E  lea.l    $57b1e.l, a0
+  56984  bra.b    $5693a
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[COS]  handler=0x056956  priv=0  cmd_id=0x01D9
+  56956  lea.l    $57780.l, a0
+  5695C  bra.b    $5693a
+  5695E  lea.l    $57bd0.l, a0
+  56964  bra.b    $5693a
+  56966  lea.l    $578d6.l, a0
+  5696C  bra.b    $5693a
+  5696E  lea.l    $579f4.l, a0
+  56974  bra.b    $5693a
+  56976  lea.l    $5698e.l, a0
+  5697C  bra.b    $5693a
+  5697E  lea.l    $57b1e.l, a0
+  56984  bra.b    $5693a
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[ATN]  handler=0x05695E  priv=0  cmd_id=0x01DA
+  5695E  lea.l    $57bd0.l, a0
+  56964  bra.b    $5693a
+  56966  lea.l    $578d6.l, a0
+  5696C  bra.b    $5693a
+  5696E  lea.l    $579f4.l, a0
+  56974  bra.b    $5693a
+  56976  lea.l    $5698e.l, a0
+  5697C  bra.b    $5693a
+  5697E  lea.l    $57b1e.l, a0
+  56984  bra.b    $5693a
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[EXP]  handler=0x056966  priv=0  cmd_id=0x01DB
+  56966  lea.l    $578d6.l, a0
+  5696C  bra.b    $5693a
+  5696E  lea.l    $579f4.l, a0
+  56974  bra.b    $5693a
+  56976  lea.l    $5698e.l, a0
+  5697C  bra.b    $5693a
+  5697E  lea.l    $57b1e.l, a0
+  56984  bra.b    $5693a
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[LOG]  handler=0x05696E  priv=0  cmd_id=0x01DC
+  5696E  lea.l    $579f4.l, a0
+  56974  bra.b    $5693a
+  56976  lea.l    $5698e.l, a0
+  5697C  bra.b    $5693a
+  5697E  lea.l    $57b1e.l, a0
+  56984  bra.b    $5693a
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[LGT]  handler=0x056976  priv=0  cmd_id=0x01DD
+  56976  lea.l    $5698e.l, a0
+  5697C  bra.b    $5693a
+  5697E  lea.l    $57b1e.l, a0
+  56984  bra.b    $5693a
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[SQR]  handler=0x05697E  priv=0  cmd_id=0x01DE
+  5697E  lea.l    $57b1e.l, a0
+  56984  bra.b    $5693a
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[ABS]  handler=0x056986  priv=0  cmd_id=0x01DF
+  56986  lea.l    $569a8.l, a0
+  5698C  bra.b    $5693a
+  5698E  jsr      $579f4.l
+  56994  move.l   #$40026bb1, d2
+  5699A  move.l   #$bbb55516, d3
+  569A0  jsr      $5745a.l
+  569A6  rts      
+
+[BINCMP]  handler=0x056618  priv=0  cmd_id=0x01E0
+  56618  not.w    $4(a7)
+  5661C  rts      
+
+[BINAND]  handler=0x056600  priv=0  cmd_id=0x01E1
+  56600  movea.l  (a7)+, a0
+  56602  move.w   (a7)+, d0
+  56604  and.w    d0, (a7)
+  56606  jmp      (a0)
+  56608  movea.l  (a7)+, a0
+  5660A  move.w   (a7)+, d0
+  5660C  or.w     d0, (a7)
+  5660E  jmp      (a0)
+  56610  movea.l  (a7)+, a0
+  56612  move.w   (a7)+, d0
+  56614  eor.w    d0, (a7)
+  56616  jmp      (a0)
+  56618  not.w    $4(a7)
+  5661C  rts      
+
+[BINIOR]  handler=0x056608  priv=0  cmd_id=0x01E2
+  56608  movea.l  (a7)+, a0
+  5660A  move.w   (a7)+, d0
+  5660C  or.w     d0, (a7)
+  5660E  jmp      (a0)
+  56610  movea.l  (a7)+, a0
+  56612  move.w   (a7)+, d0
+  56614  eor.w    d0, (a7)
+  56616  jmp      (a0)
+  56618  not.w    $4(a7)
+  5661C  rts      
+
+[BINEOR]  handler=0x056610  priv=0  cmd_id=0x01E3
+  56610  movea.l  (a7)+, a0
+  56612  move.w   (a7)+, d0
+  56614  eor.w    d0, (a7)
+  56616  jmp      (a0)
+  56618  not.w    $4(a7)
+  5661C  rts      
+
+[BIT]  handler=0x05662C  priv=0  cmd_id=0x01E4
+  5662C  movea.l  (a7)+, a0
+  5662E  move.w   (a7)+, d0
+  56630  cmpi.w   #$f, d0
+  56634  bhi.b    $5661e
+  56636  cmpi.w   #$8, d0
+  5663A  bge.b    $56648
+  5663C  btst.l   d0, $1(a7)
+  56640  bne.w    $564f6
+  56644  bra.w    $564f2
+  56648  subq.w   #$8, d0
+  5664A  btst.l   d0, (a7)
+  5664C  bne.w    $564f6
+  56650  bra.w    $564f2
+  56654  movea.l  (a7)+, a0
+  56656  move.w   (a7)+, d0
+  56658  move.w   (a7), d1
+  5665A  tst.w    d0
+  5665C  beq.b    $5666a
+  5665E  blt.b    $56664
+  56660  lsr.w    d0, d1
+  56662  bra.b    $56668
+  56664  neg.w    d0
+  56666  lsl.w    d0, d1
+  56668  move.w   d1, (a7)
+  5666A  jmp      (a0)
+  5666C  movea.l  (a7)+, a0
+  5666E  move.w   (a7)+, d0
+  56670  move.w   (a7), d1
+  56672  tst.w    d0
+  56674  beq.b    $56682
+  56676  blt.b    $5667c
+  56678  ror.w    d0, d1
+  5667A  bra.b    $56680
+  5667C  neg.w    d0
+  5667E  rol.w    d0, d1
+  56680  move.w   d1, (a7)
+  56682  jmp      (a0)
+  56684  move.w   #$1, -(a7)
+  56688  jmp      (a0)
+  5668A  move.w   #$0, -(a7)
+  5668E  jmp      (a0)
+  56690  movea.l  (a7)+, a0
+  56692  move.w   (a7)+, d1
+  56694  move.w   (a7)+, d0
+  56696  cmp.w    d1, d0
+  56698  bgt.b    $56684
+  5669A  bra.b    $5668a
+  5669C  movea.l  (a7)+, a0
+  5669E  move.w   (a7)+, d1
+  566A0  move.w   (a7)+, d0
+  566A2  cmp.w    d1, d0
+  566A4  blt.b    $56684
+  566A6  bra.b    $5668a
+  566A8  movea.l  (a7)+, a0
+  566AA  move.w   (a7)+, d1
+  566AC  move.w   (a7)+, d0
+  566AE  cmp.w    d1, d0
+  566B0  beq.b    $56684
+  566B2  bra.b    $5668a
+  566B4  movea.l  (a7)+, a0
+  566B6  move.w   (a7)+, d1
+  566B8  move.w   (a7)+, d0
+  566BA  cmp.w    d1, d0
+  566BC  bge.b    $56684
+  566BE  bra.b    $5668a
+  566C0  movea.l  (a7)+, a0
+  566C2  move.w   (a7)+, d1
+  566C4  move.w   (a7)+, d0
+  566C6  cmp.w    d1, d0
+  566C8  ble.b    $56684
+  566CA  bra.b    $5668a
+  566CC  movea.l  (a7)+, a0
+  566CE  move.w   (a7)+, d1
+  566D0  move.w   (a7)+, d0
+  566D2  cmp.w    d1, d0
+  566D4  bne.b    $56684
+  566D6  bra.b    $5668a
+  566D8  movea.l  (a7)+, a3
+  566DA  movea.l  (a7)+, a0
+  566DC  move.w   (a7)+, d0
+  566DE  ext.l    d0
+  566E0  jsr      $583ba.l
+  566E6  move.l   d0, d2
+  566E8  move.l   d1, d3
+  566EA  move.l   (a7)+, d0
+  566EC  move.l   (a7)+, d1
+  566EE  jsr      $584be.l
+  566F4  jmp      (a3)
+  566F6  bsr.b    $566d8
+  566F8  bgt.b    $56684
+  566FA  bra.b    $5668a
+  566FC  bsr.b    $566d8
+  566FE  blt.b    $56684
+  56700  bra.b    $5668a
+  56702  bsr.b    $566d8
+  56704  beq.w    $56684
+  56708  bra.b    $5668a
+  5670A  bsr.b    $566d8
+  5670C  bge.w    $56684
+  56710  bra.w    $5668a
+  56714  bsr.b    $566d8
+  56716  ble.w    $56684
+  5671A  bra.w    $5668a
+  5671E  bsr.b    $566d8
+  56720  bne.w    $56684
+  56724  bra.w    $5668a
+  56728  movea.l  (a7)+, a3
+  5672A  movea.l  (a7)+, a0
+  5672C  movea.l  (a7)+, a1
+  5672E  movea.l  (a7)+, a2
+  56730  move.w   (a7)+, d0
+  56732  ext.l    d0
+  56734  jsr      $583ba.l
+  5673A  move.l   a1, d2
+  5673C  move.l   a2, d3
+  5673E  jsr      $584be.l
+  56744  jmp      (a3)
+  56746  bsr.b    $56728
+  56748  bgt.w    $56684
+  5674C  bra.w    $5668a
+  56750  bsr.b    $56728
+  56752  blt.w    $56684
+  56756  bra.w    $5668a
+  5675A  bsr.b    $56728
+  5675C  beq.w    $56684
+  56760  bra.w    $5668a
+  56764  bsr.b    $56728
+  56766  bge.w    $56684
+  5676A  bra.w    $5668a
+  5676E  bsr.b    $56728
+  56770  ble.w    $56684
+  56774  bra.w    $5668a
+  56778  bsr.b    $56728
+  5677A  bne.w    $56684
+  5677E  bra.w    $5668a
+  56782  movea.l  (a7)+, a3
+  56784  movea.l  (a7)+, a0
+  56786  move.l   (a7)+, d2
+  56788  move.l   (a7)+, d3
+  5678A  move.l   (a7)+, d0
+  5678C  move.l   (a7)+, d1
+  5678E  jsr      $584be.l
+  56794  jmp      (a3)
+  56796  bsr.b    $56782
+  56798  bgt.w    $56684
+  5679C  bra.w    $5668a
+  567A0  bsr.b    $56782
+  567A2  blt.w    $56684
+  567A6  bra.w    $5668a
+  567AA  bsr.b    $56782
+  567AC  beq.w    $56684
+  567B0  bra.w    $5668a
+  567B4  bsr.b    $56782
+  567B6  bge.w    $56684
+  567BA  bra.w    $51266
+
+[SHIFT]  handler=0x056654  priv=0  cmd_id=0x01E5
+  56654  movea.l  (a7)+, a0
+  56656  move.w   (a7)+, d0
+  56658  move.w   (a7), d1
+  5665A  tst.w    d0
+  5665C  beq.b    $5666a
+  5665E  blt.b    $56664
+  56660  lsr.w    d0, d1
+  56662  bra.b    $56668
+  56664  neg.w    d0
+  56666  lsl.w    d0, d1
+  56668  move.w   d1, (a7)
+  5666A  jmp      (a0)
+  5666C  movea.l  (a7)+, a0
+  5666E  move.w   (a7)+, d0
+  56670  move.w   (a7), d1
+  56672  tst.w    d0
+  56674  beq.b    $56682
+  56676  blt.b    $5667c
+  56678  ror.w    d0, d1
+  5667A  bra.b    $56680
+  5667C  neg.w    d0
+  5667E  rol.w    d0, d1
+  56680  move.w   d1, (a7)
+  56682  jmp      (a0)
+  56684  move.w   #$1, -(a7)
+  56688  jmp      (a0)
+  5668A  move.w   #$0, -(a7)
+  5668E  jmp      (a0)
+  56690  movea.l  (a7)+, a0
+  56692  move.w   (a7)+, d1
+  56694  move.w   (a7)+, d0
+  56696  cmp.w    d1, d0
+  56698  bgt.b    $56684
+  5669A  bra.b    $5668a
+  5669C  movea.l  (a7)+, a0
+  5669E  move.w   (a7)+, d1
+  566A0  move.w   (a7)+, d0
+  566A2  cmp.w    d1, d0
+  566A4  blt.b    $56684
+  566A6  bra.b    $5668a
+  566A8  movea.l  (a7)+, a0
+  566AA  move.w   (a7)+, d1
+  566AC  move.w   (a7)+, d0
+  566AE  cmp.w    d1, d0
+  566B0  beq.b    $56684
+  566B2  bra.b    $5668a
+  566B4  movea.l  (a7)+, a0
+  566B6  move.w   (a7)+, d1
+  566B8  move.w   (a7)+, d0
+  566BA  cmp.w    d1, d0
+  566BC  bge.b    $56684
+  566BE  bra.b    $5668a
+  566C0  movea.l  (a7)+, a0
+  566C2  move.w   (a7)+, d1
+  566C4  move.w   (a7)+, d0
+  566C6  cmp.w    d1, d0
+  566C8  ble.b    $56684
+  566CA  bra.b    $5668a
+  566CC  movea.l  (a7)+, a0
+  566CE  move.w   (a7)+, d1
+  566D0  move.w   (a7)+, d0
+  566D2  cmp.w    d1, d0
+  566D4  bne.b    $56684
+  566D6  bra.b    $5668a
+  566D8  movea.l  (a7)+, a3
+  566DA  movea.l  (a7)+, a0
+  566DC  move.w   (a7)+, d0
+  566DE  ext.l    d0
+  566E0  jsr      $583ba.l
+  566E6  move.l   d0, d2
+  566E8  move.l   d1, d3
+  566EA  move.l   (a7)+, d0
+  566EC  move.l   (a7)+, d1
+  566EE  jsr      $584be.l
+  566F4  jmp      (a3)
+  566F6  bsr.b    $566d8
+  566F8  bgt.b    $56684
+  566FA  bra.b    $5668a
+  566FC  bsr.b    $566d8
+  566FE  blt.b    $56684
+  56700  bra.b    $5668a
+  56702  bsr.b    $566d8
+  56704  beq.w    $56684
+  56708  bra.b    $5668a
+  5670A  bsr.b    $566d8
+  5670C  bge.w    $56684
+  56710  bra.w    $5668a
+  56714  bsr.b    $566d8
+  56716  ble.w    $56684
+  5671A  bra.w    $5668a
+  5671E  bsr.b    $566d8
+  56720  bne.w    $56684
+  56724  bra.w    $5668a
+  56728  movea.l  (a7)+, a3
+  5672A  movea.l  (a7)+, a0
+  5672C  movea.l  (a7)+, a1
+  5672E  movea.l  (a7)+, a2
+  56730  move.w   (a7)+, d0
+  56732  ext.l    d0
+  56734  jsr      $583ba.l
+  5673A  move.l   a1, d2
+  5673C  move.l   a2, d3
+  5673E  jsr      $584be.l
+  56744  jmp      (a3)
+  56746  bsr.b    $56728
+  56748  bgt.w    $56684
+  5674C  bra.w    $5668a
+  56750  bsr.b    $56728
+  56752  blt.w    $56684
+  56756  bra.w    $5668a
+  5675A  bsr.b    $56728
+  5675C  beq.w    $56684
+  56760  bra.w    $5668a
+  56764  bsr.b    $56728
+  56766  bge.w    $56684
+  5676A  bra.w    $5668a
+  5676E  bsr.b    $56728
+  56770  ble.w    $56684
+  56774  bra.w    $5668a
+  56778  bsr.b    $56728
+  5677A  bne.w    $56684
+  5677E  bra.w    $5668a
+  56782  movea.l  (a7)+, a3
+  56784  movea.l  (a7)+, a0
+  56786  move.l   (a7)+, d2
+  56788  move.l   (a7)+, d3
+  5678A  move.l   (a7)+, d0
+  5678C  move.l   (a7)+, d1
+  5678E  jsr      $584be.l
+  56794  jmp      (a3)
+  56796  bsr.b    $56782
+  56798  bgt.w    $56684
+  5679C  bra.w    $5668a
+  567A0  bsr.b    $56782
+  567A2  blt.w    $56684
+  567A6  bra.w    $5668a
+  567AA  bsr.b    $56782
+  567AC  beq.w    $56684
+  567B0  bra.w    $5668a
+  567B4  bsr.b    $56782
+  567B6  bge.w    $56684
+  567BA  bra.w    $5668a
+  567BE  bsr.b    $56782
+  567C0  ble.w    $56684
+  567C4  bra.w    $5668a
+  567C8  bsr.b    $56782
+  567CA  bne.w    $56684
+  567CE  bra.w    $5668a
+  567D2  movea.l  (a7)+, a0
+  567D4  move.w   (a7)+, d0
+  567D6  ext.l    d0
+  567D8  jsr      $583ba.l
+  567DE  move.l   d1, -(a7)
+  567E0  move.l   d0, -(a7)
+  567E2  jmp      (a0)
+
+[ROTATE]  handler=0x05666C  priv=0  cmd_id=0x01E6
+  5666C  movea.l  (a7)+, a0
+  5666E  move.w   (a7)+, d0
+  56670  move.w   (a7), d1
+  56672  tst.w    d0
+  56674  beq.b    $56682
+  56676  blt.b    $5667c
+  56678  ror.w    d0, d1
+  5667A  bra.b    $56680
+  5667C  neg.w    d0
+  5667E  rol.w    d0, d1
+  56680  move.w   d1, (a7)
+  56682  jmp      (a0)
+  56684  move.w   #$1, -(a7)
+  56688  jmp      (a0)
+  5668A  move.w   #$0, -(a7)
+  5668E  jmp      (a0)
+  56690  movea.l  (a7)+, a0
+  56692  move.w   (a7)+, d1
+  56694  move.w   (a7)+, d0
+  56696  cmp.w    d1, d0
+  56698  bgt.b    $56684
+  5669A  bra.b    $5668a
+  5669C  movea.l  (a7)+, a0
+  5669E  move.w   (a7)+, d1
+  566A0  move.w   (a7)+, d0
+  566A2  cmp.w    d1, d0
+  566A4  blt.b    $56684
+  566A6  bra.b    $5668a
+  566A8  movea.l  (a7)+, a0
+  566AA  move.w   (a7)+, d1
+  566AC  move.w   (a7)+, d0
+  566AE  cmp.w    d1, d0
+  566B0  beq.b    $56684
+  566B2  bra.b    $5668a
+  566B4  movea.l  (a7)+, a0
+  566B6  move.w   (a7)+, d1
+  566B8  move.w   (a7)+, d0
+  566BA  cmp.w    d1, d0
+  566BC  bge.b    $56684
+  566BE  bra.b    $5668a
+  566C0  movea.l  (a7)+, a0
+  566C2  move.w   (a7)+, d1
+  566C4  move.w   (a7)+, d0
+  566C6  cmp.w    d1, d0
+  566C8  ble.b    $56684
+  566CA  bra.b    $5668a
+  566CC  movea.l  (a7)+, a0
+  566CE  move.w   (a7)+, d1
+  566D0  move.w   (a7)+, d0
+  566D2  cmp.w    d1, d0
+  566D4  bne.b    $56684
+  566D6  bra.b    $5668a
+  566D8  movea.l  (a7)+, a3
+  566DA  movea.l  (a7)+, a0
+  566DC  move.w   (a7)+, d0
+  566DE  ext.l    d0
+  566E0  jsr      $583ba.l
+  566E6  move.l   d0, d2
+  566E8  move.l   d1, d3
+  566EA  move.l   (a7)+, d0
+  566EC  move.l   (a7)+, d1
+  566EE  jsr      $584be.l
+  566F4  jmp      (a3)
+  566F6  bsr.b    $566d8
+  566F8  bgt.b    $56684
+  566FA  bra.b    $5668a
+  566FC  bsr.b    $566d8
+  566FE  blt.b    $56684
+  56700  bra.b    $5668a
+  56702  bsr.b    $566d8
+  56704  beq.w    $56684
+  56708  bra.b    $5668a
+  5670A  bsr.b    $566d8
+  5670C  bge.w    $56684
+  56710  bra.w    $5668a
+  56714  bsr.b    $566d8
+  56716  ble.w    $56684
+  5671A  bra.w    $5668a
+  5671E  bsr.b    $566d8
+  56720  bne.w    $56684
+  56724  bra.w    $5668a
+  56728  movea.l  (a7)+, a3
+  5672A  movea.l  (a7)+, a0
+  5672C  movea.l  (a7)+, a1
+  5672E  movea.l  (a7)+, a2
+  56730  move.w   (a7)+, d0
+  56732  ext.l    d0
+  56734  jsr      $583ba.l
+  5673A  move.l   a1, d2
+  5673C  move.l   a2, d3
+  5673E  jsr      $584be.l
+  56744  jmp      (a3)
+  56746  bsr.b    $56728
+  56748  bgt.w    $56684
+  5674C  bra.w    $5668a
+  56750  bsr.b    $56728
+  56752  blt.w    $56684
+  56756  bra.w    $5668a
+  5675A  bsr.b    $56728
+  5675C  beq.w    $56684
+  56760  bra.w    $5668a
+  56764  bsr.b    $56728
+  56766  bge.w    $56684
+  5676A  bra.w    $5668a
+  5676E  bsr.b    $56728
+  56770  ble.w    $56684
+  56774  bra.w    $5668a
+  56778  bsr.b    $56728
+  5677A  bne.w    $56684
+  5677E  bra.w    $5668a
+  56782  movea.l  (a7)+, a3
+  56784  movea.l  (a7)+, a0
+  56786  move.l   (a7)+, d2
+  56788  move.l   (a7)+, d3
+  5678A  move.l   (a7)+, d0
+  5678C  move.l   (a7)+, d1
+  5678E  jsr      $584be.l
+  56794  jmp      (a3)
+  56796  bsr.b    $56782
+  56798  bgt.w    $56684
+  5679C  bra.w    $5668a
+  567A0  bsr.b    $56782
+  567A2  blt.w    $56684
+  567A6  bra.w    $5668a
+  567AA  bsr.b    $56782
+  567AC  beq.w    $56684
+  567B0  bra.w    $5668a
+  567B4  bsr.b    $56782
+  567B6  bge.w    $56684
+  567BA  bra.w    $5668a
+  567BE  bsr.b    $56782
+  567C0  ble.w    $56684
+  567C4  bra.w    $5668a
+  567C8  bsr.b    $56782
+  567CA  bne.w    $56684
+  567CE  bra.w    $5668a
+  567D2  movea.l  (a7)+, a0
+  567D4  move.w   (a7)+, d0
+  567D6  ext.l    d0
+  567D8  jsr      $583ba.l
+  567DE  move.l   d1, -(a7)
+  567E0  move.l   d0, -(a7)
+  567E2  jmp      (a0)
+  567E4  movea.l  (a7)+, a0
+  567E6  move.l   (a7)+, d0
+  567E8  move.l   (a7)+, d1
+  567EA  jsr      $58340.l
+  567F0  cmpi.l   #$7fff, d0
+  567F6  bgt.w    $56450
+  567FA  cmpi.l   #$aaaaaaaa, d0
+
+[IST]  handler=0x04E9F2  priv=3  cmd_id=0x01E7
+  4E9F2  link.w   a6, #$0
+  4E9F6  jsr      $38b4.l
+  4E9FC  move.w   #$1, -(a7)
+  4EA00  jsr      $5b6c6.l
+  4EA06  addq.l   #$2, a7
+  4EA08  move.w   #$4, $176a(a5)
+  4EA0E  jsr      $1780e.l
+  4EA14  clr.w    $176a(a5)
+  4EA18  unlk     a6
+  4EA1A  rts      
+
+[CNF]  handler=0x04EA1C  priv=3  cmd_id=0x01E8
+  4EA1C  link.w   a6, #$0
+  4EA20  bsr.b    $4e9f2
+  4EA22  unlk     a6
+  4EA24  rts      
+
+[INX]  handler=0x04EA26  priv=3  cmd_id=0x01E9
+  4EA26  link.w   a6, #$fff8
+  4EA2A  move.w   $176a(a5), d0
+  4EA2E  cmpi.w   #$1, d0
+  4EA32  beq.w    $4ea42
+  4EA36  cmpi.w   #$3, d0
+  4EA3A  beq.w    $4ea42
+  4EA3E  bra.w    $4eb12
+  4EA42  move.w   $8(a6), d1
+  4EA46  cmp.w    $1766(a5), d1
+  4EA4A  bne.w    $4eaf6
+  4EA4E  move.w   #$2, $176a(a5)
+  4EA54  move.w   $1774(a5), d2
+  4EA58  cmpi.w   #$270d, d2
+  4EA5C  ble.w    $4ea66
+  4EA60  move.w   #$270d, $1774(a5)
+  4EA66  move.w   $1774(a5), d3
+  4EA6A  addq.w   #$2, d3
+  4EA6C  move.w   d3, -(a7)
+  4EA6E  lea.l    -$8(a6), a0
+  4EA72  move.l   a0, -(a7)
+  4EA74  jsr      $50958.l
+  4EA7A  addq.l   #$6, a7
+  4EA7C  lea.l    -$8(a6), a0
+  4EA80  move.l   a0, -(a7)
+  4EA82  lea.l    $501c4(pc), a1
+  4EA86  move.l   a1, -(a7)
+  4EA88  lea.l    $120f00.l, a2  # SRAM 120F00
+  4EA8E  move.l   a2, -(a7)
+  4EA90  jsr      $532de.l
+  4EA96  adda.l   #$c, a7
+  4EA9C  jsr      $5b106.l
+  4EAA2  tst.b    d7
+  4EAA4  bne.w    $4eaae
+  4EAA8  move.b   #$1, $1778(a5)
+  4EAAE  clr.w    -(a7)
+  4EAB0  jsr      $1f530.l
+  4EAB6  addq.l   #$2, a7
+  4EAB8  move.w   #$2, -(a7)
+  4EABC  jsr      $1b97e.l
+  4EAC2  addq.l   #$2, a7
+  4EAC4  move.w   $1774(a5), -(a7)
+  4EAC8  jsr      $8884.l
+  4EACE  addq.l   #$2, a7
+  4EAD0  move.w   #$3, -(a7)
+  4EAD4  move.l   #$1, -(a7)
+  4EADA  jsr      $3308c.l
+  4EAE0  addq.l   #$6, a7
+  4EAE2  jsr      $88f0.l
+  4EAE8  clr.w    -(a7)
+  4EAEA  jsr      $1b97e.l
+  4EAF0  addq.l   #$2, a7
+  4EAF2  bra.w    $4eb0e
+  4EAF6  move.l   $2280.w, -(a7)
+  4EAFA  lea.l    $50198(pc), a0
+  4EAFE  move.l   a0, -(a7)
+  4EB00  jsr      $2f96.l
+  4EB06  addq.l   #$8, a7
+  4EB08  jsr      $393c.l
+  4EB0E  bra.w    $4eb2a
+  4EB12  move.l   $24fc.w, -(a7)
+  4EB16  lea.l    $50198(pc), a0
+  4EB1A  move.l   a0, -(a7)
+  4EB1C  jsr      $2f96.l
+  4EB22  addq.l   #$8, a7
+  4EB24  jsr      $393c.l
+  4EB2A  unlk     a6
+  4EB2C  rts      
+
+[FTH]  handler=0x04EB2E  priv=3  cmd_id=0x01EB
+  4EB2E  link.w   a6, #$0
+  4EB32  move.w   $176a(a5), d0
+  4EB36  cmpi.w   #$2, d0
+  4EB3A  bne.w    $4eba8
+  4EB3E  move.w   $8(a6), d1
+  4EB42  cmp.w    $1766(a5), d1
+  4EB46  bne.w    $4eb8c
+  4EB4A  jsr      $2f7a.l
+  4EB50  tst.b    d7
+  4EB52  beq.w    $4eb60
+  4EB56  jsr      $393c.l
+  4EB5C  bra.w    $4eb88
+  4EB60  move.w   #$3, $176a(a5)
+  4EB66  move.w   #$3, -(a7)
+  4EB6A  jsr      $1b97e.l
+  4EB70  addq.l   #$2, a7
+  4EB72  tst.b    $c8e(a5)
+  4EB76  beq.w    $4eb88
+  4EB7A  move.b   #$1, $127a(a5)
+  4EB80  clr.b    $c8e(a5)
+  4EB84  clr.b    $14c4(a5)
+  4EB88  bra.w    $4eba4
+  4EB8C  move.l   $2256.w, -(a7)
+  4EB90  lea.l    $50198(pc), a0
+  4EB94  move.l   a0, -(a7)
+  4EB96  jsr      $2f96.l
+  4EB9C  addq.l   #$8, a7
+  4EB9E  jsr      $393c.l
+  4EBA4  bra.w    $4ebc0
+  4EBA8  move.l   $2518.w, -(a7)
+  4EBAC  lea.l    $50198(pc), a0
+  4EBB0  move.l   a0, -(a7)
+  4EBB2  jsr      $2f96.l
+  4EBB8  addq.l   #$8, a7
+  4EBBA  jsr      $393c.l
+  4EBC0  unlk     a6
+  4EBC2  rts      
+
+[STA]  handler=0x04EBD2  priv=3  cmd_id=0x01EC
+  4EBD2  link.w   a6, #$0
+  4EBD6  jsr      $2f7a.l
+  4EBDC  tst.b    d7
+  4EBDE  beq.w    $4ebec
+  4EBE2  jsr      $393c.l
+  4EBE8  bra.w    $4ec0c
+  4EBEC  lea.l    $501c8(pc), a0
+  4EBF0  move.l   a0, -(a7)
+  4EBF2  lea.l    $120f00.l, a1  # SRAM 120F00
+  4EBF8  move.l   a1, -(a7)
+  4EBFA  jsr      $5336a.l
+  4EC00  addq.l   #$8, a7
+  4EC02  clr.w    -(a7)
+  4EC04  jsr      $1f530.l
+  4EC0A  addq.l   #$2, a7
+  4EC0C  unlk     a6
+  4EC0E  rts      
+
+[OPN]  handler=0x04E7B0  priv=3  cmd_id=0x01ED
+  4E7B0  link.w   a6, #$0
+  4E7B4  tst.w    $176a(a5)
+  4E7B8  beq.w    $4e7cc
+  4E7BC  move.w   $8(a6), d0
+  4E7C0  cmp.w    $1768(a5), d0
+  4E7C4  bne.w    $4e7cc
+  4E7C8  bra.w    $4e7de
+  4E7CC  move.l   $223a.w, -(a7)
+  4E7D0  lea.l    $50198(pc), a0
+  4E7D4  move.l   a0, -(a7)
+  4E7D6  jsr      $2f96.l
+  4E7DC  addq.l   #$8, a7
+  4E7DE  unlk     a6
+  4E7E0  rts      
+
+[CLS]  handler=0x04E7E2  priv=3  cmd_id=0x01EF
+  4E7E2  link.w   a6, #$0
+  4E7E6  tst.w    $176a(a5)
+  4E7EA  beq.w    $4e7fe
+  4E7EE  move.w   $8(a6), d0
+  4E7F2  cmp.w    $1768(a5), d0
+  4E7F6  bne.w    $4e7fe
+  4E7FA  bra.w    $4e810
+  4E7FE  move.l   $223a.w, -(a7)
+  4E802  lea.l    $50198(pc), a0
+  4E806  move.l   a0, -(a7)
+  4E808  jsr      $2f96.l
+  4E80E  addq.l   #$8, a7
+  4E810  unlk     a6
+  4E812  rts      
+
+[RST]  handler=0x04EBC4  priv=3  cmd_id=0x01F0
+  4EBC4  link.w   a6, #$0
+  4EBC8  jsr      $1ce4.l
+  4EBCE  unlk     a6
+  4EBD0  rts      
+
+[FNC]  handler=0x04FD46  priv=3  cmd_id=0x01F2
+  4FD46  link.w   a6, #$ff6c
+  4FD4A  move.w   #$8, -(a7)
+  4FD4E  lea.l    -$94(a6), a0
+  4FD52  move.l   a0, -(a7)
+  4FD54  jsr      $533d4.l
+  4FD5A  addq.l   #$6, a7
+  4FD5C  move.w   #$78, -(a7)
+  4FD60  lea.l    -$8c(a6), a0
+  4FD64  move.l   a0, -(a7)
+  4FD66  jsr      $533d4.l
+  4FD6C  addq.l   #$6, a7
+  4FD6E  move.w   #$1, -$90(a6)
+  4FD74  clr.w    $1774(a5)
+  4FD78  tst.l    $8(a6)
+  4FD7C  bne.w    $4fdac
+  4FD80  lea.l    $e(a6), a0
+  4FD84  move.l   a0, -$4(a6)
+  4FD88  movea.l  -$4(a6), a1
+  4FD8C  addq.l   #$2, -$4(a6)
+  4FD90  move.w   (a1), $1768(a5)
+  4FD94  movea.l  -$4(a6), a2
+  4FD98  addq.l   #$2, -$4(a6)
+  4FD9C  move.w   (a2), $1766(a5)
+  4FDA0  movea.l  -$4(a6), a3
+  4FDA4  move.w   (a3), $1764(a5)
+  4FDA8  bra.w    $5015c
+  4FDAC  move.w   #$1, -$14(a6)
+  4FDB2  move.w   -$14(a6), d0
+  4FDB6  cmp.w    $c(a6), d0
+  4FDBA  bgt.w    $5015c
+  4FDBE  move.l   $8(a6), -$4(a6)
+  4FDC4  move.w   $c(a6), -$12(a6)
+  4FDCA  move.w   -$12(a6), d1
+  4FDCE  cmp.w    -$14(a6), d1
+  4FDD2  ble.w    $4fe2e
+  4FDD6  movea.l  -$4(a6), a4
+  4FDDA  addq.l   #$2, -$4(a6)
+  4FDDE  move.w   (a4), d7
+  4FDE0  bra.w    $4fe1a
+  4FDE4  addq.l   #$2, -$4(a6)
+  4FDE8  addq.l   #$2, -$4(a6)
+  4FDEC  bra.w    $4fe28
+  4FDF0  addq.l   #$4, -$4(a6)
+  4FDF4  addq.l   #$8, -$4(a6)
+  4FDF8  addq.l   #$2, -$4(a6)
+  4FDFC  addq.l   #$2, -$4(a6)
+  4FE00  bra.w    $4fe28
+  4FE04  move.l   $274e.w, -(a7)
+  4FE08  lea.l    $50256(pc), a0
+  4FE0C  move.l   a0, -(a7)
+  4FE0E  jsr      $2f96.l
+  4FE14  addq.l   #$8, a7
+  4FE16  bra.w    $4fe28
+  4FE1A  cmpi.w   #$0, d7
+  4FE1E  beq.b    $4fde4
+  4FE20  cmpi.w   #$1, d7
+  4FE24  beq.b    $4fdf0
+  4FE26  bra.b    $4fe04
+  4FE28  subq.w   #$1, -$12(a6)
+  4FE2C  bra.b    $4fdca
+  4FE2E  movea.l  -$4(a6), a0
+  4FE32  addq.l   #$2, -$4(a6)
+  4FE36  move.w   (a0), d7
+  4FE38  bra.w    $50116
+  4FE3C  movea.l  -$4(a6), a1
+  4FE40  addq.l   #$2, -$4(a6)
+  4FE44  move.w   (a1), d7
+  4FE46  bra.w    $4fea8
+  4FE4A  clr.w    -$8e(a6)
+  4FE4E  bra.w    $4fece
+  4FE52  move.w   #$1, -$8e(a6)
+  4FE58  bra.w    $4fece
+  4FE5C  clr.w    -$94(a6)
+  4FE60  bra.w    $4fece
+  4FE64  move.w   #$1, -$94(a6)
+  4FE6A  bra.w    $4fece
+  4FE6E  clr.w    -$92(a6)
+  4FE72  bra.w    $4fece
+  4FE76  move.w   #$1, -$92(a6)
+  4FE7C  bra.w    $4fece
+  4FE80  move.w   #$1, -$90(a6)
+  4FE86  bra.w    $4fece
+  4FE8A  clr.w    -$90(a6)
+  4FE8E  bra.w    $4fece
+  4FE92  move.l   $274e.w, -(a7)
+  4FE96  lea.l    $50256(pc), a2
+  4FE9A  move.l   a2, -(a7)
+  4FE9C  jsr      $2f96.l
+  4FEA2  addq.l   #$8, a7
+  4FEA4  bra.w    $4fece
+  4FEA8  cmpi.w   #$7, d7
+  4FEAC  bgt.b    $4fe92
+  4FEAE  cmpi.w   #$0, d7
+  4FEB2  blt.b    $4fe92
+  4FEB4  asl.w    #$1, d7
+  4FEB6  move.w   $4febe(pc, d7.w), d7
+  4FEBA  jmp      $4febe(pc, d7.w)
+
+[CIILMODE?]  handler=0x04E89A  priv=2  cmd_id=0x01F4
+  4E89A  link.w   a6, #$fffc
+  4E89E  jsr      $1dc20.l
+  4E8A4  tst.b    d7
+  4E8A6  beq.w    $4e8ee
+  4E8AA  move.b   $1773(a5), d0
+  4E8AE  cmpi.b   #$1, d0
+  4E8B2  bne.w    $4e8c2
+  4E8B6  lea.l    $5019a(pc), a0
+  4E8BA  move.l   a0, -$4(a6)
+  4E8BE  bra.w    $4e8ca
+  4E8C2  lea.l    $5019e(pc), a1
+  4E8C6  move.l   a1, -$4(a6)
+  4E8CA  movea.l  -$4(a6), a2
+  4E8CE  move.l   a2, -(a7)
+  4E8D0  lea.l    $501b6(pc), a3
+  4E8D4  move.l   a3, -(a7)
+  4E8D6  lea.l    $120f00.l, a4  # SRAM 120F00
+  4E8DC  move.l   a4, -(a7)
+  4E8DE  jsr      $532de.l
+  4E8E4  adda.l   #$c, a7
+  4E8EA  bra.w    $4e910
+  4E8EE  clr.l    d0
+  4E8F0  move.b   $1773(a5), d0
+  4E8F4  move.w   d0, -(a7)
+  4E8F6  lea.l    $501b2(pc), a0
+  4E8FA  move.l   a0, -(a7)
+  4E8FC  lea.l    $120f00.l, a1  # SRAM 120F00
+  4E902  move.l   a1, -(a7)
+  4E904  jsr      $532de.l
+  4E90A  adda.l   #$a, a7
+  4E910  clr.w    -(a7)
+  4E912  jsr      $1f530.l
+  4E918  addq.l   #$2, a7
+  4E91A  unlk     a6
+  4E91C  rts      
+
+[CIIL?]  handler=0x04E814  priv=2  cmd_id=0x01F5
+  4E814  link.w   a6, #$fffc
+  4E818  jsr      $1dc20.l
+  4E81E  tst.b    d7
+  4E820  beq.w    $4e868
+  4E824  bsr.w    $4e596
+  4E828  cmpi.b   #$1, d7
+  4E82C  bne.w    $4e83c
+  4E830  lea.l    $5019a(pc), a0
+  4E834  move.l   a0, -$4(a6)
+  4E838  bra.w    $4e844
+  4E83C  lea.l    $5019e(pc), a1
+  4E840  move.l   a1, -$4(a6)
+  4E844  movea.l  -$4(a6), a2
+  4E848  move.l   a2, -(a7)
+  4E84A  lea.l    $501a2(pc), a3
+  4E84E  move.l   a3, -(a7)
+  4E850  lea.l    $120f00.l, a4  # SRAM 120F00
+  4E856  move.l   a4, -(a7)
+  4E858  jsr      $532de.l
+  4E85E  adda.l   #$c, a7
+  4E864  bra.w    $4e88c
+  4E868  bsr.w    $4e596
+  4E86C  clr.l    d0
+  4E86E  move.b   d7, d0
+  4E870  move.w   d0, -(a7)
+  4E872  lea.l    $501b2(pc), a0
+  4E876  move.l   a0, -(a7)
+  4E878  lea.l    $120f00.l, a1  # SRAM 120F00
+  4E87E  move.l   a1, -(a7)
+  4E880  jsr      $532de.l
+  4E886  adda.l   #$a, a7
+  4E88C  clr.w    -(a7)
+  4E88E  jsr      $1f530.l
+  4E894  addq.l   #$2, a7
+  4E896  unlk     a6
+  4E898  rts      
+
+[CANCIIL]  handler=0x04E9E4  priv=2  cmd_id=0x01F6
+  4E9E4  link.w   a6, #$0
+  4E9E8  bsr.b    $4e9aa
+  4E9EA  clr.b    $1772(a5)
+  4E9EE  unlk     a6
+  4E9F0  rts      
+
+[GETCIIL]  handler=0x04E996  priv=2  cmd_id=0x01F7
+  4E996  link.w   a6, #$0
+  4E99A  move.b   $5ff00.l, $1772(a5)
+  4E9A2  bsr.w    $4e91e
+  4E9A6  unlk     a6
+  4E9A8  rts      

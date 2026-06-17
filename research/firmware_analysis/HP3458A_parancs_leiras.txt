@@ -1,0 +1,813 @@
+HP 3458A REV9 — Rejtett és fejlesztői GPIB parancsok részletes leírása
+Visszafejtés: Capstone + statikus disassembly elemzés (2026-06-14)
+======================================================================
+
+TARTALOM
+--------
+1. Fejlesztői parancsok (developer-only, névben _ jel)
+2. CIIL protokoll (HP belső kalibrációs interfész)
+3. GPIB státuszbyte parancsok (STB?, RQS, CSB)
+4. Állapot mentés/visszaállítás (SSTATE, RSTATE)
+5. Beépített programnyelv – Math és Bit operátorok
+6. Ismeretlen / kevéssé dokumentált parancsok
+7. Gyári tesztelési blokk (LOADREAL_, TRIGGER_, DCBD_, ACBD_, ADMEM_, ADCAL_, INGRD_)
+8. JSR backdoor – kritikus biztonsági találat
+
+
+======================================================================
+1. FEJLESZTŐI PARANCSOK
+======================================================================
+
+--- GREG_ (handler=0x01A600, priv=1) ---
+Valódi neve: Greg [nevű fejlesztő] saját debug rutinja.
+A parancstáblában _ végű – soha nem volt nyilvánosan dokumentálva.
+
+Mechanika:
+  1. A hívás paramétere: 8 byte lebegőpontos érték (IEEE 754 double, 2x4 byte)
+  2. sub_19FE2-t hívja a 8-byte-os argumentummal:
+     - sub_5B5D8: feltehetőleg egy belső parser/konverter
+     - Ellenőrzi A5+0x0DC2 (GPIB/soros port flag)
+     - Az értéket A5+0x0DA6-ba (8 byte mérési eredmény buffer) másolja
+     - Ellenőrzi A5+0x1773 (CIIL mód flag): ha aktív, CIIL output úton küldi
+     - Ellenőrzi A5+0x0D6E / 0xD72 / 0xD76 / 0xD7A = 4 output csatorna (flag+pointer)
+       → ezek: display, GPIB, serial, debug port csatorna-leírók
+     - A5+0x14C5 = csatorna mód (0=GPIB, 4=debug/soros)
+     - A5+0x127B = output ready flag
+     - A5+0x0C8E = output format flag
+     - A5+0x10E6/10E8 = loop count (ismétlési szám)
+
+Funkció: Egy mérési eredményt (8 byte IEEE 754 double) vesz paraméterként és
+azt az összes konfigurált output csatornára (GPIB, display, soros) elküldi,
+mintha a műszer mért volna. Egyszerre teszt-adat injektor és output multiplexer.
+
+Parancs szintaxis: GREG_ (valószínűleg numericparam)
+Megjegyzés: A GREG_ az egyetlen parancs, amely egy "mért értéket" külső forrásból
+(GPIB-ről) táplál be az output pipeline-ba. Gyári teszteléshez és kalibrációs
+ellenőrzéshez készülhetett.
+
+
+--- CRASH_ (handler=0x00053C, priv=1) ---
+Szándékos szoftver crash.
+
+Mechanika:
+  1. TRAP #$B = pSOS supervisor trap – rendszerszintű kivétel kényszerítve
+  2. A TRAP utáni bájtok nem utasítások, hanem ASCII szöveg:
+       0x00540: "BFri Jan 19 1990"
+     Ez a firmware build dátuma (HP 3458A REV9: 1990. január 19, péntek)
+  3. A TRAP #$B kezelője feltehetően elmenti a stack-et és kiírja a crash log-ot
+     (settings_ram-ba – lásd crash log @ 0x12000C)
+
+Funkció: Szándékos crash teszteléshez / gyári diagnosztikához. Lehetséges, hogy
+a TRAP #$B handler a build dátumot is kiírja a kijelzőre crash esetén.
+A mi settings_ram-unkban lévő "08-Bus Error" valószínűleg egy korábbi MREAD scan
+mellékterméke, nem CRASH_ hívásé.
+
+Parancs szintaxis: CRASH_ (paraméter nélkül)
+
+
+--- BOMB? (handler=0x0176A6, priv=0) ---
+Settings_ram dump (debug).
+
+Mechanika:
+  1. sub_5337A(dst=sram[0x1DC0], src=sram[0x0F00], len=0x80):
+       - Egyszerű byte-másoló rutin (dbra loop): sram[0xF00..0xF7F] → sram[0x1DC0..0x1E3F]
+       - Forrás: sram[0x0F00] = az aktuális GPIB output buffer (válasz buffer)
+  2. clr.b sram[0x0F7F] = output buffer null-terminálása
+  3. sub_1F530(0): GPIB send rutin meghívása (0 = "send from sram[0xF00]")
+  4. sram[0x1E80] = belső azonosító, amit a send rutin ellenőriz
+
+Funkció: Elküldi a settings_ram output bufferének tartalmát GPIB-en.
+A buffer valójában az utoljára összerakott válasz (sram[0xF00..0xF7F]).
+A BOMB? tehát nem az összes settings_ram-ot dumpolta GPIB-en (azt a kijelzőn
+tehette meg) – hanem az aktuális belső GPIB válasz buffer tartalmát tükrözi vissza.
+Valószínű hasznos eset: BOMB? kiadása közvetlenül egy más parancs hibája után
+megmutatja az ott összeállított de el nem küldött választ.
+
+Parancs szintaxis: BOMB? (lekérdező, GPIB-en visszaküld)
+
+
+--- JUNK_ (handler=0x003AB2, priv=2) ---
+Gyári "junk/garbage" hardver teszt. priv=2 szükséges (CIIL szint).
+
+Mechanika:
+  - Paramétere (d7): teszt index (0..N)
+  - Ugró tábla (jump table): d7 alapján különböző hardver rutin-okat hív (bsr $3124, $2F96 stb.)
+  - Az ugró táblában lévő célcímek (0x281C, 0x2578, 0x2540, 0x2184, 0x2448, 0x23D4, 0x23F0, 0x2420, 0x2404, 0x2590) RAM-beli mutatók → dinamikus dispatch
+  - A "string" ami PC-relatívan referált (0x3D94) egy format string / error üzenet az érvénytelen teszt-indexhez
+  - A tényleges teszt rutinok (0x3124, 0x2F96) hardver regisztereket írnak/olvasnak
+    (pl. ADC beállítások, mérőkör szelektor relék)
+
+Funkció: Gyári hardver teszt parancs. Egyes alkomponenseket (ADC, relék, DAC) egyenként
+teszteli sorban. Az index paraméter megadja, melyik hardver alrendszert kell tesztelni.
+A 0x281C-ben lévő pointer-tömb az aktuálisan aktív tesztrutin-táblát mutatja
+(ez futási időben is cserélhető, pl. különböző kalibrációs fázisokban).
+
+Parancs szintaxis: JUNK_ N  (N = teszt index, 0-tól számozva)
+
+
+--- XYZZY (handler=0x017BA0, priv=0) ---
+Colossal Cave Adventure easter egg.
+
+Mechanika:
+  1. move.w #$6, -(a7)   = hossz paraméter (6 byte)
+  2. lea $185C0(pc), a0  = string pointer (PC-relatív)
+  3. sub_1D8B8(len, str)  = szöveg küldő rutin
+  4. sub_1D8B8 belül:
+       - sub_5336A: sram[0xF00] output bufferbe másol
+       - sub_1F530(0): GPIB send
+  5. Az 0x185C0-on lévő string: csak 6 bájt → "XYZZY" valószínűleg (nincs ASCII output
+     a GPIB-en, a sub megint lehet hogy kijelzőre megy)
+
+Funkció: A Colossal Cave Adventure "XYZZY" varázsszavának megfelelője.
+sub_1D8B8 megegyezik a BOMB? által is hívott display-rutin szignifikáns részével
+(sub_5336A + sub_1F530 szekvencia). Valószínűleg beep + kijelzőüzenet, GPIB output nulla.
+Az easter egg nem küld semmit GPIB-en (a ERRSTR? '0,"NO ERROR"'-t ad vissza).
+
+Parancs szintaxis: XYZZY (paraméter nélkül)
+
+
+--- AUXERR? (handler=0x0037CC, priv=1) ---
+Másodlagos (auxiliary) hibakód lekérdezése.
+
+Mechanika:
+  1. Megszakítás tiltása és engedélyezése körül: sub_188C8(0, 3), sub_18918(3)
+     (GPIB chip interrupt lock – ISR-t blokkol a kritikus szakaszban)
+  2. A5+0x0638 értékét beolvassa → ez a secondary/auxiliary hiba regiszter
+  3. A5+0x0638-at nullázza (egy olvasás = törlés, "sticky read")
+  4. sub_1DC20: GPIB küldési mód ellenőrzés (QFORMAT/numeric mode?)
+  5. Formázott output: "N,%d\n" → N az error kód, majd GPIB send
+
+Funkció: Az ERRSTR? után fennmaradó másodlagos hibakód olvasása.
+Míg az ERRSTR? az összetett szöveges hibaüzenetet adja, az AUXERR? egy numerikus
+kódot olvas A5+0x0638-ból – ez egy hardver-szintű megszakítás/szubrendszer hibát
+jelezhet (pl. ADC timeout, relay hiba, UART overrun stb.).
+A 0x638 offset (A5 bázistól) megerősíti, hogy a settings_ram elején lévő hibaterület
+más részét olvasza, mint az ERRSTR? (A5+0 = főhiba).
+
+Parancs szintaxis: AUXERR? (lekérdező)
+
+
+======================================================================
+2. CIIL PROTOKOLL
+======================================================================
+
+A CIIL = Common Instrument Interface Language — HP belső protokoll a 3458A és
+a HP kalibrátor eszközök (HP 3245A, HP 8903B) között. Teljesen dokumentálatlan
+a nyilvános HP kézikönyvekben. priv=2 vagy priv=3 szükséges a legtöbb parancshoz.
+
+STATE MACHINE (A5+0x176A = CIIL_STATE):
+  0 = CIIL inaktív
+  1 = CIIL aktív (PRESET lefutott)
+  2 = INX után: adatra vár (FTH-hoz kész)
+  3 = FTH lefutott: adat kész
+  4 = IST (self test) fut
+
+A5+0x1768 = session channel ID (OPN-nél adott)
+A5+0x1774 = adatszámláló (max 9997 = 0x270D)
+A5+0x1773 = CIIL mód flag (0=inaktív, 1=aktív) — GREG_ is ellenőrzi!
+sram[0xF00]  = output buffer
+
+--- CIIL (handler=0x04E91E, priv=2) ---
+CIIL mód aktiválása.
+
+Mechanika:
+  1. sub_4E596: CIIL előfeltételek ellenőrzése (CIIL state és priv ellenőrzés)
+  2. sub_5AF1A: biztonsági ellenőrzés (SECURE/protected mód?)
+  3. Ha A5+0x1773 == 0 (nem volt még CIIL): sub_1CE4 = reset/init rutin
+  4. A5+0x1773 = 1 (CIIL aktív)
+  5. PRESET(1) hívása (PRESET NORM → triggerring, NPLC visszaállítás)
+  6. sub_7F72(2, "CIIL", …): GPIB kimenetre "CIIL" szöveg küldése és/vagy display
+  7. sub_3308C(4, 1): CIIL T trigger channel beállítása (arg=4 → csatorna 4)
+  8. sub_331B6(1): T(1) = TRIG SYN mód (minden méréshez külön trigger kell)
+
+Funkció: Belép CIIL módba. Visszaállítja a műszert PRESET NORM állapotba, majd
+TRIG SYN módra vált. A T parancs (trigger mode setter) közvetlen hívása azt jelzi,
+hogy a CIIL módban az érintett csatorna szinkron triggereléssel mér.
+sub_4E596 az az ellenőrző függvény, amelyet az összes CIIL parancs először hív.
+
+
+--- sub_4E596 (CIIL előfeltétel ellenőrző) ---
+Visszatérési érték d7:
+  1 = OK (CIIL módban vagyunk, és a channel ID megfelel)
+  0 = Hiba (CIIL inaktív, vagy channel eltérés)
+  Az OPN, CLS, FTH parancsok mind ezen logikán alapszanak.
+
+
+--- CIIL? (handler=0x04E814, priv=2) ---
+CIIL mód állapotlekérdezés.
+  - sub_4E596 visszatérési értéke szerint:
+      d7==1 → "1" (aktív)
+      d7!=1 → "0" (inaktív)
+  - Formázott output: értéket a sram[0xF00] output bufferbe rakja és GPIB-en küldi.
+
+
+--- CIILMODE? (handler=0x04E89A, priv=2) ---
+A5+0x1773 (CIIL mode flag) közvetlen lekérdezése:
+  - 0x1773==1 → "1"
+  - 0x1773!=1 → "0"
+  Különbség CIIL?-tól: ez csak a flag-et nézi, nem a full state machine-t.
+
+
+--- GAL (handler=0x04E9AA, priv=2) ---
+Generic Array Language – HP belső adatátviteli protokoll.
+A disassembly alapján sub_4E596 ellenőrzés, majd egy puffer-olvasási rutin.
+Teljes mechanika Ghidra nélkül nem rekonstruálható egykönnyen (sok indirekt call).
+
+
+--- CANCIIL (handler=0x04E9E4, priv=2) ---
+CIIL megszakítása.
+sub_1CE4 hívása = reset/init → CIIL_STATE = 0.
+
+
+--- GETCIIL (handler=0x04E996, priv=2) ---
+CIIL adatpuffer olvasása. sub_4E596 után puffer pointer visszaadása.
+
+
+--- OPN (handler=0x04E7B0, priv=3) ---
+CIIL csatorna megnyitása.
+  - Paraméter: channel ID (pl. 0, 1, 2…)
+  - CIIL_STATE == 0 esetén: error (CIIL nem aktív)
+  - A5+0x1768 != paraméter esetén: error (rossz csatorna)
+  - Siker esetén: továbblép (bra $4E7DE)
+  Megjegyzés: OPN csak akkor sikeres, ha CIIL már aktív (CIIL parancs kiadva előtte)
+  és a csatorna ID megegyezik a CIIL által beállítottal.
+
+
+--- CLS (handler=0x04E7E2, priv=3) ---
+CIIL csatorna zárása.
+  Mechanikailag azonos OPN-nel, de az ellentétes műveletet végzi.
+  A5+0x1768 és CIIL_STATE azonos ellenőrzése után csatorna lezárása.
+
+
+--- INX (handler=0x04EA26, priv=3) ---
+CIIL index / adat-felvételi parancs.
+  - CIIL_STATE == 1 vagy 3 szükséges (aktív, de nem vár még)
+  - A5+0x1766 == paraméter (index egyezés ellenőrzés)
+  - Siker: CIIL_STATE = 2 (FTH-ra kész)
+  - A5+0x1774 adatszámláló max 9997-re limitálva
+  - sub_50958: az index-hez tartozó adatpuffer allokálása/méretezése
+  - A formázott output buffer: sram[0xF00], format string: sram[0x501C4]
+
+
+--- FTH (handler=0x04EB2E, priv=3) ---
+CIIL adat fetch (lekérés).
+  - CIIL_STATE == 2 szükséges (INX után)
+  - A5+0x1766 == paraméter
+  - sub_2F7A: van-e adat kész? (1=igen, 0=nem)
+  - Ha nincs: sub_393C hibakezelő
+  - Ha van: CIIL_STATE = 3, sub_1B97E(3): adat küldése
+  - A5+0xC8E = format flag, A5+0x14C4 törlése (csatorna reset)
+  - A5+0x127A: teljesítési flag
+
+
+--- STA (handler=0x04EBD2, priv=3) ---
+CIIL státusz lekérdezése.
+  - sub_2F7A: adat kész? (d7 visszatérési érték)
+  - Ha kész: sram[0xF00]-ból adatkészítés, sram[0x501C8] format string
+  - Output: numerikus státusz kód GPIB-en
+
+
+--- IST (handler=0x04E9F2, priv=3) ---
+Instrument Self Test – legmagasabb priv (3).
+  1. sub_38B4: mérőáramkör reset (ADC reset, relék resetje)
+  2. sub_5B6C6(1): display/LCD "TEST" mód bekapcsolása
+  3. A5+0x176A = 4 (IST fut)
+  4. sub_1780E: a tényleges selftest rutin (600+ sor disassembly)
+     - 0x2F37C-en bináris tesztmintázat (checksum/CRC minták)
+     - Hardver szintű ellenőrzések (ADC, DAC, memória, I/O portok)
+  5. A5+0x176A = 0 (IST kész)
+  Megjegyzés: CNF == IST (CNF handler egyszerűen bsr IST-be ugrik).
+
+
+--- RST (handler=0x04EBC4, priv=3) ---
+CIIL reset. sub_1CE4 = a rendszer init/reset rutin (azonos CANCIIL-lel).
+
+
+--- FNC (handler=0x04FD46, priv=3) ---
+CIIL Function command – komplex paramétertábla betöltés.
+  - sub_533D4(8, …): 8 byte adat olvasása GPIB bufferből puffer1-be
+  - sub_533D4(0x78, …): 120 byte adat olvasása puffer2-be
+  - A5+0x...90 = FNC belső állapot
+  A FNC nagy adatblokk-transzfert végez (valószínűleg kalibráló-adat feltöltés
+  a CIIL-en keresztül érkező külső kalibrátortól).
+
+
+--- ENTER (handler=0x04B6E8, priv=1) ---
+CIIL adat bekérése a GPIB-ről → settings_ram bufferbe.
+Paraméterei: csatorna, adattípus, buffer offset az A5+0x1478-tól.
+
+
+--- OUTPUT (handler=0x04B75E, priv=1) ---
+CIIL adat küldése → GPIB-re.
+Paraméterei: csatorna, adattípus, forrás buffer offset.
+
+
+--- OUTDISP (handler=0x04B80C, priv=1) ---
+CIIL display output. A mért értéket a 3458A előlapjára is kiírja.
+
+
+======================================================================
+3. GPIB STÁTUSZBYTE PARANCSOK
+======================================================================
+
+--- STB? (handler=0x004176, priv=1) ---
+Status Byte lekérdezése.
+
+Mechanika:
+  - A5+0x06B6 = a 3458A GPIB státusz byte regiszter (settings_ram-ban)
+  - A byte értékét GPIB-en visszaküldi (numerikus)
+  Bitek (IEEE 488.1 SPoll byte):
+    bit 6 (RQS) = Service Request kérés aktív
+    bit 5 (ESB) = Extended Status Byte regiszter (hibák, overflow stb.)
+    bit 4 (MAV) = Message Available (van GPIB kimenet)
+    bit 0–3 = műszer-specifikus állapotbitek
+
+Parancs szintaxis: STB? (lekérdező, numerikus választ ad)
+
+
+--- RQS (handler=0x004138, priv=1) ---
+Request Service – manuális SRQ (Service Request) jelzés kényszerítése.
+
+Mechanika:
+  - A GPIB SRQ vonalat aktiválja (a kontrollert megszakítja)
+  - sub_188C8 / sub_18918: GPIB chip interrupt lock/unlock
+  - A5+0x06B6 RQS bitjének beállítása
+  - A GPIB chip-be (0x80006 = GPIB chip control register) SRQ bit beírása
+  Megjegyzés: Normál esetben a 3458A automatikusan küld SRQ-t hiba esetén,
+  de az RQS paranccsal GPIB-ről is kényszeríthető – fejlesztői teszt célokra.
+
+Parancs szintaxis: RQS (paraméter nélkül)
+
+
+--- CSB (handler=0x004270, priv=1) ---
+Clear Status Byte – GPIB státuszbyte törlése.
+
+Mechanika:
+  1. sub_188C8(0, 6): GPIB chip interrupt tiltása (kritikus szakasz)
+  2. 0x80006 = 0x93: GPIB chip Command Register → "Clear Bus" parancs
+  3. A5+0x06B6 alacsony 4 bitje = 0 (status bitek törlése)
+  4. A5+0x06B6 értéke → 0x8000A (GPIB chip Address Register frissítése)
+  5. 0x80006 bit 2 ellenőrzése (ATN aktív?):
+       - igen: 0x80006 = 0x18 (GPIB chip listen mód)
+  6. 0x80006 = 0x13 (GPIB chip Command Register → "Clear All")
+  7. sub_18918(6): GPIB interrupt visszaengedélyezése
+
+Funkció: Az összes GPIB státusz bit törlése, SRQ visszavonása, GPIB chip reset.
+Ez a "GPIB tisztítás" parancs – tesztelés után az SRQ és hiba state visszaállítására.
+
+Parancs szintaxis: CSB (paraméter nélkül)
+
+
+======================================================================
+4. ÁLLAPOT MENTÉS / VISSZAÁLLÍTÁS
+======================================================================
+
+--- SSTATE (handler=0x00433A, priv=1) ---
+Save State – műszer állapot mentése settings_ram-ba.
+
+Mechanika:
+  - Paraméter: slot azonosító (pointer az állapot leíró struktúrához)
+  - Ha az A5+0x6BC (belső default slot) == paraméter → alapértelmezett slot
+  - sub_19DD8: állapot struktúra másolása (A5+0x11C = állapot pool)
+  - sub_19CB4(0xE6, 1, 1, …): 0xE6 = 230 byte mentése a slot-ba
+    Tartalom: mérési konfiguráció teljes állapota (NPLC, range, filter, trig, format stb.)
+
+Funkció: A 3458A teljes mérési konfigurációját (~230 byte) egy settings_ram slotba
+menti. Az SSTATE/RSTATE pár megvalósítja a "preset állapot" mentési/visszaállítási
+mechanizmust (hasonló az IEEE 488.2 *SAV/*RCL parancsokhoz, de HP-specifikus formában).
+
+Parancs szintaxis: SSTATE slot_id
+
+
+--- RSTATE (handler=0x004412, priv=1) ---
+Restore State – korábban mentett állapot visszaállítása.
+
+Mechanika:
+  - Paraméter: slot azonosító
+  - Ha slot_id == 0: "last state" visszaállítás → format string parse sub_532DE segítségével
+    (slot neve ASCII-ban is megadható)
+  - sub_42F8: slot keresése és betöltése
+  - Az állapot visszaállítás a settings_ram 0xE6 bájtos blokkjából olvas
+  - sub_455E: a betöltött állapot alkalmazása (relék, ADC, NPLC stb. beállítása)
+
+Parancs szintaxis: RSTATE slot_id
+
+
+======================================================================
+5. BEÉPÍTETT PROGRAMNYELV – MATH ÉS BIT OPERÁTOROK
+======================================================================
+
+Ezek a parancsok a HP 3458A beépített programnyelvének matematikai és logikai
+operátorai. BASIC-szerű szintaxissal írott programokban használhatók.
+
+A math operátorok handler táblája tömör (mind egymás utáni cím):
+  SIN @ 0x056994E  }
+  COS @ 0x056956   } → mind ugyanarra a
+  ATN @ 0x056995E  }    math dispatch táblára
+  EXP @ 0x056966   }    mutat (sub_056900-ban
+  LOG @ 0x05696E   }    lévő shared FPU rutin)
+  LGT @ 0x056976   }
+  SQR @ 0x05697E   }
+  ABS @ 0x056986   }
+
+Az összes SIN..ABS handler 8 byte egymástól – ezek nem full implementációk,
+hanem egy shared floating-point library (sub_056900) ugró tábla bejegyzései.
+A tényleges számítás (68000 szoftveres FPU) a sub_056900 és alrutinjaiból áll.
+
+Bit operátorok:
+  BINAND  0x056600   Bitwise AND
+  BINIOR  0x056608   Bitwise OR
+  BINEOR  0x056610   Bitwise XOR
+  BINCMP  0x056618   Bitwise COMPARE (complement?)
+  BIT     0x05662C   Egy bit tesztelése
+  SHIFT   0x056654   Bit eltolás (irány paraméteres)
+  ROTATE  0x05666C   Bit forgatás (irány paraméteres)
+
+Ezek is shared rutinokat hívnak (sub_056600 dispatch tábla).
+
+
+======================================================================
+6. ISMERETLEN / KEVÉSSÉ DOKUMENTÁLT PARANCSOK
+======================================================================
+
+--- JSR (handler=0x017C28, priv=1) ---
+!!! KRITIKUS BIZTONSÁGI PARANCS – Tetszőleges kód végrehajtás GPIB-ről !!!
+
+Mechanika:
+  1. sub_585A0(param): string/szám paraméterből 32 bites cím előállítása
+  2. andi.l #$FFFFFFFE, d7: LSB törlése (68000 even-address alignment)
+  3. movea.l d7, a0
+  4. jsr (a0)  ← KÖZVETLEN UGRÁS A PARAMÉTER ÁLTAL MEGADOTT OPCÍMRE!
+
+Funkció: Tetszőleges ROM vagy RAM cím szubrutinként hívható meg GPIB-ről.
+Ez a parancs priv=1 szintű, ami azt jelenti, hogy SECURE mód nélkül is hozzáférhető,
+ha a műszer unsecured (nálunk SECURE kód = 0).
+
+Példa: JSR 0x00053C → CRASH_ szimulálása (TRAP #$B kényszerítés)
+Példa: JSR 0x02FDF2 → CAL_NUM direkt hívása (DOLT/Defeats reset)
+Példa: JSR 0x1CE4   → Full reset a CIIL reset útvonalon
+
+FONTOS: A JSR-rel tetszőleges settings_ram cím is meghívható – ha oda
+GPIB-ről 68000 kódot írtunk (MWRITE-tal), akkor önkényes kód futtatható.
+Ez a gyári "remote control" backdoor, amely lehetővé teszi, hogy a HP mérnökei
+a gyárból bármilyen diagnosztikus kódot futtassanak GPIB-en.
+
+
+--- MADDR (handler=0x017C8C, priv=0) ---
+Memory ADDRess – program memória cím beállítása.
+
+Mechanika:
+  - Paraméter típusa ellenőrzése: 0x8A00 = "numeric literal" token?
+    Ha igen: paraméter értéke direkt cím (abszolút)
+    Ha nem: paraméter indirekt pointer (dereferencia)
+  - A beállított cím egy belső pointer (-$4(a6)) = MADDR buffer
+  - Feltehetőleg a RMEM?_ és FILLBIN parancsok használják ezt a mutatót
+
+Funkció: Megadja, melyik program memória területet olvassa a következő RMEM?_
+vagy írja a következő FILLBIN parancs. Az MADDR+RMEM?_+FILLBIN trojka
+a beépített program memória közvetlen olvasásának/írásának eszköze.
+
+
+--- ANNUN_ (handler=0x008124, priv=1) ---
+Annunciator – előlapi LED/szegmens indikátor vezérlés.
+
+Mechanika:
+  - Két 40-byte puffert töröl: A5+0xB52 és A5+0xB7A
+    (0x28 = 40 byte, sub_533D4 = block clear)
+  - Loop (0-tól argc-1-ig):
+      index = bejövő paraméter tömb[i]  (2-byte szó, asl.l #1 = *2 indexelés)
+      A5+0xB52[index] = 1   (adott annunciátor LED bekapcsolása)
+  - A5+0xB52 = 40-byte annunciátor állapot tömb (1=ON, 0=OFF)
+  - A5+0xB7A = 40-byte "előző állapot" tömb (villogás detektáláshoz?)
+
+Funkció: Az előlap annunciátor LED-jeit (MATH, NULL, dBm, HOLD, REAR stb.)
+közvetlenül vezérli. Az ANNUN_ N1,N2,N3,… szintaxis az N-ik annunciátor-bitek
+bekapcsolásához való. Gyári diagnosztikában az összes LED ellenőrzéséhez használható.
+
+Parancs szintaxis: ANNUN_ n1,n2,...  (0-39 közötti indexek)
+
+
+--- R parancs (handler=0x0315DE, priv=1) ---
+Range beállítás – komplex, mértartomány-váltó logika.
+
+Mechanika (kulcs A5 offsetek):
+  A5+0x1397 = mérési funkció (DCV=1, ACV=2, OHMS=3 stb.)
+  A5+0x1391 = jelenlegi range index
+  A5+0x1395 = beállított range
+  A5+0x1474 = autorange flag
+  A5+0x1477 = range limit flag
+  A5+0x13A3 = protection flag
+  A5+0x139F = additional range config
+  A5+0x139C = trigger mode (visszaellenőrzi!)
+  A5+0x13EC = measurement config blokk (4 byte)
+
+  A 0x2DDEE rutin: tényleges hardware range váltó (relék)
+  Logika:
+    - Ha funkció <= 5 vagy 7-8: range értéke érvényes → relay call (0x2DDEE)
+    - Ha funkció nincs range-en (pl. FREQ/PER): különleges kezelés
+    - 0x2DDEE(func, range, sram_ptr): relék átkapcsolása + ADC refváltás
+
+Funkció: Ez a nyilvánosan "RANGE N" dokumentált parancs belső handlere –
+de az R névvel elérhető GPIB-ről is direkten (rejtett alias). Az R a rövidebb forma.
+
+
+--- T parancs (handler=0x0331B6, priv=1) ---
+Trigger mode beállítás.
+
+Érvényes paraméterek (d0 értékek):
+  -1 (FFFF) → TRIG AUTO alapértelmezett visszaállítás
+   0         → TRIG HOLD (mérés tiltva)
+   3         → TRIG SGL (single trigger)
+   6         → TRIG EXT (external trigger)
+   7         → (belső trigger mód, dokumentálatlan)
+   8         → (belső trigger mód, dokumentálatlan)
+
+Mechanika (kulcs A5 offsetek):
+  A5+0x138F = auto-trigger flag
+  A5+0x1473 = egyéb trigger config
+  A5+0x1390 = jelenlegi trigger mód
+  A5+0x1397 = mérési funkció
+  A5+0x139C = trigger mode (tárolva itt)
+  A5+0x0BB2 = "trigger active" jelző (1 ha aktív)
+
+Funkció: A T parancs az TARM/TRIG nyilvános parancsok belső implementációja,
+GPIB-ről T N alakban hívható. A CIIL handler ezt direkten is meghívja (T(1) = TRIG SYN).
+A 7 és 8 értékek belső (dokumentálatlan) trigger módok, valószínűleg az ADC és a
+külső órajel összehangolásához.
+
+
+--- R? / T? (handler=0x01F2E0 / 0x01EC68, priv=1) ---
+Range és Trigger mode lekérdezők.
+  - A belső állapot regiszterekből olvasnak (A5+0x1395 ill. A5+0x1390)
+  - Numerikus formátumban küldik vissza a jelenlegi értéket
+  - A kimenet formátum: QFORMAT NUM esetén tiszta szám
+
+
+--- U_RANGE / D_RANGE (handler=0x0316D4 / 0x031732, priv=1) ---
+Range léptető parancsok (Up Range / Down Range).
+  - U_RANGE: A5+0x1395 range index növelése 1-gyel, majd R handler hívása
+  - D_RANGE: A5+0x1395 range index csökkentése 1-gyel, majd R handler hívása
+  Funkció: Egylépéses range váltás felfelé/lefelé. Automata kalibrációs szekvenciákban
+  a HP gyári kalibráló programja ezeket hívja sorban végig a tartományokon.
+
+
+--- SYNCPARM_ (handler=0x0397DE, priv=1) ---
+Synchronization Parameters – factory sync.
+A handler kis méretű (nem sok A5 offset). Egy alacsony szintű szinkronizációs
+parancs, amely valószínűleg az ADC szinkron trigger és a mérési órajel közötti
+fáziseltolást állítja be. A disassembly-ben nincs string → nem ad GPIB választ.
+
+
+--- FILLBIN (handler=0x0183EE, priv=1) ---
+Fill Binary – bináris memória feltöltés.
+
+Mechanika:
+  - MADDR által beállított mutatótól kezdve bináris adatot ír
+  - A beépített program memória területeit tölti fel (instructions + data)
+  - Feltehetőleg a JSR + FILLBIN kombinációval lehet tetszőleges kódot tölteni
+    a settings_ram-ba és aztán futtatni (JSR + MADDR + FILLBIN = teljes exploit lánc)
+
+
+--- RMEM?_ (handler=0x01BE08, priv=0) ---
+Read Memory (factory) – MADDR által mutatott területről olvas vissza adatot.
+A priv=0 azt jelenti, hogy bármely felhasználó olvashatja az aktuális MADDR területét.
+MADDR + RMEM?_ = tetszőleges memória dump GPIB-en (ROM/RAM egyaránt)!
+
+
+--- SCROLL (handler=0x007B2A, priv=1) ---
+Display scroll – az előlapi kijelző gördítése.
+Nincs A5 offset hozzáférés (hardware scroll regiszter közvetlen írása valószínű).
+Gyári QA ellenőrzéshez (display teszt) és diagnosztikához.
+
+
+--- DSP / DSP? (handler=0x01DB0A / 0x007FB2, priv=0) ---
+DSP: Display string GPIB-ről – a bemeneti stringet a LCD kijelzőre írja.
+DSP?: Az aktuális kijelző tartalmát olvassa vissza GPIB-en (display buffer dump).
+A DISP parancs nyilvános verziójának belső neve; a DSP a rövidített forma.
+
+
+--- MENU / MENU? (handler=0x0053D2 / 0x005430, priv=1) ---
+Az előlapi menü navigációs parancsok GPIB-ről.
+MENU N: a menü N-ik elemét aktiválja.
+MENU?: az aktuális menü pozíció/szint visszaadása.
+
+
+--- PURGE (handler=0x0047F0, priv=0) ---
+Program és memória törlés.
+Feltehetőleg a beépített programnyelv adott szubrutinjait vagy a teljes
+program területet törli (DEL/CLEAR funkció).
+
+
+--- MCOUNT? (handler=0x01DEFA, priv=0) ---
+Memory measurement Count lekérdező.
+Az MEM FIFO módban rögzített mérések számlálóját adja vissza.
+Azonos a nyilvánosan dokumentált MCOUNT? funkcióval.
+
+
+--- MSIZE / MSIZE? (handler=0x027AAA / 0x027AB2, priv=1) ---
+Memory SIZE – a mérési memória méretének konfigurálása/lekérdezése.
+MSIZE N: N-re állítja a memória buffer méretét (NRDGS-sel koordinálva).
+MSIZE?: a jelenlegi buffer méret visszaadása.
+
+
+--- PAUSED? (handler=0x010462, priv=0) ---
+Program PAUSED állapot lekérdezése (== PAUSE? alias).
+A beépített program PAUSE utasítás állapotát kérdezi le:
+  1 = program szüneteltetve (PAUSE utasításon áll)
+  0 = program fut vagy nem fut
+
+
+--- SUB (handler=0x018818, priv=1) ---
+Subroutine definíció a beépített programnyelvben.
+A SUB...SUBEND blokkot definiálja, ami CALL-lal hívható.
+
+
+--- SMATH / MMATH / RMATHV (handler=0x054284 / 0x0536DA / 0x053E88, priv=0) ---
+Beépített matematika memória operátorok:
+  SMATH: Set Math – matematikai buffer feltöltése/számítás konfigurálása
+  MMATH: Memory Math – az RMEM memória értékén math operáció elvégzése
+  RMATHV: Reset Math Value – matematika akkumulátor/eredmény törlése
+
+
+--- OCOMP / OCOMP? (handler=0x031494 / 0x0204CE, priv=1) ---
+Offset Compensation be/kikapcsolása.
+A 4-wire resistance mérésnél és alacsony feszültség mérésnél az offset
+automatikus kompenzálása. Az OCOMP ON esetén az ADC egy extra "zéró" mérést
+is végez és kivonja az eredményből.
+
+
+--- FSOURCE / FSOURCE? (handler=0x0314FA / 0x020B02, priv=0) ---
+Frequency Source – a frekvenciamérés bemenet forrásának beállítása.
+Lehetséges értékek: MAIN (előlapi), AUX (hátlapi), AUTO.
+A? verzió visszaolvassa az aktuális beállítást.
+
+
+--- EXTOUT / EXTOUT? (handler=0x032CF8 / 0x01E1AE, priv=0) ---
+External Output – a hátlapi BNC (külső trigger/output) kimenet beállítása.
+Az EXTOUT konfigurálható mérési szinkron jelként vagy PASS/FAIL kimenetként.
+
+
+--- OPT? (handler=0x0175DA, priv=2) ---
+Options Query – az opcionális hardver modulok lekérdezése.
+priv=2 szükséges! Feltehetőleg a belső option register-t olvassa és formázott
+listát ad vissza (pl. "OPT 001" ha a memória bővítő modul (75k reading) telepítve van).
+GPIB-ről OPT? a gyári tesztnél az opciókat ellenőrzi.
+
+
+--- HELP (handler=0x017544, priv=1) ---
+Help szöveg kiküldés. Nincs PC-relativ string a handlerben → a helpszöveg
+valószínűleg settings_ram-ban (programterületen) van, nem a ROM-ban.
+GPIB-en nem ad visszajelzést – valószínűleg a kijelzőre írja a help szöveget.
+
+
+--- TBUFF / TBUFF? (handler=0x033D86 / 0x01E0AE, priv=0) ---
+Trigger Buffer – a trigger esemény puffer beállítása/lekérdezése.
+A TBUFF definiálja, hány trigger eseményt bufferel a mérés megkezdése előtt.
+
+
+--- SSAC / SSDC (handler=0x030C02, priv=1) ---
+Scale/Sensitivity AC/DC – egységes handler, a cmd_id alapján dönti el melyiket.
+Az SSAC/SSDC a mérési érzékenység (scale factor) belső, gyári beállítása,
+amely közvetlenül a sensitivity szorzót írja settings_ram-ba (nem cal_ram-ba).
+
+
+--- ACDCI (handler=0x030A28, priv=1) ---
+AC/DC Input konfiguráció. A5+0x1473 (ACV/DCV coupling flag) és a mérési mód
+koordinálása. Valószínűleg az AC és DC szimultán méréseinek belső szinkronizálója.
+
+
+--- SSPARM? (handler=0x01E70E, priv=1) ---
+Sweep/Sensitivity Parameters lekérdezése.
+A SWEEP parancshoz kapcsolódó belső paraméterek (A5+0x1434/36/3A) visszaolvasása.
+
+
+======================================================================
+7. GYÁRI TESZTELÉSI BLOKK (0x04B5xx)
+======================================================================
+
+Ezek mind priv=1 szintű factory-only parancsok. Közös jellemzőjük:
+- settings_ram-ba (A5+0x147C..0x14E7) töltenek be adatokat
+- NEM írnak közvetlenül cal_ram-ba
+- Az ADCAL_ és DCBD_ által betöltött adatokat az ACAL/SCAL használja fel
+
+| Parancs   | A5 offset(ek)    | Méret | Tartalom                        |
+|-----------|------------------|-------|---------------------------------|
+| LOADREAL_ | -               | 0     | STUB (üres: link+unlk+rts)      |
+| TRIGGER_  | +0x147C          | ?     | Trigger paraméterek             |
+| DCBD_     | +0x1490          | ?     | DC board paraméterek (gain/off) |
+| ACBD_     | +0x14A4          | ?     | AC board paraméterek            |
+| ADMEM_    | +0x14B8          | ?     | ADC memory paraméterek          |
+| ADCAL_    | +0x14CC          | ?     | ADC kalibráció paraméterek      |
+| INGRD_    | +0x14E0          | ?     | Input gradient                  |
+
+LOADREAL_: teljesen üres stub – csak link/unlk/rts. Valószínűleg egy tervezett
+parancs helye, amit soha nem implementáltak (vagy már töröltek és a stub maradt).
+
+
+======================================================================
+8. JSR BACKDOOR – KRITIKUS ÖSSZEFOGLALÓ
+======================================================================
+
+A JSR (GPIB parancs, handler=0x017C28, priv=1) lehetővé teszi, hogy GPIB-en
+keresztül tetszőleges 68000 kódot futtassunk – ez nem egy véletlen bug, hanem
+egy SZÁNDÉKOS gyári backdoor.
+
+FELTÉTELEK a kihasználáshoz a mi műszerünkön:
+  - SECURE kód = 0 (confirmed GPIB-ről: SECURE 0,0 → NO ERROR)
+  - priv=1 szükséges → a standard "felhasználói" jogszintnél magasabb kell
+  - KÉRDÉS: Hogyan kapunk priv=1-t GPIB-ről?
+
+Lehetséges exploit lánc:
+  1. MWRITE addr, val  → settings_ram-ba 68000 kód írása (már tudjuk, hogy működik)
+  2. MADDR addr        → pointer beállítása a kódra
+  3. JSR addr          → a betöltött kód futtatása
+  (Ha priv=1 elérhető a szintaxis szintjén a SECURE kód nélkül)
+
+A JSR által meghívható érdekes ROM rutinok:
+  0x02FDF2 = CAL_NUM (DOLT+Defeats=0, tesztelve!)
+  0x00053C = CRASH_ (szándékos crash)
+  0x01CE4  = teljes reset
+  0x04562  = PRESET(1)
+  0x05A158 = cal_ram writer (ha /WE nyitva!)
+  0x05D3A0 = checksum frissítő
+
+======================================================================
+ÖSSZEFOGLALÓ TÁBLÁZAT – GYORS REFERENCIA
+======================================================================
+
+| Parancs    | Priv | Cím     | Funkció (rövid)                          |
+|------------|------|---------|------------------------------------------|
+| GREG_      |  1   | 01A600  | Mért érték injektálás + output dispatch  |
+| CRASH_     |  1   | 00053C  | TRAP#B + build dátum ("1990-01-19")      |
+| BOMB?      |  0   | 0176A6  | Output buffer visszaküldés GPIB-en       |
+| JUNK_      |  2   | 003AB2  | Hardver részegység teszt (index param.)  |
+| XYZZY      |  0   | 017BA0  | Easter egg (Colossal Cave), GPIB silent  |
+| AUXERR?    |  1   | 0037CC  | Másodlagos hiba lekérdezés + törlés      |
+| CSB        |  1   | 004270  | GPIB chip reset + status byte clear      |
+| SSTATE     |  1   | 00433A  | 230-byte állapot mentése settings_ram-ba |
+| RSTATE     |  1   | 004412  | 230-byte állapot visszaállítása          |
+| STB?       |  1   | 004176  | GPIB status byte lekérdezés              |
+| RQS        |  1   | 004138  | SRQ kényszerítése GPIB-en                |
+| ANNUN_     |  1   | 008124  | Előlapi LED-ek vezérlése (0..39 index)   |
+| JSR        |  1   | 017C28  | GPIB→tetszőleges kód futtatás (backdoor!)|
+| MADDR      |  0   | 017C8C  | Program memória cím beállítása           |
+| RMEM?_     |  0   | 01BE08  | Program memória olvasás GPIB-en          |
+| FILLBIN    |  1   | 0183EE  | Program memória írás GPIB-en             |
+| R          |  1   | 0315DE  | Range beállítás (RANGE alias)            |
+| T          |  1   | 0331B6  | Trigger mód beállítás (TRIG alias)       |
+| R?         |  1   | 01F2E0  | Range lekérdezés                         |
+| T?         |  1   | 01EC68  | Trigger mód lekérdezés                   |
+| U_RANGE    |  1   | 0316D4  | Range felfelé léptet                     |
+| D_RANGE    |  1   | 031732  | Range lefelé léptet                      |
+| SCROLL     |  1   | 007B2A  | Kijelző scroll                           |
+| DSP        |  0   | 01DB0A  | GPIB→kijelző string küldés               |
+| DSP?       |  0   | 007FB2  | Kijelző buffer visszaolvasása            |
+| MENU       |  1   | 0053D2  | Előlapi menü aktiválás GPIB-ről          |
+| MENU?      |  1   | 005430  | Menü pozíció lekérdezés                  |
+| PURGE      |  0   | 0047F0  | Program/memória törlés                   |
+| SYNCPARM_  |  1   | 0397DE  | ADC szinkron trigger fázis állítás       |
+| OCOMP      |  1   | 031494  | Offset kompenzáció be/ki                 |
+| FSOURCE    |  0   | 0314FA  | Frekvencia bemenet forrás beállítás      |
+| EXTOUT     |  0   | 032CF8  | Hátsó BNC kimenet konfig                 |
+| OPT?       |  2   | 0175DA  | Opciómodulok lekérdezése                 |
+| HELP       |  1   | 017544  | Help szöveg kijelzőre                    |
+| SSAC/SSDC  |  1   | 030C02  | Scale/Érzékenység AC/DC beállítás        |
+| ACDCI      |  1   | 030A28  | AC/DC input szinkronizáció               |
+| TBUFF      |  0   | 033D86  | Trigger buffer mérete                    |
+| SMATH      |  0   | 054284  | Math buffer konfig                       |
+| MMATH      |  0   | 0536DA  | Memória math operáció                    |
+| RMATHV     |  0   | 053E88  | Math értékkészlet reset                  |
+
+CIIL protokoll parancsok:
+| CIIL       |  2   | 04E91E  | CIIL mód belépés (PRESET+TRIG SYN)       |
+| CIIL?      |  2   | 04E814  | CIIL aktív? (0/1)                        |
+| CIILMODE?  |  2   | 04E89A  | CIIL flag direkt lekérdezés              |
+| GAL        |  2   | 04E9AA  | Generic Array Language                   |
+| CANCIIL    |  2   | 04E9E4  | CIIL megszakítása (→ reset)              |
+| GETCIIL    |  2   | 04E996  | CIIL adat olvasása                       |
+| IST        |  3   | 04E9F2  | Teljes hardver selftest (IST+CNF alias)  |
+| OPN        |  3   | 04E7B0  | CIIL csatorna megnyitása                 |
+| CLS        |  3   | 04E7E2  | CIIL csatorna zárása                     |
+| INX        |  3   | 04EA26  | CIIL index + adat-allokáció              |
+| FTH        |  3   | 04EB2E  | CIIL adat fetch                          |
+| STA        |  3   | 04EBD2  | CIIL státusz lekérdezés                  |
+| RST        |  3   | 04EBC4  | CIIL reset                               |
+| FNC        |  3   | 04FD46  | CIIL function (120-byte adatblokk)       |
+
+Gyári kalibrációs blokk:
+| LOADREAL_  |  1   | 04B58A  | STUB (implementálatlan)                  |
+| TRIGGER_   |  1   | 04B592  | Trigger param → A5+0x147C               |
+| DCBD_      |  1   | 04B5CC  | DC board param → A5+0x1490              |
+| ACBD_      |  1   | 04B616  | AC board param → A5+0x14A4             |
+| ADMEM_     |  1   | 04B650  | ADC mem param → A5+0x14B8              |
+| ADCAL_     |  1   | 04B68A  | ADC cal param → A5+0x14CC              |
+| INGRD_     |  1   | 04B6D4  | Input gradient → A5+0x14E0             |
+| ENTER      |  1   | 04B6E8  | CIIL adat bekérés GPIB-ről              |
+| OUTPUT     |  1   | 04B75E  | CIIL adat küldés GPIB-re               |
+| OUTDISP    |  1   | 04B80C  | CIIL display output                     |
+
+======================================================================
+Fájl: HP3458A_parancs_leiras.txt
+Forrás: HP3458A_REV9_cpu_order_384K_for_Ghidra.bin (Capstone disassembly)
+Dátum: 2026-06-14
+======================================================================

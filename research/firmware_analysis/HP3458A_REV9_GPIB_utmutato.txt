@@ -1,0 +1,628 @@
+================================================================================
+  HP3458A REV9 FIRMWARE — TELJES GPIB ÚTMUTATÓ ÉS BELSŐ MECHANIZMUSOK
+  Visszafejtési dátum: 2026-06-05 (frissítve)
+  Firmware build: Fri Jan 19 1990
+================================================================================
+
+TARTALOM
+--------
+ 1. Firmware alapadatok
+ 2. Parancs-tábla felépítése
+ 3. Dokumentált GPIB parancsok áttekintése
+ 4. Undokumentált / belső parancsok
+ 5. MADDR / MREAD / MWRITE — memória-hozzáférés GPIB-en
+ 6. SECURE mechanizmus
+ 7. GPIB BASIC interpreter
+ 8. CIIL / szkenner parancsok
+ 9. Easter egg-ek és diagnosztikai érdekességek
+10. Biztonság és javasolt sorrend
+11. Ghidra / disassembly útmutató
+12. [ÚJ] Handler-cím konvenció és belső architektúra
+13. [ÚJ] BEEP ↔ MREAD kapcsolat (biztonsági kapuőr)
+14. [ÚJ] Float deszkriptor rendszer (IEEE 754)
+15. [ÚJ] pSOS RTOS rendszerhívások
+16. Mellékelt fájlok
+
+
+================================================================================
+1. FIRMWARE ALAPADATOK
+================================================================================
+
+CPU:          Motorola MC68HC000PB (68000 family), big-endian
+ROM:          6 × EPROM (U110–U115), páronként byte-interleaved
+              3 bank × 128 KiB = 384 KiB aktív tartalom
+RTOS:         pSOS (Process Schedulable OS) — beágyazott valós idejű OS
+              "N^NuFATAL PSOS ERROR IN SPAWN_P" @ 0x001DEC
+Build dátum:  Fri Jan 19 1990  (CRASH_ handler 0x053C-ben beágyazva)
+Reset vector: PC = 0x00000808, SP = 0x0001897E
+
+Firmware image (Ghidra-hoz): HP3458A_REV9_cpu_order_384K_for_Ghidra.bin
+SHA256: 98ae54efe22a0a4eb9c581956bbc2d839481a480600f7d58a39fdb78d73876d7
+
+RAM layout (futáskor, A5 regiszter = globális adat-area base):
+  A5 + 0x0BAE   Timer kalibrációs konstans (CPU-sebesség-függő)
+  A5 + 0x0A48   GPIB output "pending" flag (MREAD után törli)
+  A5 + 0x0F00   GPIB output csatorna descriptor (8 byte)
+  A5 + 0x13A6   BEEP enable / MREAD gate flag (0=MREAD TILTOTT!)
+  A5 + 0x144A   MWRITE write-protect állapot (0/1/2)
+  A5 + 0x1B02   BEEP hardware állapot
+  A5 + 0x1DB5   BEEP mode copy
+  0x000023F0    MADDR aktuális cím regiszter (32-bit, short absolute)
+
+
+================================================================================
+2. PARANCS-TÁBLA FELÉPÍTÉSE
+================================================================================
+
+Helye:       0x08B20 – 0x0AF80 a CPU-order képben
+Bejegyzések: 388 db, egyenként 24 byte
+
+Rekord formátum (24 byte):
+  [00–01] name_len    — parancs neve hossza (max 10 karakter)
+  [02–11] name        — 10 byte, null-padded
+  [12–13] cmd_id      — belső opcode
+  [14–15] flags       — REV9-ben mindig 0x0000
+  [16–17] 0x89EA      — dispatch engine konstans
+  [18–19] handler_hi  — handler cím HIGH szó (tipikusan 0x0001)
+  [20–21] handler_lo  — handler cím LOW szó
+  [22–23] priv        — hozzáférési szint
+
+FONTOS: A VALÓDI handler-cím = (handler_hi << 16) | handler_lo
+        Tehát handler_lo=0x7BBA + handler_hi=0x0001 → 0x00017BBA
+        Ez a 24-bites ROM-cím a tényleges 68000 rutin belépési pontja.
+
+Flag2 (handler_hi) értékek:
+  0x0000 = token/keyword (nincs handler; flag2 és handler_lo is 0x0000)
+  0x0001 = normál parancs (handler_hi = 0x0001, handler = 0x00017xxx)
+  0x0002 = query parancs
+  stb.
+
+Priv mező:
+  0x0000 = korlátlan
+  0x0001 = standard (legtöbb parancs)
+  0x0002 = CIIL option szükséges
+  0x0003 = legmagasabb privilégium
+
+
+================================================================================
+3. DOKUMENTÁLT GPIB PARANCSOK ÁTTEKINTÉSE
+================================================================================
+
+MÉRÉSI FUNKCIÓK:
+  DCV, ACV, ACI, DCI, OHM, OHMF, FREQ, PER,
+  ACDCV, ACDCI, DSAC, DSDC, SSAC, SSDC, SSRC,
+  NMR, NMR?
+
+KONFIGURÁCIÓ:
+  NPLC, NRDGS, TRIG, TARM, APER, RANGE, ARANGE,
+  AZERO, OCOMP, FIXEDZ, LEVEL, LFILTER, LFREQ,
+  SETACV, ACBAND, SLOPE, FSOURCE, FUNC, SWEEP,
+  RATIO, RES, DELAY, EXTOUT, NDIG, TBUFF, TIMER
+
+MEMÓRIA / BUFFER:
+  MEM, MFORMAT, MSIZE, MMATH, MCOUNT?, RMEM,
+  MATH, RMATH, SMATH, COMPRESS, INBUF, OFORMAT
+
+KALIBRÁLÁS:
+  CAL, CAL?, CALNUM?, CALSTR, CALSTR?,
+  ACAL, SCAL, SECURE, DIAGNOST, GAL, CAL_NUM
+
+I/O, KOMMUNIKÁCIÓ:
+  ADDRESS, DISP, DISP?, DSP, DSP?, DEFKEY, DEFKEY?,
+  RQS, SRQ, STB?, EMASK, EMASK?, CSB, LOCK,
+  MENU, MENU?, QFORMAT, SCROLL, TONE, BEEP
+
+PROGRAMOZÁSI NYELV (GPIB BASIC interpreter):
+  SUB, SUBEND, CALL, RETURN, END, DELSUB, PAUSE,
+  IF, THEN, ELSE, ENDIF, FOR, TO, NEXT, STEP,
+  WHILE, ENDWHILE, LET, DIM, REAL, INTEGER,
+  ALWAYS, CONT, SCRATCH, FILLBIN, FILL,
+  ENTER, OUTPUT, OUTDISP, LIST, CAT
+
+MATH / LOGIKAI OPERÁTOROK:
+  SIN, COS, ATN, EXP, LOG, LGT, SQR, ABS,
+  BINCMP, BINAND, BINIOR, BINEOR, BIT, SHIFT, ROTATE,
+  AND, OR, NOT, EXOR, DIV, MOD
+
+CIIL SCANNER INTERFACE (priv=0x0002–0x0003):
+  CIIL, GAL, OPT?, CIILMODE?, CIIL?, CANCIIL, GETCIIL,
+  IST, CNF, INX, FTH, STA, OPN, CLS, RST, FNC
+
+
+================================================================================
+4. UNDOKUMENTÁLT / BELSŐ PARANCSOK
+================================================================================
+
+  Parancs      CmdID   Handler_lo  Valódi addr  Leírás
+  ------------ ------- ----------  -----------  ---------------------------------
+  MREAD        0x0185  0x7BBA      0x00017BBA   Memória olvasás (WORD)
+  MWRITE       0x0186  0x7BF6      0x00017BF6   Memória írás (WORD, védett)
+  MADDR        0x0187  0x7C8C      0x00017C8C   Cím beállítás (decimális float!)
+  JSR          0x0189  0x7C28      0x00017C28   68000 kód végrehajtás GPIB-ből!
+  CALLARRAY    0x018A  0x7C58      0x00017C58   Vtable metódus dispatch
+  ECHO         0x018C  0xDB86      (low-addr)   Echo (token dispatch tábla)
+  ECHO2        0x018E  0xDBAA      (low-addr)   Echo 2. variáns
+  XYZZY        0x018F  0x7BA0      0x00017BA0   Easter egg: "I see " (6 kar.)
+  RMEM?_       0x0190  0xBE08      (low-addr)   Memória query variáns
+  LOADREAL_    0x0191  0xB58A      (low-addr)   Float betöltés belső
+  ANNUN_       0x0192  0x8124      (low-addr)   Kijelző annunciator közvetlen
+  ADMEM_       0x0194  0xB650      (low-addr)   A/D memória közvetlen
+  ADCAL_       0x0195  0xB68A      (low-addr)   A/D kalibráció belső
+  TRIGGER_     0x0196  0xB592      (low-addr)   Trigger belső
+  DCBD_        0x0197  0xB5CC      (low-addr)   DC board közvetlen
+  ACBD_        0x0198  0xB616      (low-addr)   AC board közvetlen
+  INGRD_       0x0199  0xB6D4      (low-addr)   Integrátor/input ground
+  BUSOUT_      0x019A  0xB36C      (low-addr)   Bus output
+  SYNCPARM_    0x019B  0x97DE      (low-addr)   Szinkron paraméterek
+  JUNK_        0x019C  0x3AB2      (low-addr)   Teszt (CIIL priv)
+  GREG_        0x019D  0xA600      (low-addr)   Fejlesztői privát ("Greg")
+  CRASH_       0x019E  0x053C      (low-addr)   ILLEGAL utasítás → reset!
+  FILLBIN      0x019F  0x83EE      (low-addr)   Bináris buffer feltöltése
+  BOMB?        0x0182  0x76A6      (low-addr)   Self-test query
+  U_RANGE      0x0183  0x16D4      (low-addr)   Felső range belső
+  D_RANGE      0x0184  0x1732      (low-addr)   Alsó range belső
+  CAL_NUM      0x015B  0xFDF2      (low-addr)   CAL szám közvetlen
+  DIAGNOST     0x00B2  0xE58A      (low-addr)   Teljes diagnosztika
+
+
+================================================================================
+5. MADDR / MREAD / MWRITE — MEMÓRIA-HOZZÁFÉRÉS GPIB-EN
+================================================================================
+
+FONTOS ELŐFELTÉTELEK:
+  1. BEEP 1  →  engedélyezi az MREAD-et (A5+0x13A6 = 1)
+  2. BEEP 2  →  MREAD direkten, security check NÉLKÜL (bypass!)
+  3. Alternatíva: MREAD a "BEEP 2" aliasán keresztül mindig működik
+
+--- MADDR (cím beállítása) ---
+
+Szintaxis:  MADDR <decimal_address>
+Példák:
+  MADDR 9200       ← 0x23F0 decimálisan = 9200
+  MADDR 73728      ← 0x12000 = 73728 (RAM terület kezdete kb.)
+  MADDR 1179648    ← 0x120000 = 1 179 648
+
+FIGYELEM:
+  - Cím DECIMÁLISAN adandó meg (NEM hexában!)
+  - Belső float konverzió: 9200 → IEEE 754 double → deszkriptor
+  - Az int_to_ieee754 (0x583BA) és ieee754_to_int (0x58340) rutinok végzik
+
+--- MREAD (memória olvasás) ---
+
+Szintaxis:  MREAD
+Feltétel:   BEEP 1 előbb (vagy BEEP 2 = közvetlen bypass)
+
+Amit csinál (0x00017BBA handler):
+  1. Veszi az MADDR deszkriptorát
+  2. ieee754_to_int (0x585A0 → 0x58340): float → integer RAM-cím
+  3. Páros-igazítás (ANDI.L #$FFFFFFFE): word-boundary
+  4. MOVE.W (A0), -(A7): WORD (2 bájt!) olvasás az adott cím ről
+  5. gpib_send_word (0x1D8DC → 0x50958): decimális ASCII → GPIB
+  6. Eredmény formátuma: "+XXXXX" vagy "-XXXXX" (max 5 decimális jegy)
+
+Visszatérési érték példák:
+  MREAD → "+2345"    (ha a cím  tartalma 0x0929 = 2345)
+  MREAD → "-1"       (ha 0xFFFF = -1 signed)
+  MREAD → "+0"       (ha 0x0000)
+
+--- MWRITE (memória írás) ---
+
+Szintaxis:  MWRITE <decimal_value>
+Feltétel:   SECURE kód + A5+0x144A flag megfelelő állapot
+
+Amit csinál (0x00017BF6 handler):
+  1. Veszi a value paramétert ($8(A6))
+  2. Veszi az MADDR deszkriptort ($A(A6))
+  3. ieee754_to_int: float descriptor → integer target address
+  4. MOVE.W $8(A6), (A0): WORD (2 bájt!) írás a célcím re
+
+MWRITE mindig WORD írást végez (2 bájt)!
+
+--- JSR GPIB-PARANCS (kódvégrehajtás) ---
+
+Szintaxis:  JSR <decimal_address>
+VESZÉLYES: Tetszőleges 68000 kódot futtat a megadott ROM-cím en!
+
+Amit csinál (0x00017C28 handler):
+  1. ieee754_to_int: float → integer address
+  2. JSR (A0): meghívja a 68000 kódot ezen a cím en
+
+Csak ROM-beli rutinokra biztonságos! Ismeretlen cím re soha!
+
+--- CALLARRAY ---
+
+Szintaxis:  CALLARRAY <array_ptr>, <index>
+Handler:    0x00017C58
+
+Vtable-alapú metódushívás:
+  A0 = array base, D0 = index
+  A2 = dereference array[index] (pointer a descriptor-ra)
+  A3 = dereference A2+0x16 (vtable method pointer)
+  JSR (A3): meghívja a metódust
+
+--- Példa munkamenet (Python pyvisa) ---
+
+import pyvisa
+rm   = pyvisa.ResourceManager()
+inst = rm.open_resource('GPIB::22::INSTR')
+inst.timeout = 5000
+
+# BEEP engedélyezés (MREAD gate)
+inst.write('BEEP 1')
+
+# MADDR: 0x120000 = 1179648 decimális
+inst.write('MADDR 1179648')
+val = inst.query('MREAD')
+print(f'Érték: {val}')
+
+# CAL RAM dump (word-onként, 256 word = 512 bájt)
+results = []
+for i in range(256):
+    cim = 1179648 + i * 2          # word-onként léptetünk
+    inst.write(f'MADDR {cim}')
+    v = inst.query('MREAD').strip()
+    results.append((cim, int(v)))
+    print(f'0x{cim:08X}: {v}')
+
+# BEEP 2 bypass (nincs szükség előzetes BEEP 1-re):
+inst.write('MADDR 9200')
+val = inst.query('BEEP 2')   # VAGY:
+val = inst.write('BEEP 2'); val = inst.read()
+
+
+================================================================================
+6. SECURE MECHANIZMUS
+================================================================================
+
+Szintaxis:  SECURE <kód>
+Handler:    0x0FCEE
+Factory kód: 22 (közismert HP szerviz-kód)
+
+Ha rossz kód:   "Wrong secure code" @ 0x02FEB4
+Ha nem volt:    "SECURE REQUIRED"   @ 0x05D464
+
+Hatása:
+  - Megnyitja ACAL, SCAL, CAL, CALSTR írási módját
+  - Engedélyezi MWRITE protected területekre is
+
+A SECURE flag: A5+0x13A6 RAM bájt
+  ≠0 = szabad (MREAD aktív)
+  = 0 = védett (MREAD IG NORED)
+
+
+================================================================================
+7. GPIB BASIC INTERPRETER
+================================================================================
+
+A HP3458A beépített BASIC-szerű programozási nyelvet tartalmaz.
+FONTOS: Minden érték IEEE 754 double (8 bájt) belső tárolásban!
+
+Például MADDR 9200 → 9200.0 float descriptor → ieee754_to_int → 0x23F0 cím
+
+Programozási konstrukciók:
+  SUB <name> / SUBEND / CALL / RETURN / END / DELSUB
+  IF / THEN / ELSE / ENDIF
+  FOR / TO / NEXT / STEP
+  WHILE / ENDWHILE
+  LET / DIM / REAL / INTEGER
+
+I/O:
+  ENTER <var>           ← GPIB bevitel
+  OUTPUT <val>          ← GPIB kimenet
+  OUTDISP <str>         ← kijelzőre írás
+
+Matematika: SIN COS ATN EXP LOG LGT SQR ABS
+Bináris:    BINCMP BINAND BINIOR BINEOR BIT SHIFT ROTATE
+
+Példa:
+  SUB RAMTEST
+    DIM ADDR
+    LET ADDR = 1179648
+    BEEP 1
+    MADDR ADDR
+    OUTPUT MREAD
+  SUBEND
+
+
+================================================================================
+8. CIIL / SZKENNER PARANCSOK
+================================================================================
+
+CIIL = Common Instrument Interface Language (opcionális szkenner kártya)
+Privilege szint: priv = 0x0002 vagy 0x0003
+
+  Parancs      Leírás
+  ----------   ---------------------------------------------
+  CIIL         CIIL mód bekapcsolása
+  GAL          Galvanic isolation
+  OPT?         Opciók (CIIL megléte)
+  CIILMODE?    CIIL mód lekérdezése
+  CIIL?        CIIL állapot
+  CANCIIL      CIIL törlése
+  GETCIIL      CIIL adat lekérdezése
+  IST          Individual Status
+  CNF          Configure
+  INX          Index
+  FTH          Fetch
+  STA          Status
+  OPN          Open
+  CLS          Close
+  RST          Reset
+  FNC          Function
+
+
+================================================================================
+9. EASTER EGG-EK ÉS DIAGNOSZTIKAI ÉRDEKESSÉGEK
+================================================================================
+
+XYZZY (CmdID: 0x018F, valódi handler: 0x00017BA0)
+  Az Adventure szövegkalandjáték varázs-parancsára utal.
+  Disassembly:
+    LINK A6, #0
+    MOVE.W #6, -(A7)          ← 6 karakter hossz
+    LEA $185C0(PC), A0        ← "I see no cave here" szövegre mutat
+    JSR $1D8B8                ← string output GPIB-re
+    UNLK A6, RTS
+  GPIB-re küldött szöveg: "I see " (csak az első 6 karakter!)
+  Teljes szöveg @ 0x185C0: "I see no cave here" (Adventure idézet)
+
+BOMB? (CmdID: 0x0182, handler: 0x76A6)
+  Diagnosztikai self-test query, a "ticking bomb" metaforára utal.
+
+CRASH_ (CmdID: 0x019E, handler: 0x053C)
+  Első 2 byte: 4E 4B = 68000 ILLEGAL INSTRUCTION → szándékos reset.
+  Utána beágyazva: "Fri Jan 19 1990" (build dátum!)
+  Majd: "HP3458A" model string.
+
+GREG_ (CmdID: 0x019D, handler: 0xA600)
+  Fejlesztői privát parancs. Valószínűleg "Greg" HP mérnök hagyatéka.
+
+BUILD DÁTUM @ 0x053E:
+  Hex: 46 72 69 20 4A 61 6E 20 31 39 20 31 39 39 30
+  ASCII: "Fri Jan 19 1990"
+
+
+================================================================================
+10. BIZTONSÁG ÉS JAVASOLT SORREND
+================================================================================
+
+AJÁNLOTT SORREND (egyre kockázatosabb):
+
+1. CSAK LEKÉRDEZÉS (teljesen biztonságos):
+   REV?          → firmware verzió
+   CAL?          → kalibráció állapot
+   TEMP?         → belső hőmérséklet
+   OPT?          → opciók
+   ERR?          → hibakód
+
+2. MREAD (biztonságos, nem ír):
+   BEEP 1        → engedélyezés (VAGY: BEEP 2 = bypass)
+   MADDR <cim>   → cím beállítás (decimális!)
+   MREAD         → word (2 bájt) olvasás → "+XXXXX" formátum
+
+   Ajánlott első célcím: A5+0x0000 területe (ha ismert A5 értéke)
+   Biztonságos olvasni: bármely ROM-cím  (0x000000-0x05FFFF)
+
+3. DIAGNOSZTIKA:
+   DIAGNOST      → belső öndiagnosztika
+   BOMB?         → self-test query
+
+4. MWRITE (magas kockázat — CSAK backup után!):
+   Előfeltételek:
+     * Fizikai NVRAM chip (DS1220/FRAM) mentve és jelölve
+     * GPIB dump kész (minden CAL/NVRAM cím)
+     * Min. 3 egyező dump, hash ellenőrizve
+     * Eredeti chip félretéve
+   Eljárás:
+     SECURE 22     → védelmi kód
+     MADDR <cim>   → célcím
+     MWRITE <val>  → WORD írás (2 bájt!)
+
+   SOHA NE ÍRJ:
+     - CAL konstansokat tesztelés nélkül
+     - Ismeretlen cím ekre
+     - Ellenőrizetlen értékeket
+
+5. JSR (legmagasabb kockázat):
+   JSR <cim>     → 68000 kód végrehajtás GPIB-ből
+   Csak ismert, biztonságos ROM-rutinra!
+   Pl. JSR <REV? handler cím> = REV? aliasa
+
+KERÜLENDŐ (ismeretlen hatás):
+  CRASH_  (reset!)
+  MWRITE CAL területre
+  CAL, STORE, SAVE, INIT, ERASE, FORMAT
+  JSR ismeretlen cím re
+
+
+================================================================================
+11. GHIDRA / DISASSEMBLY ÚTMUTATÓ
+================================================================================
+
+Import beállítások:
+  Processor:    Motorola 68000, big-endian
+  Base address: 0x000000
+  Entry point:  0x00000808
+
+Fájl: HP3458A_REV9_cpu_order_384K_for_Ghidra.bin
+
+RAM szegmens hozzáadása:
+  Név: RAM, Start: 0x00100000, Size: 0x020000, R/W
+
+FONTOS: A valódi handlerek a 0x17xxx tartományban vannak!
+        A 0x7xxx tartományban lévő "alacsony" wrapper-ek a BEEP
+        dispatch-hez kapcsolódnak, NEM a handler fő kódjához.
+
+Javasolt funkció-nevesítések Ghidrában:
+
+  Cím        Javasolt név
+  ---------  ---------------------------
+  0x00008B20 cmd_table_start
+  0x00017BBA MREAD_handler
+  0x00017BF6 MWRITE_handler
+  0x00017C28 JSR_GPIB_handler
+  0x00017C58 CALLARRAY_handler
+  0x00017BA0 XYZZY_handler
+  0x00017C8C MADDR_handler
+  0x00017D04 maddr_type_dispatch
+  0x00007BBA mread_entry_lowaddr
+  0x00007BCC beep_handler
+  0x0000763A mread_main_logic
+  0x0000761E mread_output_cleanup
+  0x00007C3C mwrite_exec_lowaddr
+  0x000585A0 descriptor_to_addr
+  0x00058340 ieee754_double_to_int
+  0x000583BA int_to_ieee754_double
+  0x00001D8DC gpib_send_word
+  0x00050958 int_to_decimal_ascii
+  0x00008908 timer_delay
+  0x000188C8 psos_channel_read_type0
+  0x00018918 psos_channel_read_type5
+  0x00185C0  xyzzy_string
+
+
+================================================================================
+12. [ÚJ] HANDLER-CÍM KONVENCIÓ ÉS BELSŐ ARCHITEKTÚRA
+================================================================================
+
+A parancs-tábla rekordjaiban [18-21] mezők adják a 32-bites handler-cím et:
+  bytes [18-19] = handler_hi  (tipikusan 0x0001)
+  bytes [20-21] = handler_lo  (pl. 0x7BBA)
+  → Valódi 24-bit cím: 0x00017BBA
+
+Ez a cím  tartalmaz 68000 LINK utasítással kezdődő rutin belépési pontot.
+
+A kétszintes cím -rendszer oka: a BEEP dispatch kódjában a "0x7xxx" tartomány
+szintén tartalmaz MREAD-hez kapcsolódó rutinokat, de ezek a beágyazott
+"BEEP flag" kapuőrhöz kapcsolódó wrapper-ek, nem a tényleges handlerek.
+
+Handler-cím  helyes vs. hibás értelmezés:
+  Helytelen: handler = handler_lo = 0x7BBA  →  BEEP wrapper-ben landol
+  Helyes:    handler = 0x00017BBA           →  valódi MREAD rutin (LINK A6, #-12)
+
+CALLARRAY vtable-mechanizmusa:
+  descriptor[0x16] = method pointer  (vtable-szerű objektum-interfész)
+  A 68000-ben nincs natív OOP, de a HP mérnökök implementálták!
+
+
+================================================================================
+13. [ÚJ] BEEP ↔ MREAD KAPCSOLAT (BIZTONSÁGI KAPUŐR)
+================================================================================
+
+A HP3458A biztonsági architektúrájában a BEEP parancs kettős szerepet tölt be:
+
+BEEP handler (0x7BCC) kódrészlete:
+  LINK A6, #0
+  MOVE.W $8(A6), D7        ← BEEP mode (0/1/2/-1)
+  BRA.B $7C1E              ← mode dispatch
+
+  ; D7=0 vagy D7=1 esetén (0x7BD6):
+  MOVE.W $8(A6), D0        ← D0 = mode
+  MOVE.B D0, $1DB5(A5)     ← tárolja A5+0x1DB5-be
+  MOVE.B D0, $13A6(A5)     ← UGYANODA TÁROLJA: A5+0x13A6 = MREAD gate!
+  JSR $5DA0C               ← hardver beeper vezérlés
+
+MREAD entry (0x7BBA) kódrészlete:
+  TST.B $13A6(A5)          ← ellenőrzi a BEEP flag-et
+  BEQ.B $7BC8              ← ha 0 (BEEP OFF): SKIP → nem olvas semmit!
+  JSR $763A                ← ha ≠0 (BEEP ON): MREAD fő logika
+
+BEEP mode hatása:
+  BEEP 0  → A5+0x13A6 = 0  → MREAD TILTOTT (üres visszatérés)
+  BEEP 1  → A5+0x13A6 = 1  → MREAD ENGEDÉLYEZETT
+  BEEP 2  → közvetlenül JSR 0x763A → MREAD bypass (security check kihagyva!)
+  BEEP -1 → hiba ("Expected 0 to 2 or -1 for mode" @ 0x84D4)
+
+KÖVETKEZMÉNY: Alapbeállításban a BEEP állapota dönti el, hogy MREAD működik-e.
+  Ha a műszer BEEP-je ki van kapcsolva → MREAD is tiltott.
+  Megoldás: BEEP 1 először, vagy BEEP 2 direkt (bypass).
+
+
+================================================================================
+14. [ÚJ] FLOAT DESZKRIPTOR RENDSZER (IEEE 754)
+================================================================================
+
+A HP3458A GPIB BASIC interpretere MINDEN értéket 8-bájtos
+IEEE 754 double-precision floating point-ként kezel.
+
+Ez vonatkozik a memória-cím ekre is!
+
+MADDR <decimal> → belső konverzió:
+  1. "9200" string → 9200.0 double → 8-bájtos deszkriptor
+  2. Deszkriptor RAM-ban tárolva (mint MADDR változója)
+
+MREAD → cím feloldás:
+  1. 8-bájtos deszkriptor betöltés
+  2. descriptor_to_addr (0x585A0) → ieee754_to_int (0x58340)
+  3. IEEE 754 double → integer:
+     - Exponent kinyerés: (D0 & 0x7FF0) >> 4 → biased exp
+     - Bias korrekció: exp - 0x3FE (= 1022, standard 1023-as + 1 offset)
+     - Mantissa + sign rekonstrukció
+  4. ANDI.L #$FFFFFFFE: páros-ra igazítás (WORD access miatt)
+  5. Eredmény: a tényleges CPU RAM-cím  D7-ben
+
+Deszkriptor struktúra (8 byte, param pointer által mutatva):
+  [0x00-0x07]: IEEE 754 double value
+  [0x0C]:      típusjelző (ha == 0x0004: közvetlen érték, nem pointer)
+  [0x0E]:      hozzáférési típus / D7 dispatch érték (1/2/3/4)
+  [0x16]:      tényleges cím  vagy pointer a cím hez
+
+MADDR dispatch (0x17D04), D7 értéke alapján:
+  D7=1 → 0x17C9A → tipus-1 leíró kezelés
+  D7=2 → 0x17CC0 → tipus-2 leíró kezelés
+  D7=3 → 0x17CE6 → tipus-3 leíró kezelés
+  D7=4 → 0x17CF2 → tipus-4 leíró kezelés
+
+Cím -konverziós rutinok:
+  0x585A0 = descriptor_to_addr  (deszkriptor → int, MREAD/MWRITE/JSR használja)
+  0x58340 = ieee754_to_int      (IEEE 754 double → 32-bit int, mag)
+  0x583BA = int_to_ieee754      (32-bit int → IEEE 754 double)
+  0x585B4 = store_descriptor    (int → deszkriptor visszatárolás)
+
+
+================================================================================
+15. [ÚJ] pSOS RTOS RENDSZERHÍVÁSOK
+================================================================================
+
+A HP3458A pSOS (Process Schedulable OS) valós idejű OS-t futtat.
+Megerősítő szöveg: "N^NuFATAL PSOS ERROR IN SPAWN_P" @ 0x001DEC
+
+pSOS rendszerhívás interfész:
+  moveq  #<sysnum>, d7    ← rendszerhívás száma D7-ben
+  trap   #0               ← TRAP #0 = pSOS szoftver-megszakítás
+
+pSOS rendszerhívás #24 (0x18) — GPIB I/O csatorna:
+  Kód: moveq #$18, d7; trap #0
+  Paraméterek:
+    A0 = csatorna descriptor (A5+0x0F00 = GPIB output csatorna)
+    A1 = output buffer (A5+0x120C6E)
+    D0 = buffer offset/méret
+    D1 = flags
+
+A pSOS csatornák belső tábláiban:
+  0x120C14 = referencia-számláló tábla (típusonként egy word)
+  0x120C32 = pointer tábla (típusonként egy long ptr)
+  0x120C6E = output buffer
+
+MREAD szempontjából:
+  JSR $188C8 → TRAP #0 (pSOS I/O) → olvassa a MADDR-értéket és előkészíti
+  JSR $49DE  → küldési rutin → GPIB-re megy az eredmény
+
+
+================================================================================
+16. MELLÉKELT FÁJLOK
+================================================================================
+
+  HP3458A_REV9_elemzesi_terv_es_adatok.txt   ← eredeti elemzési terv + hash-ek
+  HP3458A_REV9_relevant_strings.txt           ← firmware string-lista cím ekkel
+  HP3458A_REV9_GPIB_utmutato.txt             ← EZ A FÁJL (átfogó útmutató)
+  HP3458A_REV9_disassembly.txt               ← annotált 68000 disassembly
+  HP3458A_REV9_cpu_order_384K_for_Ghidra.bin ← Ghidra import fájl
+  assemble_rev9.py                           ← ROM összeszámoló script
+  analyze_deep.py                            ← deep analysis script 1
+  analyze_deep2.py                           ← deep analysis script 2
+  analyze_save_all.py                        ← disassembly mentő script
+
+================================================================================
+EOF — HP3458A REV9 GPIB Útmutató — 2026-06-05 (v2, frissített)
+================================================================================
